@@ -1,0 +1,27 @@
+{
+  "configurations": [
+    {
+      "name": "STM32",
+      "includePath": [
+        "Core/Inc",
+        "Drivers/CMSIS/Device/ST/STM32F4xx/Include",
+        "Drivers/CMSIS/Include",
+        "Drivers/STM32F4xx_HAL_Driver/Inc",
+        "Drivers/STM32F4xx_HAL_Driver/Inc/Legacy",
+        "Middlewares/ST/STM32_USB_Host_Library/Class/CDC/Inc",
+        "Middlewares/ST/STM32_USB_Host_Library/Core/Inc",
+        "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS",
+        "Middlewares/Third_Party/FreeRTOS/Source/include",
+        "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F",
+        "USB_HOST/App",
+        "USB_HOST/Target"
+      ],
+      "defines": [
+        "STM32F407xx",
+        "USE_HAL_DRIVER"
+      ],
+      "compilerPath": "c:\\Users\\leejo\\AppData\\Roaming\\Code\\User\\globalStorage\\bmd.stm32-for-vscode\\@xpack-dev-tools\\arm-none-eabi-gcc\\15.2.1-1.1.1\\.content\\bin\\arm-none-eabi-gcc.EXE"
+    }
+  ],
+  "version": 4
+}

@@ -89,7 +89,12 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  GPIO_InitStruct.Pin = GPIO_PIN_12;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP; // Push-Pull
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -144,6 +149,8 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+
+    // USING FREERTOS<, WRITE CODE IN DEFAULT TASK BELOW
 
     /* USER CODE BEGIN 3 */
   }
@@ -455,7 +462,8 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
+    HAL_Delay(500);
   }
   /* USER CODE END 5 */
 }

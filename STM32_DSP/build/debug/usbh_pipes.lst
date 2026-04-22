@@ -1,0 +1,509 @@
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccSQRQj7.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"usbh_pipes.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c"
+  20              		.section	.text.USBH_GetFreePipe,"ax",%progbits
+  21              		.align	1
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	USBH_GetFreePipe:
+  27              	.LVL0:
+  28              	.LFB146:
+   1:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** /**
+   2:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   ******************************************************************************
+   3:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @file    usbh_pipes.c
+   4:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @author  MCD Application Team
+   5:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @brief   This file implements functions for opening and closing Pipes
+   6:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   ******************************************************************************
+   7:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @attention
+   8:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   *
+   9:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * Copyright (c) 2015 STMicroelectronics.
+  10:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * All rights reserved.
+  11:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   *
+  12:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * This software is licensed under terms that can be found in the LICENSE file
+  13:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * in the root directory of this software component.
+  14:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * If no LICENSE file comes with this software, it is provided AS-IS.
+  15:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   *
+  16:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   ******************************************************************************
+  17:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   */
+  18:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+  19:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** /* Includes ------------------------------------------------------------------*/
+  20:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** #include "usbh_pipes.h"
+  21:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+  22:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** /** @addtogroup USBH_LIB
+  23:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @{
+  24:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   */
+  25:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+  26:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** /** @addtogroup USBH_LIB_CORE
+  27:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @{
+  28:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   */
+  29:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+  30:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** /** @defgroup USBH_PIPES
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccSQRQj7.s 			page 2
+
+
+  31:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @brief This file includes opening and closing Pipes
+  32:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @{
+  33:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   */
+  34:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+  35:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** /** @defgroup USBH_PIPES_Private_Defines
+  36:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @{
+  37:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   */
+  38:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** /**
+  39:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @}
+  40:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   */
+  41:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+  42:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** /** @defgroup USBH_PIPES_Private_TypesDefinitions
+  43:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @{
+  44:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   */
+  45:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** /**
+  46:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @}
+  47:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   */
+  48:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+  49:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+  50:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** /** @defgroup USBH_PIPES_Private_Macros
+  51:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @{
+  52:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   */
+  53:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** /**
+  54:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @}
+  55:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   */
+  56:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+  57:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+  58:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** /** @defgroup USBH_PIPES_Private_Variables
+  59:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @{
+  60:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   */
+  61:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+  62:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** /**
+  63:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @}
+  64:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   */
+  65:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+  66:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+  67:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** /** @defgroup USBH_PIPES_Private_Functions
+  68:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @{
+  69:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   */
+  70:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** static uint16_t USBH_GetFreePipe(USBH_HandleTypeDef *phost);
+  71:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+  72:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+  73:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** /**
+  74:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @brief  USBH_Open_Pipe
+  75:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   *         Open a  pipe
+  76:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @param  phost: Host Handle
+  77:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @param  pipe_num: Pipe Number
+  78:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @param  dev_address: USB Device address allocated to attached device
+  79:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @param  speed : USB device speed (Full/Low)
+  80:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @param  ep_type: end point type (Bulk/int/ctl)
+  81:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @param  mps: max pkt size
+  82:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @retval USBH Status
+  83:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   */
+  84:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** USBH_StatusTypeDef USBH_OpenPipe(USBH_HandleTypeDef *phost, uint8_t pipe_num,
+  85:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****                                  uint8_t epnum, uint8_t dev_address,
+  86:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****                                  uint8_t speed, uint8_t ep_type, uint16_t mps)
+  87:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** {
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccSQRQj7.s 			page 3
+
+
+  88:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   (void)USBH_LL_OpenPipe(phost, pipe_num, epnum, dev_address, speed, ep_type, mps);
+  89:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+  90:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   return USBH_OK;
+  91:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** }
+  92:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+  93:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** #if defined (USBH_IN_NAK_PROCESS) && (USBH_IN_NAK_PROCESS == 1U)
+  94:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** /**
+  95:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @brief  USBH_ActivatePipe
+  96:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   *         Activate a pipe
+  97:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @param  phost: Host Handle
+  98:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @param  pipe_num: Pipe Number
+  99:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @retval USBH Status
+ 100:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   */
+ 101:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** USBH_StatusTypeDef USBH_ActivatePipe(USBH_HandleTypeDef *phost, uint8_t pipe_num)
+ 102:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** {
+ 103:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   USBH_LL_ActivatePipe(phost, pipe_num);
+ 104:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 105:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   return USBH_OK;
+ 106:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** }
+ 107:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** #endif /* defined (USBH_IN_NAK_PROCESS) && (USBH_IN_NAK_PROCESS == 1U) */
+ 108:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 109:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** /**
+ 110:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @brief  USBH_ClosePipe
+ 111:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   *         Close a  pipe
+ 112:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @param  phost: Host Handle
+ 113:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @param  pipe_num: Pipe Number
+ 114:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @retval USBH Status
+ 115:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   */
+ 116:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** USBH_StatusTypeDef USBH_ClosePipe(USBH_HandleTypeDef *phost, uint8_t pipe_num)
+ 117:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** {
+ 118:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   (void)USBH_LL_ClosePipe(phost, pipe_num);
+ 119:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 120:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   return USBH_OK;
+ 121:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** }
+ 122:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 123:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 124:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** /**
+ 125:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @brief  USBH_Alloc_Pipe
+ 126:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   *         Allocate a new Pipe
+ 127:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @param  phost: Host Handle
+ 128:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @param  ep_addr: End point for which the Pipe to be allocated
+ 129:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @retval Pipe number
+ 130:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   */
+ 131:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** uint8_t USBH_AllocPipe(USBH_HandleTypeDef *phost, uint8_t ep_addr)
+ 132:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** {
+ 133:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   uint16_t pipe;
+ 134:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 135:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   pipe =  USBH_GetFreePipe(phost);
+ 136:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 137:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   if (pipe != 0xFFFFU)
+ 138:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   {
+ 139:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****     phost->Pipes[pipe & 0xFU] = (uint32_t)(0x8000U | ep_addr);
+ 140:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   }
+ 141:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 142:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   return (uint8_t)pipe;
+ 143:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** }
+ 144:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccSQRQj7.s 			page 4
+
+
+ 145:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 146:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** /**
+ 147:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @brief  USBH_Free_Pipe
+ 148:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   *         Free the USB Pipe
+ 149:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @param  phost: Host Handle
+ 150:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @param  idx: Pipe number to be freed
+ 151:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @retval USBH Status
+ 152:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   */
+ 153:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** USBH_StatusTypeDef USBH_FreePipe(USBH_HandleTypeDef *phost, uint8_t idx)
+ 154:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** {
+ 155:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   if (idx < USBH_MAX_PIPES_NBR)
+ 156:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   {
+ 157:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****     phost->Pipes[idx] &= 0x7FFFU;
+ 158:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   }
+ 159:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 160:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   return USBH_OK;
+ 161:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** }
+ 162:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 163:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 164:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** /**
+ 165:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @brief  USBH_GetFreePipe
+ 166:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @param  phost: Host Handle
+ 167:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   *         Get a free Pipe number for allocation to a device endpoint
+ 168:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   * @retval idx: Free Pipe number
+ 169:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   */
+ 170:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** static uint16_t USBH_GetFreePipe(USBH_HandleTypeDef *phost)
+ 171:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** {
+  29              		.loc 1 171 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		@ link register save eliminated.
+ 172:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   uint8_t idx = 0U;
+  34              		.loc 1 172 3 view .LVU1
+ 173:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 174:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   for (idx = 0U; idx < USBH_MAX_PIPES_NBR; idx++)
+  35              		.loc 1 174 3 view .LVU2
+  36              		.loc 1 174 12 is_stmt 0 view .LVU3
+  37 0000 0023     		movs	r3, #0
+  38              	.LVL1:
+  39              	.L2:
+  40              		.loc 1 174 22 is_stmt 1 discriminator 1 view .LVU4
+  41 0002 0F2B     		cmp	r3, #15
+  42 0004 0CD8     		bhi	.L6
+ 175:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   {
+ 176:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****     if ((phost->Pipes[idx] & 0x8000U) == 0U)
+  43              		.loc 1 176 5 view .LVU5
+  44              		.loc 1 176 22 is_stmt 0 view .LVU6
+  45 0006 03F1E002 		add	r2, r3, #224
+  46 000a 00EB8202 		add	r2, r0, r2, lsl #2
+  47 000e 5268     		ldr	r2, [r2, #4]
+  48              		.loc 1 176 8 view .LVU7
+  49 0010 12F4004F 		tst	r2, #32768
+  50 0014 02D0     		beq	.L7
+ 174:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   {
+  51              		.loc 1 174 47 is_stmt 1 discriminator 2 view .LVU8
+  52 0016 0133     		adds	r3, r3, #1
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccSQRQj7.s 			page 5
+
+
+  53              	.LVL2:
+ 174:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   {
+  54              		.loc 1 174 47 is_stmt 0 discriminator 2 view .LVU9
+  55 0018 DBB2     		uxtb	r3, r3
+  56              	.LVL3:
+ 174:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   {
+  57              		.loc 1 174 47 discriminator 2 view .LVU10
+  58 001a F2E7     		b	.L2
+  59              	.LVL4:
+  60              	.L7:
+ 177:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****     {
+ 178:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****       return (uint16_t)idx;
+  61              		.loc 1 178 7 is_stmt 1 view .LVU11
+  62              		.loc 1 178 14 is_stmt 0 view .LVU12
+  63 001c 1846     		mov	r0, r3
+  64              	.LVL5:
+  65              		.loc 1 178 14 view .LVU13
+  66 001e 7047     		bx	lr
+  67              	.LVL6:
+  68              	.L6:
+ 179:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****     }
+ 180:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   }
+ 181:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 182:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   return 0xFFFFU;
+  69              		.loc 1 182 10 view .LVU14
+  70 0020 4FF6FF70 		movw	r0, #65535
+  71              	.LVL7:
+ 183:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** }
+  72              		.loc 1 183 1 view .LVU15
+  73 0024 7047     		bx	lr
+  74              		.cfi_endproc
+  75              	.LFE146:
+  77              		.section	.text.USBH_OpenPipe,"ax",%progbits
+  78              		.align	1
+  79              		.global	USBH_OpenPipe
+  80              		.syntax unified
+  81              		.thumb
+  82              		.thumb_func
+  84              	USBH_OpenPipe:
+  85              	.LVL8:
+  86              	.LFB142:
+  87:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   (void)USBH_LL_OpenPipe(phost, pipe_num, epnum, dev_address, speed, ep_type, mps);
+  87              		.loc 1 87 1 is_stmt 1 view -0
+  88              		.cfi_startproc
+  89              		@ args = 12, pretend = 0, frame = 0
+  90              		@ frame_needed = 0, uses_anonymous_args = 0
+  87:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   (void)USBH_LL_OpenPipe(phost, pipe_num, epnum, dev_address, speed, ep_type, mps);
+  91              		.loc 1 87 1 is_stmt 0 view .LVU17
+  92 0000 00B5     		push	{lr}
+  93              		.cfi_def_cfa_offset 4
+  94              		.cfi_offset 14, -4
+  95 0002 85B0     		sub	sp, sp, #20
+  96              		.cfi_def_cfa_offset 24
+  88:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+  97              		.loc 1 88 3 is_stmt 1 view .LVU18
+  88:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+  98              		.loc 1 88 9 is_stmt 0 view .LVU19
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccSQRQj7.s 			page 6
+
+
+  99 0004 BDF820C0 		ldrh	ip, [sp, #32]
+ 100 0008 CDF808C0 		str	ip, [sp, #8]
+ 101 000c 9DF81CC0 		ldrb	ip, [sp, #28]	@ zero_extendqisi2
+ 102 0010 CDF804C0 		str	ip, [sp, #4]
+ 103 0014 9DF818C0 		ldrb	ip, [sp, #24]	@ zero_extendqisi2
+ 104 0018 CDF800C0 		str	ip, [sp]
+ 105 001c FFF7FEFF 		bl	USBH_LL_OpenPipe
+ 106              	.LVL9:
+  90:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** }
+ 107              		.loc 1 90 3 is_stmt 1 view .LVU20
+  91:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 108              		.loc 1 91 1 is_stmt 0 view .LVU21
+ 109 0020 0020     		movs	r0, #0
+ 110 0022 05B0     		add	sp, sp, #20
+ 111              		.cfi_def_cfa_offset 4
+ 112              		@ sp needed
+ 113 0024 00BD     		pop	{pc}
+  91:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 114              		.loc 1 91 1 view .LVU22
+ 115              		.cfi_endproc
+ 116              	.LFE142:
+ 118              		.section	.text.USBH_ClosePipe,"ax",%progbits
+ 119              		.align	1
+ 120              		.global	USBH_ClosePipe
+ 121              		.syntax unified
+ 122              		.thumb
+ 123              		.thumb_func
+ 125              	USBH_ClosePipe:
+ 126              	.LVL10:
+ 127              	.LFB143:
+ 117:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   (void)USBH_LL_ClosePipe(phost, pipe_num);
+ 128              		.loc 1 117 1 is_stmt 1 view -0
+ 129              		.cfi_startproc
+ 130              		@ args = 0, pretend = 0, frame = 0
+ 131              		@ frame_needed = 0, uses_anonymous_args = 0
+ 117:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   (void)USBH_LL_ClosePipe(phost, pipe_num);
+ 132              		.loc 1 117 1 is_stmt 0 view .LVU24
+ 133 0000 08B5     		push	{r3, lr}
+ 134              		.cfi_def_cfa_offset 8
+ 135              		.cfi_offset 3, -8
+ 136              		.cfi_offset 14, -4
+ 118:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 137              		.loc 1 118 3 is_stmt 1 view .LVU25
+ 118:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 138              		.loc 1 118 9 is_stmt 0 view .LVU26
+ 139 0002 FFF7FEFF 		bl	USBH_LL_ClosePipe
+ 140              	.LVL11:
+ 120:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** }
+ 141              		.loc 1 120 3 is_stmt 1 view .LVU27
+ 121:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 142              		.loc 1 121 1 is_stmt 0 view .LVU28
+ 143 0006 0020     		movs	r0, #0
+ 144 0008 08BD     		pop	{r3, pc}
+ 145              		.cfi_endproc
+ 146              	.LFE143:
+ 148              		.section	.text.USBH_AllocPipe,"ax",%progbits
+ 149              		.align	1
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccSQRQj7.s 			page 7
+
+
+ 150              		.global	USBH_AllocPipe
+ 151              		.syntax unified
+ 152              		.thumb
+ 153              		.thumb_func
+ 155              	USBH_AllocPipe:
+ 156              	.LVL12:
+ 157              	.LFB144:
+ 132:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   uint16_t pipe;
+ 158              		.loc 1 132 1 is_stmt 1 view -0
+ 159              		.cfi_startproc
+ 160              		@ args = 0, pretend = 0, frame = 0
+ 161              		@ frame_needed = 0, uses_anonymous_args = 0
+ 132:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   uint16_t pipe;
+ 162              		.loc 1 132 1 is_stmt 0 view .LVU30
+ 163 0000 38B5     		push	{r3, r4, r5, lr}
+ 164              		.cfi_def_cfa_offset 16
+ 165              		.cfi_offset 3, -16
+ 166              		.cfi_offset 4, -12
+ 167              		.cfi_offset 5, -8
+ 168              		.cfi_offset 14, -4
+ 169 0002 0546     		mov	r5, r0
+ 170 0004 0C46     		mov	r4, r1
+ 133:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 171              		.loc 1 133 3 is_stmt 1 view .LVU31
+ 135:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 172              		.loc 1 135 3 view .LVU32
+ 135:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 173              		.loc 1 135 11 is_stmt 0 view .LVU33
+ 174 0006 FFF7FEFF 		bl	USBH_GetFreePipe
+ 175              	.LVL13:
+ 137:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   {
+ 176              		.loc 1 137 3 is_stmt 1 view .LVU34
+ 137:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   {
+ 177              		.loc 1 137 6 is_stmt 0 view .LVU35
+ 178 000a 4FF6FF73 		movw	r3, #65535
+ 179 000e 9842     		cmp	r0, r3
+ 180 0010 07D0     		beq	.L13
+ 139:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   }
+ 181              		.loc 1 139 5 is_stmt 1 view .LVU36
+ 139:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   }
+ 182              		.loc 1 139 23 is_stmt 0 view .LVU37
+ 183 0012 00F00F03 		and	r3, r0, #15
+ 139:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   }
+ 184              		.loc 1 139 52 view .LVU38
+ 185 0016 44F40041 		orr	r1, r4, #32768
+ 139:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   }
+ 186              		.loc 1 139 31 view .LVU39
+ 187 001a E033     		adds	r3, r3, #224
+ 188 001c 05EB8303 		add	r3, r5, r3, lsl #2
+ 189 0020 5960     		str	r1, [r3, #4]
+ 190              	.L13:
+ 142:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** }
+ 191              		.loc 1 142 3 is_stmt 1 view .LVU40
+ 143:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 192              		.loc 1 143 1 is_stmt 0 view .LVU41
+ 193 0022 C0B2     		uxtb	r0, r0
+ 194              	.LVL14:
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccSQRQj7.s 			page 8
+
+
+ 143:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 195              		.loc 1 143 1 view .LVU42
+ 196 0024 38BD     		pop	{r3, r4, r5, pc}
+ 143:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 197              		.loc 1 143 1 view .LVU43
+ 198              		.cfi_endproc
+ 199              	.LFE144:
+ 201              		.section	.text.USBH_FreePipe,"ax",%progbits
+ 202              		.align	1
+ 203              		.global	USBH_FreePipe
+ 204              		.syntax unified
+ 205              		.thumb
+ 206              		.thumb_func
+ 208              	USBH_FreePipe:
+ 209              	.LVL15:
+ 210              	.LFB145:
+ 154:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   if (idx < USBH_MAX_PIPES_NBR)
+ 211              		.loc 1 154 1 is_stmt 1 view -0
+ 212              		.cfi_startproc
+ 213              		@ args = 0, pretend = 0, frame = 0
+ 214              		@ frame_needed = 0, uses_anonymous_args = 0
+ 215              		@ link register save eliminated.
+ 155:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   {
+ 216              		.loc 1 155 3 view .LVU45
+ 155:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   {
+ 217              		.loc 1 155 6 is_stmt 0 view .LVU46
+ 218 0000 0F29     		cmp	r1, #15
+ 219 0002 06D8     		bhi	.L16
+ 157:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   }
+ 220              		.loc 1 157 5 is_stmt 1 view .LVU47
+ 157:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   }
+ 221              		.loc 1 157 17 is_stmt 0 view .LVU48
+ 222 0004 E031     		adds	r1, r1, #224
+ 223              	.LVL16:
+ 157:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   }
+ 224              		.loc 1 157 17 view .LVU49
+ 225 0006 00EB8100 		add	r0, r0, r1, lsl #2
+ 226              	.LVL17:
+ 157:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   }
+ 227              		.loc 1 157 17 view .LVU50
+ 228 000a 4368     		ldr	r3, [r0, #4]
+ 157:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c ****   }
+ 229              		.loc 1 157 23 view .LVU51
+ 230 000c C3F30E03 		ubfx	r3, r3, #0, #15
+ 231 0010 4360     		str	r3, [r0, #4]
+ 232              	.LVL18:
+ 233              	.L16:
+ 160:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** }
+ 234              		.loc 1 160 3 is_stmt 1 view .LVU52
+ 161:Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c **** 
+ 235              		.loc 1 161 1 is_stmt 0 view .LVU53
+ 236 0012 0020     		movs	r0, #0
+ 237 0014 7047     		bx	lr
+ 238              		.cfi_endproc
+ 239              	.LFE145:
+ 241              		.text
+ 242              	.Letext0:
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccSQRQj7.s 			page 9
+
+
+ 243              		.file 2 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
+ 244              		.file 3 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
+ 245              		.file 4 "Middlewares/Third_Party/FreeRTOS/Source/include/task.h"
+ 246              		.file 5 "Middlewares/Third_Party/FreeRTOS/Source/include/queue.h"
+ 247              		.file 6 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h"
+ 248              		.file 7 "Middlewares/ST/STM32_USB_Host_Library/Core/Inc/usbh_def.h"
+ 249              		.file 8 "Middlewares/ST/STM32_USB_Host_Library/Core/Inc/usbh_core.h"
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccSQRQj7.s 			page 10
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 usbh_pipes.c
+C:\Users\leejo\AppData\Local\Temp\ccSQRQj7.s:21     .text.USBH_GetFreePipe:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccSQRQj7.s:26     .text.USBH_GetFreePipe:00000000 USBH_GetFreePipe
+C:\Users\leejo\AppData\Local\Temp\ccSQRQj7.s:78     .text.USBH_OpenPipe:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccSQRQj7.s:84     .text.USBH_OpenPipe:00000000 USBH_OpenPipe
+C:\Users\leejo\AppData\Local\Temp\ccSQRQj7.s:119    .text.USBH_ClosePipe:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccSQRQj7.s:125    .text.USBH_ClosePipe:00000000 USBH_ClosePipe
+C:\Users\leejo\AppData\Local\Temp\ccSQRQj7.s:149    .text.USBH_AllocPipe:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccSQRQj7.s:155    .text.USBH_AllocPipe:00000000 USBH_AllocPipe
+C:\Users\leejo\AppData\Local\Temp\ccSQRQj7.s:202    .text.USBH_FreePipe:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccSQRQj7.s:208    .text.USBH_FreePipe:00000000 USBH_FreePipe
+
+UNDEFINED SYMBOLS
+USBH_LL_OpenPipe
+USBH_LL_ClosePipe
