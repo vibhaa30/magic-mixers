@@ -23,7 +23,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "dsp_task.h"
+#include "spi_task.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -51,7 +52,8 @@ SPI_HandleTypeDef hspi2;
 
 osThreadId defaultTaskHandle;
 /* USER CODE BEGIN PV */
-
+osThreadId dspTaskHandle;
+osThreadId spiTaskHandle;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -115,7 +117,8 @@ int main(void)
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
-  /* add mutexes, ... */
+  osMutexDef(paramsMutex);
+  g_params_mutex = osMutexCreate(osMutex(paramsMutex));
   /* USER CODE END RTOS_MUTEX */
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
@@ -136,7 +139,11 @@ int main(void)
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  /* add threads, ... */
+  osThreadDef(dspTask, StartDSPTask, osPriorityRealtime, 0, 512);
+  dspTaskHandle = osThreadCreate(osThread(dspTask), NULL);
+
+  osThreadDef(spiTask, StartSPITask, osPriorityAboveNormal, 0, 256);
+  spiTaskHandle = osThreadCreate(osThread(spiTask), NULL);
   /* USER CODE END RTOS_THREADS */
 
   /* Start scheduler */
