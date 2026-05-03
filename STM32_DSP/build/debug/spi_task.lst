@@ -1,0 +1,312 @@
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\cckTRDHg.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"spi_task.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "Core/Src/spi_task.c"
+  20              		.section	.text.StartSPITask,"ax",%progbits
+  21              		.align	1
+  22              		.global	StartSPITask
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	StartSPITask:
+  28              	.LFB139:
+   1:Core/Src/spi_task.c **** #include "spi_task.h"
+   2:Core/Src/spi_task.c **** #include "dsp_task.h"
+   3:Core/Src/spi_task.c **** #include "main.h"
+   4:Core/Src/spi_task.c **** 
+   5:Core/Src/spi_task.c **** extern SPI_HandleTypeDef hspi2;
+   6:Core/Src/spi_task.c **** 
+   7:Core/Src/spi_task.c **** /* SPI task: receives 3-byte command packets from the Raspberry Pi 4 (SPI master)
+   8:Core/Src/spi_task.c ****    and updates the shared audio effect parameters.
+   9:Core/Src/spi_task.c **** 
+  10:Core/Src/spi_task.c ****    Packet format: [CMD] [VAL_HI] [VAL_LO]
+  11:Core/Src/spi_task.c ****    The RPi must be configured as SPI master (SPI_MODE_0, MSB first, 8-bit)
+  12:Core/Src/spi_task.c ****    to match the STM32 SPI2 slave configuration.
+  13:Core/Src/spi_task.c **** 
+  14:Core/Src/spi_task.c ****    NOTE: SPI2 is configured with software NSS. If you use a hardware CS line from
+  15:Core/Src/spi_task.c ****    the RPi, change hspi2.Init.NSS to SPI_NSS_HARD_INPUT in main.c for reliable
+  16:Core/Src/spi_task.c ****    transaction framing. */
+  17:Core/Src/spi_task.c **** void StartSPITask(void const *argument)
+  18:Core/Src/spi_task.c **** {
+  29              		.loc 1 18 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 8
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              	.LVL0:
+  34              		.loc 1 18 1 is_stmt 0 view .LVU1
+  35 0000 00B5     		push	{lr}
+  36              		.cfi_def_cfa_offset 4
+  37              		.cfi_offset 14, -4
+  38 0002 83B0     		sub	sp, sp, #12
+  39              		.cfi_def_cfa_offset 16
+  40 0004 34E0     		b	.L2
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\cckTRDHg.s 			page 2
+
+
+  41              	.LVL1:
+  42              	.L3:
+  19:Core/Src/spi_task.c ****     uint8_t pkt[SPI_PKT_SIZE];
+  20:Core/Src/spi_task.c **** 
+  21:Core/Src/spi_task.c ****     for (;;) {
+  22:Core/Src/spi_task.c ****         /* Block waiting for a complete 3-byte packet from the RPi (100 ms timeout) */
+  23:Core/Src/spi_task.c ****         if (HAL_SPI_Receive(&hspi2, pkt, SPI_PKT_SIZE, 100) != HAL_OK) {
+  24:Core/Src/spi_task.c ****             /* Clear overrun flag so SPI2 is ready for the next transaction */
+  25:Core/Src/spi_task.c ****             __HAL_SPI_CLEAR_OVRFLAG(&hspi2);
+  26:Core/Src/spi_task.c ****             osDelay(1);
+  27:Core/Src/spi_task.c ****             continue;
+  28:Core/Src/spi_task.c ****         }
+  29:Core/Src/spi_task.c **** 
+  30:Core/Src/spi_task.c ****         osMutexWait(g_params_mutex, osWaitForever);
+  43              		.loc 1 30 9 is_stmt 1 view .LVU2
+  44 0006 4FF0FF31 		mov	r1, #-1
+  45 000a 2B4B     		ldr	r3, .L14
+  46 000c 1868     		ldr	r0, [r3]
+  47 000e FFF7FEFF 		bl	osMutexWait
+  48              	.LVL2:
+  31:Core/Src/spi_task.c **** 
+  32:Core/Src/spi_task.c ****         switch (pkt[0]) {
+  49              		.loc 1 32 9 view .LVU3
+  50              		.loc 1 32 20 is_stmt 0 view .LVU4
+  51 0012 9DF80430 		ldrb	r3, [sp, #4]	@ zero_extendqisi2
+  52              		.loc 1 32 9 view .LVU5
+  53 0016 032B     		cmp	r3, #3
+  54 0018 3FD0     		beq	.L5
+  55 001a 11D8     		bhi	.L6
+  56 001c 012B     		cmp	r3, #1
+  57 001e 16D0     		beq	.L7
+  58 0020 022B     		cmp	r3, #2
+  59 0022 21D1     		bne	.L9
+  33:Core/Src/spi_task.c ****         case SPI_CMD_SET_VOLUME:
+  34:Core/Src/spi_task.c ****             /* VAL_HI = 0-100 maps to 0.0-1.0 */
+  35:Core/Src/spi_task.c ****             g_audio_params.volume = (float)pkt[1] / 100.0f;
+  36:Core/Src/spi_task.c ****             break;
+  37:Core/Src/spi_task.c **** 
+  38:Core/Src/spi_task.c ****         case SPI_CMD_SET_LPF:
+  39:Core/Src/spi_task.c ****             /* VAL_HI = 0-255 maps to 0.0-1.0 alpha (0 = max cut, 255 = bypass) */
+  40:Core/Src/spi_task.c ****             g_audio_params.lpf_alpha = (float)pkt[1] / 255.0f;
+  60              		.loc 1 40 13 is_stmt 1 view .LVU6
+  61              		.loc 1 40 50 is_stmt 0 view .LVU7
+  62 0024 9DF80530 		ldrb	r3, [sp, #5]	@ zero_extendqisi2
+  63 0028 07EE903A 		vmov	s15, r3	@ int
+  64              		.loc 1 40 40 view .LVU8
+  65 002c F8EE677A 		vcvt.f32.u32	s15, s15
+  66              		.loc 1 40 54 view .LVU9
+  67 0030 DFED226A 		vldr.32	s13, .L14+4
+  68 0034 87EEA67A 		vdiv.f32	s14, s15, s13
+  69              		.loc 1 40 38 view .LVU10
+  70 0038 214B     		ldr	r3, .L14+8
+  71 003a 83ED017A 		vstr.32	s14, [r3, #4]
+  41:Core/Src/spi_task.c ****             break;
+  72              		.loc 1 41 13 is_stmt 1 view .LVU11
+  73 003e 13E0     		b	.L9
+  74              	.L6:
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\cckTRDHg.s 			page 3
+
+
+  32:Core/Src/spi_task.c ****         case SPI_CMD_SET_VOLUME:
+  75              		.loc 1 32 9 is_stmt 0 view .LVU12
+  76 0040 042B     		cmp	r3, #4
+  77 0042 11D1     		bne	.L9
+  42:Core/Src/spi_task.c **** 
+  43:Core/Src/spi_task.c ****         case SPI_CMD_SET_DELAY:
+  44:Core/Src/spi_task.c ****             {
+  45:Core/Src/spi_task.c ****                 uint16_t samples = ((uint16_t)pkt[1] << 8) | pkt[2];
+  46:Core/Src/spi_task.c ****                 if (samples > DELAY_BUF_SAMPLES)
+  47:Core/Src/spi_task.c ****                     samples = DELAY_BUF_SAMPLES;
+  48:Core/Src/spi_task.c ****                 g_audio_params.delay_samples = samples;
+  49:Core/Src/spi_task.c ****             }
+  50:Core/Src/spi_task.c ****             break;
+  51:Core/Src/spi_task.c **** 
+  52:Core/Src/spi_task.c ****         case SPI_CMD_SET_EFFECTS:
+  53:Core/Src/spi_task.c ****             /* VAL_HI = bitmask of EFFECT_VOLUME | EFFECT_LPF | EFFECT_DELAY */
+  54:Core/Src/spi_task.c ****             g_audio_params.effects_mask = pkt[1];
+  78              		.loc 1 54 13 is_stmt 1 view .LVU13
+  79              		.loc 1 54 46 is_stmt 0 view .LVU14
+  80 0044 9DF80520 		ldrb	r2, [sp, #5]	@ zero_extendqisi2
+  81              		.loc 1 54 41 view .LVU15
+  82 0048 1D4B     		ldr	r3, .L14+8
+  83 004a 9A72     		strb	r2, [r3, #10]
+  55:Core/Src/spi_task.c ****             break;
+  84              		.loc 1 55 13 is_stmt 1 view .LVU16
+  85 004c 0CE0     		b	.L9
+  86              	.L7:
+  35:Core/Src/spi_task.c ****             break;
+  87              		.loc 1 35 13 view .LVU17
+  35:Core/Src/spi_task.c ****             break;
+  88              		.loc 1 35 47 is_stmt 0 view .LVU18
+  89 004e 9DF80530 		ldrb	r3, [sp, #5]	@ zero_extendqisi2
+  90 0052 07EE903A 		vmov	s15, r3	@ int
+  35:Core/Src/spi_task.c ****             break;
+  91              		.loc 1 35 37 view .LVU19
+  92 0056 F8EE677A 		vcvt.f32.u32	s15, s15
+  35:Core/Src/spi_task.c ****             break;
+  93              		.loc 1 35 51 view .LVU20
+  94 005a DFED1A6A 		vldr.32	s13, .L14+12
+  95 005e 87EEA67A 		vdiv.f32	s14, s15, s13
+  35:Core/Src/spi_task.c ****             break;
+  96              		.loc 1 35 35 view .LVU21
+  97 0062 174B     		ldr	r3, .L14+8
+  98 0064 83ED007A 		vstr.32	s14, [r3]
+  36:Core/Src/spi_task.c **** 
+  99              		.loc 1 36 13 is_stmt 1 view .LVU22
+ 100              	.L9:
+  56:Core/Src/spi_task.c **** 
+  57:Core/Src/spi_task.c ****         default:
+  58:Core/Src/spi_task.c ****             /* Unknown command: ignore */
+  59:Core/Src/spi_task.c ****             break;
+  60:Core/Src/spi_task.c ****         }
+  61:Core/Src/spi_task.c **** 
+  62:Core/Src/spi_task.c ****         osMutexRelease(g_params_mutex);
+ 101              		.loc 1 62 9 view .LVU23
+ 102 0068 134B     		ldr	r3, .L14
+ 103 006a 1868     		ldr	r0, [r3]
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\cckTRDHg.s 			page 4
+
+
+ 104 006c FFF7FEFF 		bl	osMutexRelease
+ 105              	.LVL3:
+ 106              	.L2:
+  19:Core/Src/spi_task.c **** 
+ 107              		.loc 1 19 5 view .LVU24
+  21:Core/Src/spi_task.c ****         /* Block waiting for a complete 3-byte packet from the RPi (100 ms timeout) */
+ 108              		.loc 1 21 5 view .LVU25
+  23:Core/Src/spi_task.c ****             /* Clear overrun flag so SPI2 is ready for the next transaction */
+ 109              		.loc 1 23 9 view .LVU26
+  23:Core/Src/spi_task.c ****             /* Clear overrun flag so SPI2 is ready for the next transaction */
+ 110              		.loc 1 23 13 is_stmt 0 view .LVU27
+ 111 0070 6423     		movs	r3, #100
+ 112 0072 0322     		movs	r2, #3
+ 113 0074 01A9     		add	r1, sp, #4
+ 114 0076 1448     		ldr	r0, .L14+16
+ 115 0078 FFF7FEFF 		bl	HAL_SPI_Receive
+ 116              	.LVL4:
+  23:Core/Src/spi_task.c ****             /* Clear overrun flag so SPI2 is ready for the next transaction */
+ 117              		.loc 1 23 12 discriminator 1 view .LVU28
+ 118 007c 0028     		cmp	r0, #0
+ 119 007e C2D0     		beq	.L3
+  25:Core/Src/spi_task.c ****             osDelay(1);
+ 120              		.loc 1 25 13 is_stmt 1 view .LVU29
+ 121              	.LBB2:
+  25:Core/Src/spi_task.c ****             osDelay(1);
+ 122              		.loc 1 25 13 view .LVU30
+ 123 0080 0023     		movs	r3, #0
+ 124 0082 0093     		str	r3, [sp]
+  25:Core/Src/spi_task.c ****             osDelay(1);
+ 125              		.loc 1 25 13 view .LVU31
+ 126 0084 104B     		ldr	r3, .L14+16
+ 127 0086 1B68     		ldr	r3, [r3]
+ 128 0088 DA68     		ldr	r2, [r3, #12]
+ 129 008a 0092     		str	r2, [sp]
+  25:Core/Src/spi_task.c ****             osDelay(1);
+ 130              		.loc 1 25 13 view .LVU32
+ 131 008c 9B68     		ldr	r3, [r3, #8]
+ 132 008e 0093     		str	r3, [sp]
+  25:Core/Src/spi_task.c ****             osDelay(1);
+ 133              		.loc 1 25 13 view .LVU33
+ 134 0090 009B     		ldr	r3, [sp]
+ 135              	.LBE2:
+  25:Core/Src/spi_task.c ****             osDelay(1);
+ 136              		.loc 1 25 13 view .LVU34
+  26:Core/Src/spi_task.c ****             continue;
+ 137              		.loc 1 26 13 view .LVU35
+ 138 0092 0120     		movs	r0, #1
+ 139 0094 FFF7FEFF 		bl	osDelay
+ 140              	.LVL5:
+  27:Core/Src/spi_task.c ****         }
+ 141              		.loc 1 27 13 view .LVU36
+ 142 0098 EAE7     		b	.L2
+ 143              	.L5:
+ 144              	.LBB3:
+  45:Core/Src/spi_task.c ****                 if (samples > DELAY_BUF_SAMPLES)
+ 145              		.loc 1 45 17 view .LVU37
+  45:Core/Src/spi_task.c ****                 if (samples > DELAY_BUF_SAMPLES)
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\cckTRDHg.s 			page 5
+
+
+ 146              		.loc 1 45 50 is_stmt 0 view .LVU38
+ 147 009a 9DF80520 		ldrb	r2, [sp, #5]	@ zero_extendqisi2
+  45:Core/Src/spi_task.c ****                 if (samples > DELAY_BUF_SAMPLES)
+ 148              		.loc 1 45 65 view .LVU39
+ 149 009e 9DF80630 		ldrb	r3, [sp, #6]	@ zero_extendqisi2
+  45:Core/Src/spi_task.c ****                 if (samples > DELAY_BUF_SAMPLES)
+ 150              		.loc 1 45 26 view .LVU40
+ 151 00a2 43EA0223 		orr	r3, r3, r2, lsl #8
+ 152              	.LVL6:
+  46:Core/Src/spi_task.c ****                     samples = DELAY_BUF_SAMPLES;
+ 153              		.loc 1 46 17 is_stmt 1 view .LVU41
+  46:Core/Src/spi_task.c ****                     samples = DELAY_BUF_SAMPLES;
+ 154              		.loc 1 46 20 is_stmt 0 view .LVU42
+ 155 00a6 B3F5007F 		cmp	r3, #512
+ 156 00aa 01D9     		bls	.L11
+  47:Core/Src/spi_task.c ****                 g_audio_params.delay_samples = samples;
+ 157              		.loc 1 47 29 view .LVU43
+ 158 00ac 4FF40073 		mov	r3, #512
+ 159              	.LVL7:
+ 160              	.L11:
+  48:Core/Src/spi_task.c ****             }
+ 161              		.loc 1 48 17 is_stmt 1 view .LVU44
+  48:Core/Src/spi_task.c ****             }
+ 162              		.loc 1 48 46 is_stmt 0 view .LVU45
+ 163 00b0 034A     		ldr	r2, .L14+8
+ 164 00b2 1381     		strh	r3, [r2, #8]	@ movhi
+ 165              	.LBE3:
+  50:Core/Src/spi_task.c **** 
+ 166              		.loc 1 50 13 is_stmt 1 view .LVU46
+ 167 00b4 D8E7     		b	.L9
+ 168              	.L15:
+ 169 00b6 00BF     		.align	2
+ 170              	.L14:
+ 171 00b8 00000000 		.word	g_params_mutex
+ 172 00bc 00007F43 		.word	1132396544
+ 173 00c0 00000000 		.word	g_audio_params
+ 174 00c4 0000C842 		.word	1120403456
+ 175 00c8 00000000 		.word	hspi2
+ 176              		.cfi_endproc
+ 177              	.LFE139:
+ 179              		.text
+ 180              	.Letext0:
+ 181              		.file 2 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
+ 182              		.file 3 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
+ 183              		.file 4 "Middlewares/Third_Party/FreeRTOS/Source/include/queue.h"
+ 184              		.file 5 "Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h"
+ 185              		.file 6 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h"
+ 186              		.file 7 "Core/Inc/dsp_task.h"
+ 187              		.file 8 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
+ 188              		.file 9 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 189              		.file 10 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
+ 190              		.file 11 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h"
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\cckTRDHg.s 			page 6
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 spi_task.c
+C:\Users\leejo\AppData\Local\Temp\cckTRDHg.s:21     .text.StartSPITask:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\cckTRDHg.s:27     .text.StartSPITask:00000000 StartSPITask
+C:\Users\leejo\AppData\Local\Temp\cckTRDHg.s:171    .text.StartSPITask:000000b8 $d
+
+UNDEFINED SYMBOLS
+osMutexWait
+osMutexRelease
+HAL_SPI_Receive
+osDelay
+g_params_mutex
+g_audio_params
+hspi2

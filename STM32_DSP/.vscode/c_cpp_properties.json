@@ -8,13 +8,9 @@
         "Drivers/CMSIS/Include",
         "Drivers/STM32F4xx_HAL_Driver/Inc",
         "Drivers/STM32F4xx_HAL_Driver/Inc/Legacy",
-        "Middlewares/ST/STM32_USB_Host_Library/Class/CDC/Inc",
-        "Middlewares/ST/STM32_USB_Host_Library/Core/Inc",
         "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS",
         "Middlewares/Third_Party/FreeRTOS/Source/include",
-        "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F",
-        "USB_HOST/App",
-        "USB_HOST/Target"
+        "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F"
       ],
       "defines": [
         "STM32F407xx",

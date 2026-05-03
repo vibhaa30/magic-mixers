@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
   29:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c ****  * A sample implementation of pvPortMalloc() and vPortFree() that combines
   30:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c ****  * (coalescences) adjacent memory blocks as they are freed, and in so doing
   31:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c ****  * limits memory fragmentation.
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 2
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 2
 
 
   32:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c ****  *
@@ -118,7 +118,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
   86:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c ****  * Called automatically to setup the required heap structures the first time
   87:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c ****  * pvPortMalloc() is called.
   88:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c ****  */
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 3
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 3
 
 
   89:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** static void prvHeapInit( void );
@@ -178,7 +178,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  143:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 				xWantedSize += xHeapStructSize;
  144:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 
  145:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 				/* Ensure that blocks are always aligned to the required number
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 4
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 4
 
 
  146:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 				of bytes. */
@@ -238,7 +238,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  200:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 						pxNewBlockLink->xBlockSize = pxBlock->xBlockSize - xWantedSize;
  201:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 						pxBlock->xBlockSize = xWantedSize;
  202:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 5
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 5
 
 
  203:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 						/* Insert the new block into the list of free blocks. */
@@ -298,7 +298,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  257:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 		}
  258:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 	}
  259:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 	#endif
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 6
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 6
 
 
  260:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 
@@ -358,7 +358,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  314:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 
  315:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** size_t xPortGetFreeHeapSize( void )
  316:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** {
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 7
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 7
 
 
  317:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 	return xFreeBytesRemaining;
@@ -418,7 +418,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
   52 000a 21F00701 		bic	r1, r1, #7
   53              	.LVL3:
  347:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 		xTotalHeapSize -= uxAddress - ( size_t ) ucHeap;
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 8
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 8
 
 
   54              		.loc 1 347 3 is_stmt 1 view .LVU13
@@ -478,7 +478,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  364:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 	pxEnd->pxNextFreeBlock = NULL;
   91              		.loc 1 364 2 is_stmt 1 view .LVU31
   92              		.loc 1 364 25 is_stmt 0 view .LVU32
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 9
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 9
 
 
   93 002c 1960     		str	r1, [r3]
@@ -538,7 +538,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  132 0050 00000000 		.word	xStart
  133 0054 00000000 		.word	pxEnd
  134 0058 00000000 		.word	xMinimumEverFreeBytesRemaining
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 10
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 10
 
 
  135 005c 00000000 		.word	xFreeBytesRemaining
@@ -598,7 +598,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  173 000a 5168     		ldr	r1, [r2, #4]
  174              		.loc 1 396 12 view .LVU60
  175 000c 02EB010C 		add	ip, r2, r1
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 11
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 11
 
 
  176              		.loc 1 396 4 view .LVU61
@@ -658,7 +658,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  195              		.loc 1 431 2 is_stmt 1 view .LVU70
  196              		.loc 1 431 4 is_stmt 0 view .LVU71
  197 0020 9042     		cmp	r0, r2
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 12
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 12
 
 
  198 0022 00D0     		beq	.L6
@@ -718,7 +718,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  233 0040 1944     		add	r1, r1, r3
  234 0042 4160     		str	r1, [r0, #4]
  415:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 		}
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 13
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 13
 
 
  235              		.loc 1 415 4 is_stmt 1 view .LVU87
@@ -778,7 +778,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  281              		.loc 1 120 2 view .LVU97
  282 0004 FFF7FEFF 		bl	vTaskSuspendAll
  283              	.LVL24:
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 14
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 14
 
 
  124:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 		{
@@ -838,7 +838,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  320              		.loc 1 160 29 view .LVU115
  163:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 			{
  321              		.loc 1 163 4 view .LVU116
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 15
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 15
 
 
  163:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 			{
@@ -898,7 +898,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  169:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 				{
  362              		.loc 1 169 62 discriminator 1 view .LVU131
  363 004c 2368     		ldr	r3, [r4]
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 16
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 16
 
 
  169:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 				{
@@ -958,7 +958,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  196:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 
  401              		.loc 1 196 7 discriminator 1 view .LVU149
  402              	.LBB12:
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 17
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 17
 
 
  403              	.LBI12:
@@ -1018,7 +1018,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
   53:Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h **** #define portBASE_TYPE	long
   54:Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h **** 
   55:Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h **** typedef portSTACK_TYPE StackType_t;
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 18
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 18
 
 
   56:Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h **** typedef long BaseType_t;
@@ -1078,7 +1078,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  110:Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h **** (which build with all the ports) will build. */
  111:Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h **** #define portTASK_FUNCTION_PROTO( vFunction, pvParameters ) void vFunction( void *pvParameters )
  112:Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h **** #define portTASK_FUNCTION( vFunction, pvParameters ) void vFunction( void *pvParameters )
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 19
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 19
 
 
  113:Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h **** /*-----------------------------------------------------------*/
@@ -1138,7 +1138,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  167:Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h **** #endif
  168:Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h **** 
  169:Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h **** portFORCE_INLINE static BaseType_t xPortIsInsideInterrupt( void )
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 20
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 20
 
 
  170:Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h **** {
@@ -1198,7 +1198,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  201:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 
  429              		.loc 1 201 7 is_stmt 1 view .LVU157
  201:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 21
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 21
 
 
  430              		.loc 1 201 27 is_stmt 0 view .LVU158
@@ -1258,7 +1258,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  468              		.loc 1 226 6 is_stmt 1 view .LVU174
  226:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 				}
  469              		.loc 1 226 36 is_stmt 0 view .LVU175
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 22
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 22
 
 
  470 00ae 144A     		ldr	r2, .L37+20
@@ -1318,7 +1318,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  514 00d8 FEE7     		b	.L28
  515              	.LVL41:
  516              	.L31:
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 23
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 23
 
 
  118:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 
@@ -1378,7 +1378,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  564              		.loc 1 271 2 view .LVU195
  271:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 	{
  565              		.loc 1 271 4 is_stmt 0 view .LVU196
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 24
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 24
 
 
  566 0000 0028     		cmp	r0, #0
@@ -1438,7 +1438,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  610              		.loc 1 281 3 view .LVU207
  611 002a FEE7     		b	.L42
  612              	.L41:
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 25
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 25
 
 
  281:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 		configASSERT( pxLink->pxNextFreeBlock == NULL );
@@ -1498,7 +1498,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  295:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 					traceFREE( pv, pxLink->xBlockSize );
  653              		.loc 1 295 26 view .LVU223
  654 0054 084A     		ldr	r2, .L49+4
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 26
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 26
 
 
  655 0056 1368     		ldr	r3, [r2]
@@ -1558,7 +1558,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  702              	.LFB7:
  316:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 	return xFreeBytesRemaining;
  703              		.loc 1 316 1 is_stmt 1 view -0
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 27
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 27
 
 
  704              		.cfi_startproc
@@ -1618,7 +1618,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  756              		.cfi_startproc
  757              		@ args = 0, pretend = 0, frame = 0
  758              		@ frame_needed = 0, uses_anonymous_args = 0
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 28
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 28
 
 
  759              		@ link register save eliminated.
@@ -1678,7 +1678,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  800              		.loc 1 453 3 is_stmt 1 view .LVU248
  801              		.loc 1 453 5 is_stmt 0 view .LVU249
  802 000c 93B1     		cbz	r3, .L63
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 29
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 29
 
 
  445:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 
@@ -1738,7 +1738,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  461:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 				{
  829              		.loc 1 461 16 is_stmt 0 view .LVU260
  830 0024 5A68     		ldr	r2, [r3, #4]
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 30
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 30
 
 
  461:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 				{
@@ -1798,7 +1798,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  482:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 
  483:Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c **** 	taskENTER_CRITICAL();
  869              		.loc 1 483 2 is_stmt 1 view .LVU277
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 31
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 31
 
 
  870 0046 FFF7FEFF 		bl	vPortEnterCritical
@@ -1858,7 +1858,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  921              	xNumberOfSuccessfulFrees:
  922 0000 00000000 		.space	4
  923              		.section	.bss.xNumberOfSuccessfulAllocations,"aw",%nobits
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 32
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 32
 
 
  924              		.align	2
@@ -1896,50 +1896,50 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 1
  963              		.file 5 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
  964              		.file 6 "Middlewares/Third_Party/FreeRTOS/Source/include/portable.h"
  965              		.file 7 "Middlewares/Third_Party/FreeRTOS/Source/include/task.h"
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s 			page 33
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s 			page 33
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 heap_4.c
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:21     .text.prvHeapInit:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:26     .text.prvHeapInit:00000000 prvHeapInit
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:131    .text.prvHeapInit:0000004c $d
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:957    .bss.ucHeap:00000000 ucHeap
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:951    .bss.xStart:00000000 xStart
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:945    .bss.pxEnd:00000000 pxEnd
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:933    .bss.xMinimumEverFreeBytesRemaining:00000000 xMinimumEverFreeBytesRemaining
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:939    .bss.xFreeBytesRemaining:00000000 xFreeBytesRemaining
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:915    .bss.xBlockAllocatedBit:00000000 xBlockAllocatedBit
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:141    .text.prvInsertBlockIntoFreeList:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:146    .text.prvInsertBlockIntoFreeList:00000000 prvInsertBlockIntoFreeList
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:251    .text.prvInsertBlockIntoFreeList:00000054 $d
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:257    .text.pvPortMalloc:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:263    .text.pvPortMalloc:00000000 pvPortMalloc
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:539    .text.pvPortMalloc:000000ec $d
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:927    .bss.xNumberOfSuccessfulAllocations:00000000 xNumberOfSuccessfulAllocations
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:549    .text.vPortFree:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:555    .text.vPortFree:00000000 vPortFree
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:688    .text.vPortFree:00000074 $d
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:921    .bss.xNumberOfSuccessfulFrees:00000000 xNumberOfSuccessfulFrees
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:695    .text.xPortGetFreeHeapSize:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:701    .text.xPortGetFreeHeapSize:00000000 xPortGetFreeHeapSize
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:716    .text.xPortGetFreeHeapSize:00000008 $d
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:721    .text.xPortGetMinimumEverFreeHeapSize:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:727    .text.xPortGetMinimumEverFreeHeapSize:00000000 xPortGetMinimumEverFreeHeapSize
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:742    .text.xPortGetMinimumEverFreeHeapSize:00000008 $d
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:747    .text.vPortInitialiseBlocks:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:753    .text.vPortInitialiseBlocks:00000000 vPortInitialiseBlocks
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:766    .text.vPortGetHeapStats:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:772    .text.vPortGetHeapStats:00000000 vPortGetHeapStats
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:902    .text.vPortGetHeapStats:00000068 $d
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:912    .bss.xBlockAllocatedBit:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:918    .bss.xNumberOfSuccessfulFrees:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:924    .bss.xNumberOfSuccessfulAllocations:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:930    .bss.xMinimumEverFreeBytesRemaining:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:936    .bss.xFreeBytesRemaining:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:942    .bss.pxEnd:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:948    .bss.xStart:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccCaONv5.s:954    .bss.ucHeap:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:21     .text.prvHeapInit:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:26     .text.prvHeapInit:00000000 prvHeapInit
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:131    .text.prvHeapInit:0000004c $d
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:957    .bss.ucHeap:00000000 ucHeap
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:951    .bss.xStart:00000000 xStart
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:945    .bss.pxEnd:00000000 pxEnd
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:933    .bss.xMinimumEverFreeBytesRemaining:00000000 xMinimumEverFreeBytesRemaining
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:939    .bss.xFreeBytesRemaining:00000000 xFreeBytesRemaining
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:915    .bss.xBlockAllocatedBit:00000000 xBlockAllocatedBit
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:141    .text.prvInsertBlockIntoFreeList:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:146    .text.prvInsertBlockIntoFreeList:00000000 prvInsertBlockIntoFreeList
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:251    .text.prvInsertBlockIntoFreeList:00000054 $d
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:257    .text.pvPortMalloc:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:263    .text.pvPortMalloc:00000000 pvPortMalloc
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:539    .text.pvPortMalloc:000000ec $d
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:927    .bss.xNumberOfSuccessfulAllocations:00000000 xNumberOfSuccessfulAllocations
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:549    .text.vPortFree:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:555    .text.vPortFree:00000000 vPortFree
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:688    .text.vPortFree:00000074 $d
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:921    .bss.xNumberOfSuccessfulFrees:00000000 xNumberOfSuccessfulFrees
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:695    .text.xPortGetFreeHeapSize:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:701    .text.xPortGetFreeHeapSize:00000000 xPortGetFreeHeapSize
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:716    .text.xPortGetFreeHeapSize:00000008 $d
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:721    .text.xPortGetMinimumEverFreeHeapSize:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:727    .text.xPortGetMinimumEverFreeHeapSize:00000000 xPortGetMinimumEverFreeHeapSize
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:742    .text.xPortGetMinimumEverFreeHeapSize:00000008 $d
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:747    .text.vPortInitialiseBlocks:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:753    .text.vPortInitialiseBlocks:00000000 vPortInitialiseBlocks
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:766    .text.vPortGetHeapStats:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:772    .text.vPortGetHeapStats:00000000 vPortGetHeapStats
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:902    .text.vPortGetHeapStats:00000068 $d
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:912    .bss.xBlockAllocatedBit:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:918    .bss.xNumberOfSuccessfulFrees:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:924    .bss.xNumberOfSuccessfulAllocations:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:930    .bss.xMinimumEverFreeBytesRemaining:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:936    .bss.xFreeBytesRemaining:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:942    .bss.pxEnd:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:948    .bss.xStart:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccv7BVdF.s:954    .bss.ucHeap:00000000 $d
 
 UNDEFINED SYMBOLS
 vTaskSuspendAll
