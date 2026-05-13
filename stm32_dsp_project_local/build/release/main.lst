@@ -1,0 +1,902 @@
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"main.c"
+  16              		.text
+  17              		.section	.text.MX_GPIO_Init,"ax",%progbits
+  18              		.align	1
+  19              		.syntax unified
+  20              		.thumb
+  21              		.thumb_func
+  23              	MX_GPIO_Init:
+  24              		@ args = 0, pretend = 0, frame = 48
+  25              		@ frame_needed = 0, uses_anonymous_args = 0
+  26 0000 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+  27 0004 8DB0     		sub	sp, sp, #52
+  28 0006 07AD     		add	r5, sp, #28
+  29 0008 0024     		movs	r4, #0
+  30 000a 0794     		str	r4, [sp, #28]
+  31 000c 0894     		str	r4, [sp, #32]
+  32 000e 0994     		str	r4, [sp, #36]
+  33 0010 0A94     		str	r4, [sp, #40]
+  34 0012 0B94     		str	r4, [sp, #44]
+  35 0014 0194     		str	r4, [sp, #4]
+  36 0016 594B     		ldr	r3, .L3
+  37 0018 1A6B     		ldr	r2, [r3, #48]
+  38 001a 42F01002 		orr	r2, r2, #16
+  39 001e 1A63     		str	r2, [r3, #48]
+  40 0020 1A6B     		ldr	r2, [r3, #48]
+  41 0022 02F01002 		and	r2, r2, #16
+  42 0026 0192     		str	r2, [sp, #4]
+  43 0028 019A     		ldr	r2, [sp, #4]
+  44 002a 0294     		str	r4, [sp, #8]
+  45 002c 1A6B     		ldr	r2, [r3, #48]
+  46 002e 42F00402 		orr	r2, r2, #4
+  47 0032 1A63     		str	r2, [r3, #48]
+  48 0034 1A6B     		ldr	r2, [r3, #48]
+  49 0036 02F00402 		and	r2, r2, #4
+  50 003a 0292     		str	r2, [sp, #8]
+  51 003c 029A     		ldr	r2, [sp, #8]
+  52 003e 0394     		str	r4, [sp, #12]
+  53 0040 1A6B     		ldr	r2, [r3, #48]
+  54 0042 42F08002 		orr	r2, r2, #128
+  55 0046 1A63     		str	r2, [r3, #48]
+  56 0048 1A6B     		ldr	r2, [r3, #48]
+  57 004a 02F08002 		and	r2, r2, #128
+  58 004e 0392     		str	r2, [sp, #12]
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s 			page 2
+
+
+  59 0050 039A     		ldr	r2, [sp, #12]
+  60 0052 0494     		str	r4, [sp, #16]
+  61 0054 1A6B     		ldr	r2, [r3, #48]
+  62 0056 42F00102 		orr	r2, r2, #1
+  63 005a 1A63     		str	r2, [r3, #48]
+  64 005c 1A6B     		ldr	r2, [r3, #48]
+  65 005e 02F00102 		and	r2, r2, #1
+  66 0062 0492     		str	r2, [sp, #16]
+  67 0064 049A     		ldr	r2, [sp, #16]
+  68 0066 0594     		str	r4, [sp, #20]
+  69 0068 1A6B     		ldr	r2, [r3, #48]
+  70 006a 42F00202 		orr	r2, r2, #2
+  71 006e 1A63     		str	r2, [r3, #48]
+  72 0070 1A6B     		ldr	r2, [r3, #48]
+  73 0072 02F00202 		and	r2, r2, #2
+  74 0076 0592     		str	r2, [sp, #20]
+  75 0078 059A     		ldr	r2, [sp, #20]
+  76 007a 0694     		str	r4, [sp, #24]
+  77 007c 1A6B     		ldr	r2, [r3, #48]
+  78 007e 42F00802 		orr	r2, r2, #8
+  79 0082 1A63     		str	r2, [r3, #48]
+  80 0084 1B6B     		ldr	r3, [r3, #48]
+  81 0086 03F00803 		and	r3, r3, #8
+  82 008a 0693     		str	r3, [sp, #24]
+  83 008c 069B     		ldr	r3, [sp, #24]
+  84 008e 3C4F     		ldr	r7, .L3+4
+  85 0090 2246     		mov	r2, r4
+  86 0092 0821     		movs	r1, #8
+  87 0094 3846     		mov	r0, r7
+  88 0096 FFF7FEFF 		bl	HAL_GPIO_WritePin
+  89 009a DFF8F0A0 		ldr	r10, .L3+16
+  90 009e 0122     		movs	r2, #1
+  91 00a0 1146     		mov	r1, r2
+  92 00a2 5046     		mov	r0, r10
+  93 00a4 FFF7FEFF 		bl	HAL_GPIO_WritePin
+  94 00a8 DFF8E490 		ldr	r9, .L3+20
+  95 00ac 2246     		mov	r2, r4
+  96 00ae 4FF21001 		movw	r1, #61456
+  97 00b2 4846     		mov	r0, r9
+  98 00b4 FFF7FEFF 		bl	HAL_GPIO_WritePin
+  99 00b8 4FF00808 		mov	r8, #8
+ 100 00bc CDF81C80 		str	r8, [sp, #28]
+ 101 00c0 0126     		movs	r6, #1
+ 102 00c2 0896     		str	r6, [sp, #32]
+ 103 00c4 0994     		str	r4, [sp, #36]
+ 104 00c6 0A94     		str	r4, [sp, #40]
+ 105 00c8 2946     		mov	r1, r5
+ 106 00ca 3846     		mov	r0, r7
+ 107 00cc FFF7FEFF 		bl	HAL_GPIO_Init
+ 108 00d0 0796     		str	r6, [sp, #28]
+ 109 00d2 0896     		str	r6, [sp, #32]
+ 110 00d4 0994     		str	r4, [sp, #36]
+ 111 00d6 0A94     		str	r4, [sp, #40]
+ 112 00d8 2946     		mov	r1, r5
+ 113 00da 5046     		mov	r0, r10
+ 114 00dc FFF7FEFF 		bl	HAL_GPIO_Init
+ 115 00e0 CDF81C80 		str	r8, [sp, #28]
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s 			page 3
+
+
+ 116 00e4 4FF00208 		mov	r8, #2
+ 117 00e8 CDF82080 		str	r8, [sp, #32]
+ 118 00ec 0994     		str	r4, [sp, #36]
+ 119 00ee 0A94     		str	r4, [sp, #40]
+ 120 00f0 4FF0050B 		mov	fp, #5
+ 121 00f4 CDF82CB0 		str	fp, [sp, #44]
+ 122 00f8 2946     		mov	r1, r5
+ 123 00fa 5046     		mov	r0, r10
+ 124 00fc FFF7FEFF 		bl	HAL_GPIO_Init
+ 125 0100 0796     		str	r6, [sp, #28]
+ 126 0102 4FF4901A 		mov	r10, #1179648
+ 127 0106 CDF820A0 		str	r10, [sp, #32]
+ 128 010a 0994     		str	r4, [sp, #36]
+ 129 010c 2946     		mov	r1, r5
+ 130 010e 1D48     		ldr	r0, .L3+8
+ 131 0110 FFF7FEFF 		bl	HAL_GPIO_Init
+ 132 0114 0423     		movs	r3, #4
+ 133 0116 0793     		str	r3, [sp, #28]
+ 134 0118 0894     		str	r4, [sp, #32]
+ 135 011a 0994     		str	r4, [sp, #36]
+ 136 011c 2946     		mov	r1, r5
+ 137 011e 1A48     		ldr	r0, .L3+12
+ 138 0120 FFF7FEFF 		bl	HAL_GPIO_Init
+ 139 0124 4FF48063 		mov	r3, #1024
+ 140 0128 0793     		str	r3, [sp, #28]
+ 141 012a CDF82080 		str	r8, [sp, #32]
+ 142 012e 0994     		str	r4, [sp, #36]
+ 143 0130 0A94     		str	r4, [sp, #40]
+ 144 0132 CDF82CB0 		str	fp, [sp, #44]
+ 145 0136 2946     		mov	r1, r5
+ 146 0138 1348     		ldr	r0, .L3+12
+ 147 013a FFF7FEFF 		bl	HAL_GPIO_Init
+ 148 013e 4FF21003 		movw	r3, #61456
+ 149 0142 0793     		str	r3, [sp, #28]
+ 150 0144 0896     		str	r6, [sp, #32]
+ 151 0146 0994     		str	r4, [sp, #36]
+ 152 0148 0A94     		str	r4, [sp, #40]
+ 153 014a 2946     		mov	r1, r5
+ 154 014c 4846     		mov	r0, r9
+ 155 014e FFF7FEFF 		bl	HAL_GPIO_Init
+ 156 0152 2023     		movs	r3, #32
+ 157 0154 0793     		str	r3, [sp, #28]
+ 158 0156 0894     		str	r4, [sp, #32]
+ 159 0158 0994     		str	r4, [sp, #36]
+ 160 015a 2946     		mov	r1, r5
+ 161 015c 4846     		mov	r0, r9
+ 162 015e FFF7FEFF 		bl	HAL_GPIO_Init
+ 163 0162 CDF81C80 		str	r8, [sp, #28]
+ 164 0166 CDF820A0 		str	r10, [sp, #32]
+ 165 016a 0994     		str	r4, [sp, #36]
+ 166 016c 2946     		mov	r1, r5
+ 167 016e 3846     		mov	r0, r7
+ 168 0170 FFF7FEFF 		bl	HAL_GPIO_Init
+ 169 0174 0DB0     		add	sp, sp, #52
+ 170              		@ sp needed
+ 171 0176 BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 172              	.L4:
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s 			page 4
+
+
+ 173 017a 00BF     		.align	2
+ 174              	.L3:
+ 175 017c 00380240 		.word	1073887232
+ 176 0180 00100240 		.word	1073876992
+ 177 0184 00000240 		.word	1073872896
+ 178 0188 00040240 		.word	1073873920
+ 179 018c 00080240 		.word	1073874944
+ 180 0190 000C0240 		.word	1073875968
+ 182              		.section	.text.MX_DMA_Init,"ax",%progbits
+ 183              		.align	1
+ 184              		.syntax unified
+ 185              		.thumb
+ 186              		.thumb_func
+ 188              	MX_DMA_Init:
+ 189              		@ args = 0, pretend = 0, frame = 8
+ 190              		@ frame_needed = 0, uses_anonymous_args = 0
+ 191 0000 10B5     		push	{r4, lr}
+ 192 0002 82B0     		sub	sp, sp, #8
+ 193 0004 0024     		movs	r4, #0
+ 194 0006 0094     		str	r4, [sp]
+ 195 0008 124B     		ldr	r3, .L7
+ 196 000a 1A6B     		ldr	r2, [r3, #48]
+ 197 000c 42F40012 		orr	r2, r2, #2097152
+ 198 0010 1A63     		str	r2, [r3, #48]
+ 199 0012 1A6B     		ldr	r2, [r3, #48]
+ 200 0014 02F40012 		and	r2, r2, #2097152
+ 201 0018 0092     		str	r2, [sp]
+ 202 001a 009A     		ldr	r2, [sp]
+ 203 001c 0194     		str	r4, [sp, #4]
+ 204 001e 1A6B     		ldr	r2, [r3, #48]
+ 205 0020 42F48002 		orr	r2, r2, #4194304
+ 206 0024 1A63     		str	r2, [r3, #48]
+ 207 0026 1B6B     		ldr	r3, [r3, #48]
+ 208 0028 03F48003 		and	r3, r3, #4194304
+ 209 002c 0193     		str	r3, [sp, #4]
+ 210 002e 019B     		ldr	r3, [sp, #4]
+ 211 0030 2246     		mov	r2, r4
+ 212 0032 0521     		movs	r1, #5
+ 213 0034 0E20     		movs	r0, #14
+ 214 0036 FFF7FEFF 		bl	HAL_NVIC_SetPriority
+ 215 003a 0E20     		movs	r0, #14
+ 216 003c FFF7FEFF 		bl	HAL_NVIC_EnableIRQ
+ 217 0040 2246     		mov	r2, r4
+ 218 0042 0521     		movs	r1, #5
+ 219 0044 3820     		movs	r0, #56
+ 220 0046 FFF7FEFF 		bl	HAL_NVIC_SetPriority
+ 221 004a 3820     		movs	r0, #56
+ 222 004c FFF7FEFF 		bl	HAL_NVIC_EnableIRQ
+ 223 0050 02B0     		add	sp, sp, #8
+ 224              		@ sp needed
+ 225 0052 10BD     		pop	{r4, pc}
+ 226              	.L8:
+ 227              		.align	2
+ 228              	.L7:
+ 229 0054 00380240 		.word	1073887232
+ 231              		.section	.text.StartDefaultTask,"ax",%progbits
+ 232              		.align	1
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s 			page 5
+
+
+ 233              		.global	StartDefaultTask
+ 234              		.syntax unified
+ 235              		.thumb
+ 236              		.thumb_func
+ 238              	StartDefaultTask:
+ 239              		@ Volatile: function does not return.
+ 240              		@ args = 0, pretend = 0, frame = 0
+ 241              		@ frame_needed = 0, uses_anonymous_args = 0
+ 242 0000 08B5     		push	{r3, lr}
+ 243 0002 FFF7FEFF 		bl	MX_USB_HOST_Init
+ 244              	.L10:
+ 245 0006 4FF48051 		mov	r1, #4096
+ 246 000a 0448     		ldr	r0, .L12
+ 247 000c FFF7FEFF 		bl	HAL_GPIO_TogglePin
+ 248 0010 4FF4FA70 		mov	r0, #500
+ 249 0014 FFF7FEFF 		bl	osDelay
+ 250 0018 F5E7     		b	.L10
+ 251              	.L13:
+ 252 001a 00BF     		.align	2
+ 253              	.L12:
+ 254 001c 000C0240 		.word	1073875968
+ 256              		.section	.text.HAL_SPI_RxCpltCallback,"ax",%progbits
+ 257              		.align	1
+ 258              		.global	HAL_SPI_RxCpltCallback
+ 259              		.syntax unified
+ 260              		.thumb
+ 261              		.thumb_func
+ 263              	HAL_SPI_RxCpltCallback:
+ 264              		@ args = 0, pretend = 0, frame = 0
+ 265              		@ frame_needed = 0, uses_anonymous_args = 0
+ 266 0000 08B5     		push	{r3, lr}
+ 267 0002 0268     		ldr	r2, [r0]
+ 268 0004 0C4B     		ldr	r3, .L18
+ 269 0006 9A42     		cmp	r2, r3
+ 270 0008 00D0     		beq	.L17
+ 271              	.L14:
+ 272 000a 08BD     		pop	{r3, pc}
+ 273              	.L17:
+ 274 000c 0B49     		ldr	r1, .L18+4
+ 275 000e 0A78     		ldrb	r2, [r1]	@ zero_extendqisi2
+ 276 0010 0B4B     		ldr	r3, .L18+8
+ 277 0012 1A70     		strb	r2, [r3]
+ 278 0014 4A78     		ldrb	r2, [r1, #1]	@ zero_extendqisi2
+ 279 0016 0B4B     		ldr	r3, .L18+12
+ 280 0018 1A70     		strb	r2, [r3]
+ 281 001a 4FF40041 		mov	r1, #32768
+ 282 001e 0A48     		ldr	r0, .L18+16
+ 283 0020 FFF7FEFF 		bl	HAL_GPIO_TogglePin
+ 284 0024 094B     		ldr	r3, .L18+20
+ 285 0026 1868     		ldr	r0, [r3]
+ 286 0028 FFF7FEFF 		bl	osSemaphoreRelease
+ 287 002c 0222     		movs	r2, #2
+ 288 002e 0349     		ldr	r1, .L18+4
+ 289 0030 0748     		ldr	r0, .L18+24
+ 290 0032 FFF7FEFF 		bl	HAL_SPI_Receive_DMA
+ 291 0036 E8E7     		b	.L14
+ 292              	.L19:
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s 			page 6
+
+
+ 293              		.align	2
+ 294              	.L18:
+ 295 0038 00380040 		.word	1073756160
+ 296 003c 00000000 		.word	spi_rx_buf
+ 297 0040 00000000 		.word	gesture
+ 298 0044 00000000 		.word	intensity
+ 299 0048 000C0240 		.word	1073875968
+ 300 004c 00000000 		.word	spiSemHandle
+ 301 0050 00000000 		.word	hspi2
+ 303              		.section	.text.Error_Handler,"ax",%progbits
+ 304              		.align	1
+ 305              		.global	Error_Handler
+ 306              		.syntax unified
+ 307              		.thumb
+ 308              		.thumb_func
+ 310              	Error_Handler:
+ 311              		@ Volatile: function does not return.
+ 312              		@ args = 0, pretend = 0, frame = 0
+ 313              		@ frame_needed = 0, uses_anonymous_args = 0
+ 314              		@ link register save eliminated.
+ 315              		.syntax unified
+ 316              	@ 962 "Drivers/CMSIS/Include/cmsis_gcc.h" 1
+ 317 0000 72B6     		cpsid i
+ 318              	@ 0 "" 2
+ 319              		.thumb
+ 320              		.syntax unified
+ 321              	.L21:
+ 322 0002 FEE7     		b	.L21
+ 324              		.section	.text.MX_I2C1_Init,"ax",%progbits
+ 325              		.align	1
+ 326              		.syntax unified
+ 327              		.thumb
+ 328              		.thumb_func
+ 330              	MX_I2C1_Init:
+ 331              		@ args = 0, pretend = 0, frame = 0
+ 332              		@ frame_needed = 0, uses_anonymous_args = 0
+ 333 0000 08B5     		push	{r3, lr}
+ 334 0002 0A48     		ldr	r0, .L26
+ 335 0004 0A4B     		ldr	r3, .L26+4
+ 336 0006 0360     		str	r3, [r0]
+ 337 0008 0A4B     		ldr	r3, .L26+8
+ 338 000a 4360     		str	r3, [r0, #4]
+ 339 000c 0023     		movs	r3, #0
+ 340 000e 8360     		str	r3, [r0, #8]
+ 341 0010 C360     		str	r3, [r0, #12]
+ 342 0012 4FF48042 		mov	r2, #16384
+ 343 0016 0261     		str	r2, [r0, #16]
+ 344 0018 4361     		str	r3, [r0, #20]
+ 345 001a 8361     		str	r3, [r0, #24]
+ 346 001c C361     		str	r3, [r0, #28]
+ 347 001e 0362     		str	r3, [r0, #32]
+ 348 0020 FFF7FEFF 		bl	HAL_I2C_Init
+ 349 0024 00B9     		cbnz	r0, .L25
+ 350 0026 08BD     		pop	{r3, pc}
+ 351              	.L25:
+ 352 0028 FFF7FEFF 		bl	Error_Handler
+ 353              	.L27:
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s 			page 7
+
+
+ 354              		.align	2
+ 355              	.L26:
+ 356 002c 00000000 		.word	hi2c1
+ 357 0030 00540040 		.word	1073763328
+ 358 0034 A0860100 		.word	100000
+ 360              		.section	.text.MX_I2S3_Init,"ax",%progbits
+ 361              		.align	1
+ 362              		.syntax unified
+ 363              		.thumb
+ 364              		.thumb_func
+ 366              	MX_I2S3_Init:
+ 367              		@ args = 0, pretend = 0, frame = 0
+ 368              		@ frame_needed = 0, uses_anonymous_args = 0
+ 369 0000 08B5     		push	{r3, lr}
+ 370 0002 0C48     		ldr	r0, .L32
+ 371 0004 0C4B     		ldr	r3, .L32+4
+ 372 0006 0360     		str	r3, [r0]
+ 373 0008 4FF40072 		mov	r2, #512
+ 374 000c 4260     		str	r2, [r0, #4]
+ 375 000e 0023     		movs	r3, #0
+ 376 0010 8360     		str	r3, [r0, #8]
+ 377 0012 0321     		movs	r1, #3
+ 378 0014 C160     		str	r1, [r0, #12]
+ 379 0016 0261     		str	r2, [r0, #16]
+ 380 0018 4FF4FA42 		mov	r2, #32000
+ 381 001c 4261     		str	r2, [r0, #20]
+ 382 001e 8361     		str	r3, [r0, #24]
+ 383 0020 C361     		str	r3, [r0, #28]
+ 384 0022 0123     		movs	r3, #1
+ 385 0024 0362     		str	r3, [r0, #32]
+ 386 0026 FFF7FEFF 		bl	HAL_I2S_Init
+ 387 002a 00B9     		cbnz	r0, .L31
+ 388 002c 08BD     		pop	{r3, pc}
+ 389              	.L31:
+ 390 002e FFF7FEFF 		bl	Error_Handler
+ 391              	.L33:
+ 392 0032 00BF     		.align	2
+ 393              	.L32:
+ 394 0034 00000000 		.word	hi2s3
+ 395 0038 003C0040 		.word	1073757184
+ 397              		.section	.text.MX_SPI1_Init,"ax",%progbits
+ 398              		.align	1
+ 399              		.syntax unified
+ 400              		.thumb
+ 401              		.thumb_func
+ 403              	MX_SPI1_Init:
+ 404              		@ args = 0, pretend = 0, frame = 0
+ 405              		@ frame_needed = 0, uses_anonymous_args = 0
+ 406 0000 08B5     		push	{r3, lr}
+ 407 0002 0A48     		ldr	r0, .L38
+ 408 0004 0A4B     		ldr	r3, .L38+4
+ 409 0006 0360     		str	r3, [r0]
+ 410 0008 0023     		movs	r3, #0
+ 411 000a 4360     		str	r3, [r0, #4]
+ 412 000c 8360     		str	r3, [r0, #8]
+ 413 000e C360     		str	r3, [r0, #12]
+ 414 0010 0361     		str	r3, [r0, #16]
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s 			page 8
+
+
+ 415 0012 4361     		str	r3, [r0, #20]
+ 416 0014 8361     		str	r3, [r0, #24]
+ 417 0016 0362     		str	r3, [r0, #32]
+ 418 0018 4362     		str	r3, [r0, #36]
+ 419 001a 8362     		str	r3, [r0, #40]
+ 420 001c 0A23     		movs	r3, #10
+ 421 001e C362     		str	r3, [r0, #44]
+ 422 0020 FFF7FEFF 		bl	HAL_SPI_Init
+ 423 0024 00B9     		cbnz	r0, .L37
+ 424 0026 08BD     		pop	{r3, pc}
+ 425              	.L37:
+ 426 0028 FFF7FEFF 		bl	Error_Handler
+ 427              	.L39:
+ 428              		.align	2
+ 429              	.L38:
+ 430 002c 00000000 		.word	hspi1
+ 431 0030 00300140 		.word	1073819648
+ 433              		.section	.text.MX_SPI2_Init,"ax",%progbits
+ 434              		.align	1
+ 435              		.syntax unified
+ 436              		.thumb
+ 437              		.thumb_func
+ 439              	MX_SPI2_Init:
+ 440              		@ args = 0, pretend = 0, frame = 0
+ 441              		@ frame_needed = 0, uses_anonymous_args = 0
+ 442 0000 08B5     		push	{r3, lr}
+ 443 0002 0A48     		ldr	r0, .L44
+ 444 0004 0A4B     		ldr	r3, .L44+4
+ 445 0006 0360     		str	r3, [r0]
+ 446 0008 0023     		movs	r3, #0
+ 447 000a 4360     		str	r3, [r0, #4]
+ 448 000c 8360     		str	r3, [r0, #8]
+ 449 000e C360     		str	r3, [r0, #12]
+ 450 0010 0361     		str	r3, [r0, #16]
+ 451 0012 4361     		str	r3, [r0, #20]
+ 452 0014 8361     		str	r3, [r0, #24]
+ 453 0016 0362     		str	r3, [r0, #32]
+ 454 0018 4362     		str	r3, [r0, #36]
+ 455 001a 8362     		str	r3, [r0, #40]
+ 456 001c 0A23     		movs	r3, #10
+ 457 001e C362     		str	r3, [r0, #44]
+ 458 0020 FFF7FEFF 		bl	HAL_SPI_Init
+ 459 0024 00B9     		cbnz	r0, .L43
+ 460 0026 08BD     		pop	{r3, pc}
+ 461              	.L43:
+ 462 0028 FFF7FEFF 		bl	Error_Handler
+ 463              	.L45:
+ 464              		.align	2
+ 465              	.L44:
+ 466 002c 00000000 		.word	hspi2
+ 467 0030 00380040 		.word	1073756160
+ 469              		.section	.text.SystemClock_Config,"ax",%progbits
+ 470              		.align	1
+ 471              		.global	SystemClock_Config
+ 472              		.syntax unified
+ 473              		.thumb
+ 474              		.thumb_func
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s 			page 9
+
+
+ 476              	SystemClock_Config:
+ 477              		@ args = 0, pretend = 0, frame = 80
+ 478              		@ frame_needed = 0, uses_anonymous_args = 0
+ 479 0000 10B5     		push	{r4, lr}
+ 480 0002 94B0     		sub	sp, sp, #80
+ 481 0004 08AC     		add	r4, sp, #32
+ 482 0006 3022     		movs	r2, #48
+ 483 0008 0021     		movs	r1, #0
+ 484 000a 2046     		mov	r0, r4
+ 485 000c FFF7FEFF 		bl	memset
+ 486 0010 0023     		movs	r3, #0
+ 487 0012 0393     		str	r3, [sp, #12]
+ 488 0014 0493     		str	r3, [sp, #16]
+ 489 0016 0593     		str	r3, [sp, #20]
+ 490 0018 0693     		str	r3, [sp, #24]
+ 491 001a 0793     		str	r3, [sp, #28]
+ 492 001c 0193     		str	r3, [sp, #4]
+ 493 001e 204A     		ldr	r2, .L52
+ 494 0020 116C     		ldr	r1, [r2, #64]
+ 495 0022 41F08051 		orr	r1, r1, #268435456
+ 496 0026 1164     		str	r1, [r2, #64]
+ 497 0028 126C     		ldr	r2, [r2, #64]
+ 498 002a 02F08052 		and	r2, r2, #268435456
+ 499 002e 0192     		str	r2, [sp, #4]
+ 500 0030 019A     		ldr	r2, [sp, #4]
+ 501 0032 0293     		str	r3, [sp, #8]
+ 502 0034 1B4B     		ldr	r3, .L52+4
+ 503 0036 1A68     		ldr	r2, [r3]
+ 504 0038 42F48042 		orr	r2, r2, #16384
+ 505 003c 1A60     		str	r2, [r3]
+ 506 003e 1B68     		ldr	r3, [r3]
+ 507 0040 03F48043 		and	r3, r3, #16384
+ 508 0044 0293     		str	r3, [sp, #8]
+ 509 0046 029B     		ldr	r3, [sp, #8]
+ 510 0048 0123     		movs	r3, #1
+ 511 004a 0893     		str	r3, [sp, #32]
+ 512 004c 4FF48033 		mov	r3, #65536
+ 513 0050 0993     		str	r3, [sp, #36]
+ 514 0052 0223     		movs	r3, #2
+ 515 0054 0E93     		str	r3, [sp, #56]
+ 516 0056 4FF48002 		mov	r2, #4194304
+ 517 005a 0F92     		str	r2, [sp, #60]
+ 518 005c 0822     		movs	r2, #8
+ 519 005e 1092     		str	r2, [sp, #64]
+ 520 0060 4FF4A872 		mov	r2, #336
+ 521 0064 1192     		str	r2, [sp, #68]
+ 522 0066 1293     		str	r3, [sp, #72]
+ 523 0068 0723     		movs	r3, #7
+ 524 006a 1393     		str	r3, [sp, #76]
+ 525 006c 2046     		mov	r0, r4
+ 526 006e FFF7FEFF 		bl	HAL_RCC_OscConfig
+ 527 0072 88B9     		cbnz	r0, .L50
+ 528 0074 0F23     		movs	r3, #15
+ 529 0076 0393     		str	r3, [sp, #12]
+ 530 0078 0223     		movs	r3, #2
+ 531 007a 0493     		str	r3, [sp, #16]
+ 532 007c 0590     		str	r0, [sp, #20]
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s 			page 10
+
+
+ 533 007e 4FF4A053 		mov	r3, #5120
+ 534 0082 0693     		str	r3, [sp, #24]
+ 535 0084 4FF48053 		mov	r3, #4096
+ 536 0088 0793     		str	r3, [sp, #28]
+ 537 008a 0521     		movs	r1, #5
+ 538 008c 03A8     		add	r0, sp, #12
+ 539 008e FFF7FEFF 		bl	HAL_RCC_ClockConfig
+ 540 0092 18B9     		cbnz	r0, .L51
+ 541 0094 14B0     		add	sp, sp, #80
+ 542              		@ sp needed
+ 543 0096 10BD     		pop	{r4, pc}
+ 544              	.L50:
+ 545 0098 FFF7FEFF 		bl	Error_Handler
+ 546              	.L51:
+ 547 009c FFF7FEFF 		bl	Error_Handler
+ 548              	.L53:
+ 549              		.align	2
+ 550              	.L52:
+ 551 00a0 00380240 		.word	1073887232
+ 552 00a4 00700040 		.word	1073770496
+ 554              		.section	.text.main,"ax",%progbits
+ 555              		.align	1
+ 556              		.global	main
+ 557              		.syntax unified
+ 558              		.thumb
+ 559              		.thumb_func
+ 561              	main:
+ 562              		@ Volatile: function does not return.
+ 563              		@ args = 0, pretend = 0, frame = 120
+ 564              		@ frame_needed = 0, uses_anonymous_args = 0
+ 565 0000 00B5     		push	{lr}
+ 566 0002 9FB0     		sub	sp, sp, #124
+ 567 0004 FFF7FEFF 		bl	HAL_Init
+ 568 0008 19A9     		add	r1, sp, #100
+ 569 000a 0024     		movs	r4, #0
+ 570 000c 1994     		str	r4, [sp, #100]
+ 571 000e 4C60     		str	r4, [r1, #4]
+ 572 0010 8C60     		str	r4, [r1, #8]
+ 573 0012 CC60     		str	r4, [r1, #12]
+ 574 0014 0C61     		str	r4, [r1, #16]
+ 575 0016 4FF48053 		mov	r3, #4096
+ 576 001a 1993     		str	r3, [sp, #100]
+ 577 001c 0125     		movs	r5, #1
+ 578 001e 1A95     		str	r5, [sp, #104]
+ 579 0020 2F48     		ldr	r0, .L57
+ 580 0022 FFF7FEFF 		bl	HAL_GPIO_Init
+ 581 0026 FFF7FEFF 		bl	SystemClock_Config
+ 582 002a FFF7FEFF 		bl	MX_GPIO_Init
+ 583 002e FFF7FEFF 		bl	MX_DMA_Init
+ 584 0032 FFF7FEFF 		bl	MX_I2C1_Init
+ 585 0036 FFF7FEFF 		bl	MX_I2S3_Init
+ 586 003a FFF7FEFF 		bl	MX_SPI1_Init
+ 587 003e FFF7FEFF 		bl	MX_SPI2_Init
+ 588 0042 0222     		movs	r2, #2
+ 589 0044 2749     		ldr	r1, .L57+4
+ 590 0046 2848     		ldr	r0, .L57+8
+ 591 0048 FFF7FEFF 		bl	HAL_SPI_Receive_DMA
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s 			page 11
+
+
+ 592 004c 1794     		str	r4, [sp, #92]
+ 593 004e 1894     		str	r4, [sp, #96]
+ 594 0050 17A8     		add	r0, sp, #92
+ 595 0052 FFF7FEFF 		bl	osMutexCreate
+ 596 0056 254B     		ldr	r3, .L57+12
+ 597 0058 1860     		str	r0, [r3]
+ 598 005a 1594     		str	r4, [sp, #84]
+ 599 005c 1694     		str	r4, [sp, #88]
+ 600 005e 2946     		mov	r1, r5
+ 601 0060 15A8     		add	r0, sp, #84
+ 602 0062 FFF7FEFF 		bl	osSemaphoreCreate
+ 603 0066 224B     		ldr	r3, .L57+16
+ 604 0068 1860     		str	r0, [r3]
+ 605 006a 2146     		mov	r1, r4
+ 606 006c FFF7FEFF 		bl	osSemaphoreWait
+ 607 0070 204D     		ldr	r5, .L57+20
+ 608 0072 0DF1380C 		add	ip, sp, #56
+ 609 0076 AE46     		mov	lr, r5
+ 610 0078 BEE80F00 		ldmia	lr!, {r0, r1, r2, r3}
+ 611 007c ACE80F00 		stmia	ip!, {r0, r1, r2, r3}
+ 612 0080 9EE80700 		ldm	lr, {r0, r1, r2}
+ 613 0084 8CE80700 		stm	ip, {r0, r1, r2}
+ 614 0088 2146     		mov	r1, r4
+ 615 008a 0EA8     		add	r0, sp, #56
+ 616 008c FFF7FEFF 		bl	osThreadCreate
+ 617 0090 194B     		ldr	r3, .L57+24
+ 618 0092 1860     		str	r0, [r3]
+ 619 0094 0DF11C0C 		add	ip, sp, #28
+ 620 0098 05F11C0E 		add	lr, r5, #28
+ 621 009c BEE80F00 		ldmia	lr!, {r0, r1, r2, r3}
+ 622 00a0 ACE80F00 		stmia	ip!, {r0, r1, r2, r3}
+ 623 00a4 9EE80700 		ldm	lr, {r0, r1, r2}
+ 624 00a8 8CE80700 		stm	ip, {r0, r1, r2}
+ 625 00ac 2146     		mov	r1, r4
+ 626 00ae 07A8     		add	r0, sp, #28
+ 627 00b0 FFF7FEFF 		bl	osThreadCreate
+ 628 00b4 114B     		ldr	r3, .L57+28
+ 629 00b6 1860     		str	r0, [r3]
+ 630 00b8 EE46     		mov	lr, sp
+ 631 00ba 05F1380C 		add	ip, r5, #56
+ 632 00be BCE80F00 		ldmia	ip!, {r0, r1, r2, r3}
+ 633 00c2 AEE80F00 		stmia	lr!, {r0, r1, r2, r3}
+ 634 00c6 9CE80700 		ldm	ip, {r0, r1, r2}
+ 635 00ca 8EE80700 		stm	lr, {r0, r1, r2}
+ 636 00ce 2146     		mov	r1, r4
+ 637 00d0 6846     		mov	r0, sp
+ 638 00d2 FFF7FEFF 		bl	osThreadCreate
+ 639 00d6 0A4B     		ldr	r3, .L57+32
+ 640 00d8 1860     		str	r0, [r3]
+ 641 00da FFF7FEFF 		bl	osKernelStart
+ 642              	.L55:
+ 643 00de FEE7     		b	.L55
+ 644              	.L58:
+ 645              		.align	2
+ 646              	.L57:
+ 647 00e0 000C0240 		.word	1073875968
+ 648 00e4 00000000 		.word	spi_rx_buf
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s 			page 12
+
+
+ 649 00e8 00000000 		.word	hspi2
+ 650 00ec 00000000 		.word	g_params_mutex
+ 651 00f0 00000000 		.word	spiSemHandle
+ 652 00f4 00000000 		.word	.LANCHOR0
+ 653 00f8 00000000 		.word	defaultTaskHandle
+ 654 00fc 00000000 		.word	dspTaskHandle
+ 655 0100 00000000 		.word	spiTaskHandle
+ 657              		.section	.rodata.str1.4,"aMS",%progbits,1
+ 658              		.align	2
+ 659              	.LC4:
+ 660 0000 73706954 		.ascii	"spiTask\000"
+ 660      61736B00 
+ 661              		.align	2
+ 662              	.LC2:
+ 663 0008 64737054 		.ascii	"dspTask\000"
+ 663      61736B00 
+ 664              		.align	2
+ 665              	.LC0:
+ 666 0010 64656661 		.ascii	"defaultTask\000"
+ 666      756C7454 
+ 666      61736B00 
+ 667              		.global	intensity
+ 668              		.section	.bss.intensity,"aw",%nobits
+ 671              	intensity:
+ 672 0000 00       		.space	1
+ 673              		.global	gesture
+ 674              		.section	.bss.gesture,"aw",%nobits
+ 677              	gesture:
+ 678 0000 00       		.space	1
+ 679              		.global	spi_rx_buf
+ 680              		.section	.bss.spi_rx_buf,"aw",%nobits
+ 681              		.align	2
+ 684              	spi_rx_buf:
+ 685 0000 0000     		.space	2
+ 686              		.global	spiSemHandle
+ 687              		.section	.bss.spiSemHandle,"aw",%nobits
+ 688              		.align	2
+ 691              	spiSemHandle:
+ 692 0000 00000000 		.space	4
+ 693              		.global	spiTaskHandle
+ 694              		.section	.bss.spiTaskHandle,"aw",%nobits
+ 695              		.align	2
+ 698              	spiTaskHandle:
+ 699 0000 00000000 		.space	4
+ 700              		.global	dspTaskHandle
+ 701              		.section	.bss.dspTaskHandle,"aw",%nobits
+ 702              		.align	2
+ 705              	dspTaskHandle:
+ 706 0000 00000000 		.space	4
+ 707              		.global	defaultTaskHandle
+ 708              		.section	.bss.defaultTaskHandle,"aw",%nobits
+ 709              		.align	2
+ 712              	defaultTaskHandle:
+ 713 0000 00000000 		.space	4
+ 714              		.global	hdma_spi2_rx
+ 715              		.section	.bss.hdma_spi2_rx,"aw",%nobits
+ 716              		.align	2
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s 			page 13
+
+
+ 719              	hdma_spi2_rx:
+ 720 0000 00000000 		.space	96
+ 720      00000000 
+ 720      00000000 
+ 720      00000000 
+ 720      00000000 
+ 721              		.global	hdma_spi1_rx
+ 722              		.section	.bss.hdma_spi1_rx,"aw",%nobits
+ 723              		.align	2
+ 726              	hdma_spi1_rx:
+ 727 0000 00000000 		.space	96
+ 727      00000000 
+ 727      00000000 
+ 727      00000000 
+ 727      00000000 
+ 728              		.global	hspi2
+ 729              		.section	.bss.hspi2,"aw",%nobits
+ 730              		.align	2
+ 733              	hspi2:
+ 734 0000 00000000 		.space	88
+ 734      00000000 
+ 734      00000000 
+ 734      00000000 
+ 734      00000000 
+ 735              		.global	hspi1
+ 736              		.section	.bss.hspi1,"aw",%nobits
+ 737              		.align	2
+ 740              	hspi1:
+ 741 0000 00000000 		.space	88
+ 741      00000000 
+ 741      00000000 
+ 741      00000000 
+ 741      00000000 
+ 742              		.global	hi2s3
+ 743              		.section	.bss.hi2s3,"aw",%nobits
+ 744              		.align	2
+ 747              	hi2s3:
+ 748 0000 00000000 		.space	72
+ 748      00000000 
+ 748      00000000 
+ 748      00000000 
+ 748      00000000 
+ 749              		.global	hi2c1
+ 750              		.section	.bss.hi2c1,"aw",%nobits
+ 751              		.align	2
+ 754              	hi2c1:
+ 755 0000 00000000 		.space	84
+ 755      00000000 
+ 755      00000000 
+ 755      00000000 
+ 755      00000000 
+ 756              		.section	.rodata
+ 757              		.align	2
+ 758              		.set	.LANCHOR0,. + 0
+ 759              	.LC6:
+ 760 0000 10000000 		.word	.LC0
+ 761 0004 00000000 		.word	StartDefaultTask
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s 			page 14
+
+
+ 762 0008 0000     		.short	0
+ 763 000a 0000     		.space	2
+ 764 000c 00000000 		.word	0
+ 765 0010 80000000 		.word	128
+ 766 0014 00000000 		.word	0
+ 767 0018 00000000 		.word	0
+ 768              	.LC7:
+ 769 001c 08000000 		.word	.LC2
+ 770 0020 00000000 		.word	StartDSPTask
+ 771 0024 0300     		.short	3
+ 772 0026 0000     		.space	2
+ 773 0028 00000000 		.word	0
+ 774 002c 00020000 		.word	512
+ 775 0030 00000000 		.word	0
+ 776 0034 00000000 		.word	0
+ 777              	.LC8:
+ 778 0038 00000000 		.word	.LC4
+ 779 003c 00000000 		.word	StartSPITask
+ 780 0040 0100     		.short	1
+ 781 0042 0000     		.space	2
+ 782 0044 00000000 		.word	0
+ 783 0048 00010000 		.word	256
+ 784 004c 00000000 		.word	0
+ 785 0050 00000000 		.word	0
+ 786              		.ident	"GCC: (xPack GNU Arm Embedded GCC arm64) 15.2.1 20251203"
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s 			page 15
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:18     .text.MX_GPIO_Init:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:23     .text.MX_GPIO_Init:00000000 MX_GPIO_Init
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:175    .text.MX_GPIO_Init:0000017c $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:183    .text.MX_DMA_Init:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:188    .text.MX_DMA_Init:00000000 MX_DMA_Init
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:229    .text.MX_DMA_Init:00000054 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:232    .text.StartDefaultTask:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:238    .text.StartDefaultTask:00000000 StartDefaultTask
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:254    .text.StartDefaultTask:0000001c $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:257    .text.HAL_SPI_RxCpltCallback:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:263    .text.HAL_SPI_RxCpltCallback:00000000 HAL_SPI_RxCpltCallback
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:295    .text.HAL_SPI_RxCpltCallback:00000038 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:684    .bss.spi_rx_buf:00000000 spi_rx_buf
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:677    .bss.gesture:00000000 gesture
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:671    .bss.intensity:00000000 intensity
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:691    .bss.spiSemHandle:00000000 spiSemHandle
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:733    .bss.hspi2:00000000 hspi2
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:304    .text.Error_Handler:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:310    .text.Error_Handler:00000000 Error_Handler
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:325    .text.MX_I2C1_Init:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:330    .text.MX_I2C1_Init:00000000 MX_I2C1_Init
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:356    .text.MX_I2C1_Init:0000002c $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:754    .bss.hi2c1:00000000 hi2c1
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:361    .text.MX_I2S3_Init:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:366    .text.MX_I2S3_Init:00000000 MX_I2S3_Init
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:394    .text.MX_I2S3_Init:00000034 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:747    .bss.hi2s3:00000000 hi2s3
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:398    .text.MX_SPI1_Init:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:403    .text.MX_SPI1_Init:00000000 MX_SPI1_Init
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:430    .text.MX_SPI1_Init:0000002c $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:740    .bss.hspi1:00000000 hspi1
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:434    .text.MX_SPI2_Init:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:439    .text.MX_SPI2_Init:00000000 MX_SPI2_Init
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:466    .text.MX_SPI2_Init:0000002c $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:470    .text.SystemClock_Config:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:476    .text.SystemClock_Config:00000000 SystemClock_Config
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:551    .text.SystemClock_Config:000000a0 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:555    .text.main:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:561    .text.main:00000000 main
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:647    .text.main:000000e0 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:712    .bss.defaultTaskHandle:00000000 defaultTaskHandle
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:705    .bss.dspTaskHandle:00000000 dspTaskHandle
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:698    .bss.spiTaskHandle:00000000 spiTaskHandle
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:658    .rodata.str1.4:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:672    .bss.intensity:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:678    .bss.gesture:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:681    .bss.spi_rx_buf:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:688    .bss.spiSemHandle:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:695    .bss.spiTaskHandle:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:702    .bss.dspTaskHandle:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:709    .bss.defaultTaskHandle:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:719    .bss.hdma_spi2_rx:00000000 hdma_spi2_rx
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:716    .bss.hdma_spi2_rx:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:726    .bss.hdma_spi1_rx:00000000 hdma_spi1_rx
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:723    .bss.hdma_spi1_rx:00000000 $d
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s 			page 16
+
+
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:730    .bss.hspi2:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:737    .bss.hspi1:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:744    .bss.hi2s3:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:751    .bss.hi2c1:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccpavVli.s:757    .rodata:00000000 $d
+
+UNDEFINED SYMBOLS
+HAL_GPIO_WritePin
+HAL_GPIO_Init
+HAL_NVIC_SetPriority
+HAL_NVIC_EnableIRQ
+MX_USB_HOST_Init
+HAL_GPIO_TogglePin
+osDelay
+osSemaphoreRelease
+HAL_SPI_Receive_DMA
+HAL_I2C_Init
+HAL_I2S_Init
+HAL_SPI_Init
+memset
+HAL_RCC_OscConfig
+HAL_RCC_ClockConfig
+HAL_Init
+osMutexCreate
+osSemaphoreCreate
+osSemaphoreWait
+osThreadCreate
+osKernelStart
+g_params_mutex
+StartDSPTask
+StartSPITask

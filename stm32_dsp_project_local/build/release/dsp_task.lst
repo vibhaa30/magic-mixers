@@ -1,0 +1,370 @@
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"dsp_task.c"
+  16              		.text
+  17              		.section	.text.apply_volume,"ax",%progbits
+  18              		.align	1
+  19              		.syntax unified
+  20              		.thumb
+  21              		.thumb_func
+  23              	apply_volume:
+  24              		@ args = 0, pretend = 0, frame = 0
+  25              		@ frame_needed = 0, uses_anonymous_args = 0
+  26              		@ link register save eliminated.
+  27 0000 0023     		movs	r3, #0
+  28 0002 12E0     		b	.L2
+  29              	.L3:
+  30 0004 30F91320 		ldrsh	r2, [r0, r3, lsl #1]
+  31 0008 07EE902A 		vmov	s15, r2	@ int
+  32 000c F8EEE77A 		vcvt.f32.s32	s15, s15
+  33 0010 67EE807A 		vmul.f32	s15, s15, s0
+  34 0014 FDEEE77A 		vcvt.s32.f32	s15, s15
+  35 0018 17EE902A 		vmov	r2, s15	@ int
+  36 001c 20F81320 		strh	r2, [r0, r3, lsl #1]	@ movhi
+  37 0020 5A1C     		adds	r2, r3, #1
+  38 0022 0021     		movs	r1, #0
+  39 0024 20F81210 		strh	r1, [r0, r2, lsl #1]	@ movhi
+  40 0028 0233     		adds	r3, r3, #2
+  41              	.L2:
+  42 002a 3F2B     		cmp	r3, #63
+  43 002c EADD     		ble	.L3
+  44 002e 7047     		bx	lr
+  46              		.section	.text.apply_lpf,"ax",%progbits
+  47              		.align	1
+  48              		.syntax unified
+  49              		.thumb
+  50              		.thumb_func
+  52              	apply_lpf:
+  53              		@ args = 0, pretend = 0, frame = 0
+  54              		@ frame_needed = 0, uses_anonymous_args = 0
+  55              		@ link register save eliminated.
+  56 0000 B7EE006A 		vmov.f32	s12, #1.0e+0
+  57 0004 36EE406A 		vsub.f32	s12, s12, s0
+  58 0008 0023     		movs	r3, #0
+  59 000a 37E0     		b	.L5
+  60              	.L6:
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s 			page 2
+
+
+  61 000c 30F91320 		ldrsh	r2, [r0, r3, lsl #1]
+  62 0010 07EE102A 		vmov	s14, r2	@ int
+  63 0014 B8EEC77A 		vcvt.f32.s32	s14, s14
+  64 0018 991C     		adds	r1, r3, #2
+  65 001a 30F91120 		ldrsh	r2, [r0, r1, lsl #1]
+  66 001e 07EE902A 		vmov	s15, r2	@ int
+  67 0022 F8EEE77A 		vcvt.f32.s32	s15, s15
+  68 0026 20EE077A 		vmul.f32	s14, s0, s14
+  69 002a 164A     		ldr	r2, .L7
+  70 002c D2ED006A 		vldr.32	s13, [r2]
+  71 0030 66EE266A 		vmul.f32	s13, s12, s13
+  72 0034 37EE267A 		vadd.f32	s14, s14, s13
+  73 0038 82ED007A 		vstr.32	s14, [r2]
+  74 003c 60EE277A 		vmul.f32	s15, s0, s15
+  75 0040 114A     		ldr	r2, .L7+4
+  76 0042 D2ED006A 		vldr.32	s13, [r2]
+  77 0046 66EE266A 		vmul.f32	s13, s12, s13
+  78 004a 77EEA67A 		vadd.f32	s15, s15, s13
+  79 004e C2ED007A 		vstr.32	s15, [r2]
+  80 0052 BDEEC77A 		vcvt.s32.f32	s14, s14
+  81 0056 17EE102A 		vmov	r2, s14	@ int
+  82 005a 20F81320 		strh	r2, [r0, r3, lsl #1]	@ movhi
+  83 005e 03F1010C 		add	ip, r3, #1
+  84 0062 0022     		movs	r2, #0
+  85 0064 20F81C20 		strh	r2, [r0, ip, lsl #1]	@ movhi
+  86 0068 FDEEE77A 		vcvt.s32.f32	s15, s15
+  87 006c 17EE90CA 		vmov	ip, s15	@ int
+  88 0070 20F811C0 		strh	ip, [r0, r1, lsl #1]	@ movhi
+  89 0074 D91C     		adds	r1, r3, #3
+  90 0076 20F81120 		strh	r2, [r0, r1, lsl #1]	@ movhi
+  91 007a 0433     		adds	r3, r3, #4
+  92              	.L5:
+  93 007c 3F2B     		cmp	r3, #63
+  94 007e C5DD     		ble	.L6
+  95 0080 7047     		bx	lr
+  96              	.L8:
+  97 0082 00BF     		.align	2
+  98              	.L7:
+  99 0084 00000000 		.word	lpf_L
+ 100 0088 00000000 		.word	lpf_R
+ 102              		.section	.text.apply_delay,"ax",%progbits
+ 103              		.align	1
+ 104              		.syntax unified
+ 105              		.thumb
+ 106              		.thumb_func
+ 108              	apply_delay:
+ 109              		@ args = 0, pretend = 0, frame = 0
+ 110              		@ frame_needed = 0, uses_anonymous_args = 0
+ 111 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 112 0004 0C46     		mov	r4, r1
+ 113 0006 01B9     		cbnz	r1, .L10
+ 114 0008 0124     		movs	r4, #1
+ 115              	.L10:
+ 116 000a 4FF0000E 		mov	lr, #0
+ 117 000e 5DE0     		b	.L11
+ 118              	.L12:
+ 119 0010 314E     		ldr	r6, .L15
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s 			page 3
+
+
+ 120 0012 3388     		ldrh	r3, [r6]
+ 121 0014 03F50072 		add	r2, r3, #512
+ 122 0018 121B     		subs	r2, r2, r4
+ 123 001a 5142     		rsbs	r1, r2, #0
+ 124 001c C2F30802 		ubfx	r2, r2, #0, #9
+ 125 0020 C1F30801 		ubfx	r1, r1, #0, #9
+ 126 0024 58BF     		it	pl
+ 127 0026 4A42     		rsbpl	r2, r1, #0
+ 128 0028 30F91EC0 		ldrsh	ip, [r0, lr, lsl #1]
+ 129 002c 0EF10205 		add	r5, lr, #2
+ 130 0030 30F91510 		ldrsh	r1, [r0, r5, lsl #1]
+ 131 0034 92B2     		uxth	r2, r2
+ 132 0036 DFF8B080 		ldr	r8, .L15+16
+ 133 003a 38F91270 		ldrsh	r7, [r8, r2, lsl #1]
+ 134 003e 06EE907A 		vmov	s13, r7	@ int
+ 135 0042 264F     		ldr	r7, .L15+4
+ 136 0044 37F91220 		ldrsh	r2, [r7, r2, lsl #1]
+ 137 0048 07EE102A 		vmov	s14, r2	@ int
+ 138 004c 28F813C0 		strh	ip, [r8, r3, lsl #1]	@ movhi
+ 139 0050 27F81310 		strh	r1, [r7, r3, lsl #1]	@ movhi
+ 140 0054 0133     		adds	r3, r3, #1
+ 141 0056 5A42     		rsbs	r2, r3, #0
+ 142 0058 C3F30803 		ubfx	r3, r3, #0, #9
+ 143 005c C2F30802 		ubfx	r2, r2, #0, #9
+ 144 0060 58BF     		it	pl
+ 145 0062 5342     		rsbpl	r3, r2, #0
+ 146 0064 3380     		strh	r3, [r6]	@ movhi
+ 147 0066 07EE90CA 		vmov	s15, ip	@ int
+ 148 006a F8EEE77A 		vcvt.f32.s32	s15, s15
+ 149 006e DFED1C5A 		vldr.32	s11, .L15+8
+ 150 0072 67EEA57A 		vmul.f32	s15, s15, s11
+ 151 0076 F8EEE66A 		vcvt.f32.s32	s13, s13
+ 152 007a 9FED1A6A 		vldr.32	s12, .L15+12
+ 153 007e 66EE866A 		vmul.f32	s13, s13, s12
+ 154 0082 77EEA67A 		vadd.f32	s15, s15, s13
+ 155 0086 FDEEE77A 		vcvt.s32.f32	s15, s15
+ 156 008a 17EE903A 		vmov	r3, s15	@ int
+ 157 008e 20F81E30 		strh	r3, [r0, lr, lsl #1]	@ movhi
+ 158 0092 0EF10102 		add	r2, lr, #1
+ 159 0096 0023     		movs	r3, #0
+ 160 0098 20F81230 		strh	r3, [r0, r2, lsl #1]	@ movhi
+ 161 009c 07EE901A 		vmov	s15, r1	@ int
+ 162 00a0 F8EEE77A 		vcvt.f32.s32	s15, s15
+ 163 00a4 67EEA57A 		vmul.f32	s15, s15, s11
+ 164 00a8 B8EEC77A 		vcvt.f32.s32	s14, s14
+ 165 00ac 27EE067A 		vmul.f32	s14, s14, s12
+ 166 00b0 77EE877A 		vadd.f32	s15, s15, s14
+ 167 00b4 FDEEE77A 		vcvt.s32.f32	s15, s15
+ 168 00b8 17EE902A 		vmov	r2, s15	@ int
+ 169 00bc 20F81520 		strh	r2, [r0, r5, lsl #1]	@ movhi
+ 170 00c0 0EF10302 		add	r2, lr, #3
+ 171 00c4 20F81230 		strh	r3, [r0, r2, lsl #1]	@ movhi
+ 172 00c8 0EF1040E 		add	lr, lr, #4
+ 173              	.L11:
+ 174 00cc BEF13F0F 		cmp	lr, #63
+ 175 00d0 9EDD     		ble	.L12
+ 176 00d2 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s 			page 4
+
+
+ 177              	.L16:
+ 178 00d6 00BF     		.align	2
+ 179              	.L15:
+ 180 00d8 00000000 		.word	delay_wr
+ 181 00dc 00000000 		.word	delay_line_R
+ 182 00e0 3333333F 		.word	1060320051
+ 183 00e4 9A99993E 		.word	1050253722
+ 184 00e8 00000000 		.word	delay_line_L
+ 186              		.section	.text.StartDSPTask,"ax",%progbits
+ 187              		.align	1
+ 188              		.global	StartDSPTask
+ 189              		.syntax unified
+ 190              		.thumb
+ 191              		.thumb_func
+ 193              	StartDSPTask:
+ 194              		@ Volatile: function does not return.
+ 195              		@ args = 0, pretend = 0, frame = 16
+ 196              		@ frame_needed = 0, uses_anonymous_args = 0
+ 197 0000 00B5     		push	{lr}
+ 198 0002 87B0     		sub	sp, sp, #28
+ 199 0004 8022     		movs	r2, #128
+ 200 0006 0021     		movs	r1, #0
+ 201 0008 1F48     		ldr	r0, .L25
+ 202 000a FFF7FEFF 		bl	memset
+ 203 000e 05E0     		b	.L20
+ 204              	.L18:
+ 205 0010 14F0020F 		tst	r4, #2
+ 206 0014 2BD1     		bne	.L23
+ 207              	.L19:
+ 208 0016 14F0040F 		tst	r4, #4
+ 209 001a 2ED1     		bne	.L24
+ 210              	.L20:
+ 211 001c 1B4E     		ldr	r6, .L25+4
+ 212 001e 1A4C     		ldr	r4, .L25
+ 213 0020 4FF0FF35 		mov	r5, #-1
+ 214 0024 0095     		str	r5, [sp]
+ 215 0026 2023     		movs	r3, #32
+ 216 0028 3246     		mov	r2, r6
+ 217 002a 2146     		mov	r1, r4
+ 218 002c 1848     		ldr	r0, .L25+8
+ 219 002e FFF7FEFF 		bl	HAL_I2SEx_TransmitReceive
+ 220 0032 8022     		movs	r2, #128
+ 221 0034 3146     		mov	r1, r6
+ 222 0036 2046     		mov	r0, r4
+ 223 0038 FFF7FEFF 		bl	memcpy
+ 224 003c 154C     		ldr	r4, .L25+12
+ 225 003e 2946     		mov	r1, r5
+ 226 0040 2068     		ldr	r0, [r4]
+ 227 0042 FFF7FEFF 		bl	osMutexWait
+ 228 0046 144B     		ldr	r3, .L25+16
+ 229 0048 93E80700 		ldm	r3, {r0, r1, r2}
+ 230 004c 06AB     		add	r3, sp, #24
+ 231 004e 03E90700 		stmdb	r3, {r0, r1, r2}
+ 232 0052 2068     		ldr	r0, [r4]
+ 233 0054 FFF7FEFF 		bl	osMutexRelease
+ 234 0058 9DF81640 		ldrb	r4, [sp, #22]	@ zero_extendqisi2
+ 235 005c 14F0010F 		tst	r4, #1
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s 			page 5
+
+
+ 236 0060 D6D0     		beq	.L18
+ 237 0062 9DED030A 		vldr.32	s0, [sp, #12]
+ 238 0066 0848     		ldr	r0, .L25
+ 239 0068 FFF7FEFF 		bl	apply_volume
+ 240 006c D0E7     		b	.L18
+ 241              	.L23:
+ 242 006e 9DED040A 		vldr.32	s0, [sp, #16]
+ 243 0072 0548     		ldr	r0, .L25
+ 244 0074 FFF7FEFF 		bl	apply_lpf
+ 245 0078 CDE7     		b	.L19
+ 246              	.L24:
+ 247 007a BDF81410 		ldrh	r1, [sp, #20]
+ 248 007e 0248     		ldr	r0, .L25
+ 249 0080 FFF7FEFF 		bl	apply_delay
+ 250 0084 CAE7     		b	.L20
+ 251              	.L26:
+ 252 0086 00BF     		.align	2
+ 253              	.L25:
+ 254 0088 00000000 		.word	tx_buf
+ 255 008c 00000000 		.word	rx_buf
+ 256 0090 00000000 		.word	hi2s3
+ 257 0094 00000000 		.word	g_params_mutex
+ 258 0098 00000000 		.word	g_audio_params
+ 260              		.section	.bss.lpf_R,"aw",%nobits
+ 261              		.align	2
+ 264              	lpf_R:
+ 265 0000 00000000 		.space	4
+ 266              		.section	.bss.lpf_L,"aw",%nobits
+ 267              		.align	2
+ 270              	lpf_L:
+ 271 0000 00000000 		.space	4
+ 272              		.section	.bss.delay_wr,"aw",%nobits
+ 273              		.align	1
+ 276              	delay_wr:
+ 277 0000 0000     		.space	2
+ 278              		.section	.bss.delay_line_R,"aw",%nobits
+ 279              		.align	2
+ 282              	delay_line_R:
+ 283 0000 00000000 		.space	1024
+ 283      00000000 
+ 283      00000000 
+ 283      00000000 
+ 283      00000000 
+ 284              		.section	.bss.delay_line_L,"aw",%nobits
+ 285              		.align	2
+ 288              	delay_line_L:
+ 289 0000 00000000 		.space	1024
+ 289      00000000 
+ 289      00000000 
+ 289      00000000 
+ 289      00000000 
+ 290              		.section	.bss.tx_buf,"aw",%nobits
+ 291              		.align	2
+ 294              	tx_buf:
+ 295 0000 00000000 		.space	128
+ 295      00000000 
+ 295      00000000 
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s 			page 6
+
+
+ 295      00000000 
+ 295      00000000 
+ 296              		.section	.bss.rx_buf,"aw",%nobits
+ 297              		.align	2
+ 300              	rx_buf:
+ 301 0000 00000000 		.space	128
+ 301      00000000 
+ 301      00000000 
+ 301      00000000 
+ 301      00000000 
+ 302              		.global	g_params_mutex
+ 303              		.section	.bss.g_params_mutex,"aw",%nobits
+ 304              		.align	2
+ 307              	g_params_mutex:
+ 308 0000 00000000 		.space	4
+ 309              		.global	g_audio_params
+ 310              		.section	.data.g_audio_params,"aw"
+ 311              		.align	2
+ 314              	g_audio_params:
+ 315 0000 CDCC4C3F 		.word	1061997773
+ 316 0004 0000803F 		.word	1065353216
+ 317 0008 0001     		.short	256
+ 318 000a 01       		.byte	1
+ 319 000b 00       		.space	1
+ 320              		.ident	"GCC: (xPack GNU Arm Embedded GCC arm64) 15.2.1 20251203"
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s 			page 7
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 dsp_task.c
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:18     .text.apply_volume:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:23     .text.apply_volume:00000000 apply_volume
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:47     .text.apply_lpf:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:52     .text.apply_lpf:00000000 apply_lpf
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:99     .text.apply_lpf:00000084 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:270    .bss.lpf_L:00000000 lpf_L
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:264    .bss.lpf_R:00000000 lpf_R
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:103    .text.apply_delay:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:108    .text.apply_delay:00000000 apply_delay
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:180    .text.apply_delay:000000d8 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:276    .bss.delay_wr:00000000 delay_wr
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:282    .bss.delay_line_R:00000000 delay_line_R
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:288    .bss.delay_line_L:00000000 delay_line_L
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:187    .text.StartDSPTask:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:193    .text.StartDSPTask:00000000 StartDSPTask
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:254    .text.StartDSPTask:00000088 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:294    .bss.tx_buf:00000000 tx_buf
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:300    .bss.rx_buf:00000000 rx_buf
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:307    .bss.g_params_mutex:00000000 g_params_mutex
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:314    .data.g_audio_params:00000000 g_audio_params
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:261    .bss.lpf_R:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:267    .bss.lpf_L:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:273    .bss.delay_wr:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:279    .bss.delay_line_R:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:285    .bss.delay_line_L:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:291    .bss.tx_buf:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:297    .bss.rx_buf:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:304    .bss.g_params_mutex:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccOMRWuB.s:311    .data.g_audio_params:00000000 $d
+
+UNDEFINED SYMBOLS
+memset
+HAL_I2SEx_TransmitReceive
+memcpy
+osMutexWait
+osMutexRelease
+hi2s3

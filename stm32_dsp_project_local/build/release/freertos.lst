@@ -1,0 +1,72 @@
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccjm7H6a.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"freertos.c"
+  16              		.text
+  17              		.section	.text.vApplicationGetIdleTaskMemory,"ax",%progbits
+  18              		.align	1
+  19              		.global	vApplicationGetIdleTaskMemory
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  24              	vApplicationGetIdleTaskMemory:
+  25              		@ args = 0, pretend = 0, frame = 0
+  26              		@ frame_needed = 0, uses_anonymous_args = 0
+  27              		@ link register save eliminated.
+  28 0000 034B     		ldr	r3, .L2
+  29 0002 0360     		str	r3, [r0]
+  30 0004 034B     		ldr	r3, .L2+4
+  31 0006 0B60     		str	r3, [r1]
+  32 0008 8023     		movs	r3, #128
+  33 000a 1360     		str	r3, [r2]
+  34 000c 7047     		bx	lr
+  35              	.L3:
+  36 000e 00BF     		.align	2
+  37              	.L2:
+  38 0010 00000000 		.word	xIdleTaskTCBBuffer
+  39 0014 00000000 		.word	xIdleStack
+  41              		.section	.bss.xIdleStack,"aw",%nobits
+  42              		.align	2
+  45              	xIdleStack:
+  46 0000 00000000 		.space	512
+  46      00000000 
+  46      00000000 
+  46      00000000 
+  46      00000000 
+  47              		.section	.bss.xIdleTaskTCBBuffer,"aw",%nobits
+  48              		.align	2
+  51              	xIdleTaskTCBBuffer:
+  52 0000 00000000 		.space	84
+  52      00000000 
+  52      00000000 
+  52      00000000 
+  52      00000000 
+  53              		.ident	"GCC: (xPack GNU Arm Embedded GCC arm64) 15.2.1 20251203"
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccjm7H6a.s 			page 2
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 freertos.c
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccjm7H6a.s:18     .text.vApplicationGetIdleTaskMemory:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccjm7H6a.s:24     .text.vApplicationGetIdleTaskMemory:00000000 vApplicationGetIdleTaskMemory
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccjm7H6a.s:38     .text.vApplicationGetIdleTaskMemory:00000010 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccjm7H6a.s:51     .bss.xIdleTaskTCBBuffer:00000000 xIdleTaskTCBBuffer
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccjm7H6a.s:45     .bss.xIdleStack:00000000 xIdleStack
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccjm7H6a.s:42     .bss.xIdleStack:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccjm7H6a.s:48     .bss.xIdleTaskTCBBuffer:00000000 $d
+
+NO UNDEFINED SYMBOLS

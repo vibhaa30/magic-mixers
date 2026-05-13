@@ -1,0 +1,134 @@
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc37IosO.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"usb_host.c"
+  16              		.text
+  17              		.section	.text.USBH_UserProcess,"ax",%progbits
+  18              		.align	1
+  19              		.syntax unified
+  20              		.thumb
+  21              		.thumb_func
+  23              	USBH_UserProcess:
+  24              		@ args = 0, pretend = 0, frame = 0
+  25              		@ frame_needed = 0, uses_anonymous_args = 0
+  26              		@ link register save eliminated.
+  27 0000 0429     		cmp	r1, #4
+  28 0002 0CD0     		beq	.L2
+  29 0004 0529     		cmp	r1, #5
+  30 0006 02D0     		beq	.L3
+  31 0008 0229     		cmp	r1, #2
+  32 000a 04D0     		beq	.L4
+  33 000c 7047     		bx	lr
+  34              	.L3:
+  35 000e 064B     		ldr	r3, .L6
+  36 0010 0322     		movs	r2, #3
+  37 0012 1A70     		strb	r2, [r3]
+  38 0014 7047     		bx	lr
+  39              	.L4:
+  40 0016 044B     		ldr	r3, .L6
+  41 0018 0222     		movs	r2, #2
+  42 001a 1A70     		strb	r2, [r3]
+  43 001c 7047     		bx	lr
+  44              	.L2:
+  45 001e 024B     		ldr	r3, .L6
+  46 0020 0122     		movs	r2, #1
+  47 0022 1A70     		strb	r2, [r3]
+  48 0024 7047     		bx	lr
+  49              	.L7:
+  50 0026 00BF     		.align	2
+  51              	.L6:
+  52 0028 00000000 		.word	Appli_state
+  54              		.section	.text.MX_USB_HOST_Init,"ax",%progbits
+  55              		.align	1
+  56              		.global	MX_USB_HOST_Init
+  57              		.syntax unified
+  58              		.thumb
+  59              		.thumb_func
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc37IosO.s 			page 2
+
+
+  61              	MX_USB_HOST_Init:
+  62              		@ args = 0, pretend = 0, frame = 0
+  63              		@ frame_needed = 0, uses_anonymous_args = 0
+  64 0000 08B5     		push	{r3, lr}
+  65 0002 0122     		movs	r2, #1
+  66 0004 0B49     		ldr	r1, .L16
+  67 0006 0C48     		ldr	r0, .L16+4
+  68 0008 FFF7FEFF 		bl	USBH_Init
+  69 000c 48B9     		cbnz	r0, .L13
+  70              	.L9:
+  71 000e 0B49     		ldr	r1, .L16+8
+  72 0010 0948     		ldr	r0, .L16+4
+  73 0012 FFF7FEFF 		bl	USBH_RegisterClass
+  74 0016 38B9     		cbnz	r0, .L14
+  75              	.L10:
+  76 0018 0748     		ldr	r0, .L16+4
+  77 001a FFF7FEFF 		bl	USBH_Start
+  78 001e 30B9     		cbnz	r0, .L15
+  79              	.L8:
+  80 0020 08BD     		pop	{r3, pc}
+  81              	.L13:
+  82 0022 FFF7FEFF 		bl	Error_Handler
+  83 0026 F2E7     		b	.L9
+  84              	.L14:
+  85 0028 FFF7FEFF 		bl	Error_Handler
+  86 002c F4E7     		b	.L10
+  87              	.L15:
+  88 002e FFF7FEFF 		bl	Error_Handler
+  89 0032 F5E7     		b	.L8
+  90              	.L17:
+  91              		.align	2
+  92              	.L16:
+  93 0034 00000000 		.word	USBH_UserProcess
+  94 0038 00000000 		.word	hUsbHostFS
+  95 003c 00000000 		.word	CDC_Class
+  97              		.global	Appli_state
+  98              		.section	.bss.Appli_state,"aw",%nobits
+ 101              	Appli_state:
+ 102 0000 00       		.space	1
+ 103              		.global	hUsbHostFS
+ 104              		.section	.bss.hUsbHostFS,"aw",%nobits
+ 105              		.align	2
+ 108              	hUsbHostFS:
+ 109 0000 00000000 		.space	996
+ 109      00000000 
+ 109      00000000 
+ 109      00000000 
+ 109      00000000 
+ 110              		.ident	"GCC: (xPack GNU Arm Embedded GCC arm64) 15.2.1 20251203"
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc37IosO.s 			page 3
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 usb_host.c
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc37IosO.s:18     .text.USBH_UserProcess:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc37IosO.s:23     .text.USBH_UserProcess:00000000 USBH_UserProcess
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc37IosO.s:52     .text.USBH_UserProcess:00000028 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc37IosO.s:101    .bss.Appli_state:00000000 Appli_state
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc37IosO.s:55     .text.MX_USB_HOST_Init:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc37IosO.s:61     .text.MX_USB_HOST_Init:00000000 MX_USB_HOST_Init
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc37IosO.s:93     .text.MX_USB_HOST_Init:00000034 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc37IosO.s:108    .bss.hUsbHostFS:00000000 hUsbHostFS
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc37IosO.s:102    .bss.Appli_state:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc37IosO.s:105    .bss.hUsbHostFS:00000000 $d
+
+UNDEFINED SYMBOLS
+USBH_Init
+USBH_RegisterClass
+USBH_Start
+Error_Handler
+CDC_Class

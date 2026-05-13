@@ -1,0 +1,151 @@
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccmkRJUg.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"usbh_pipes.c"
+  16              		.text
+  17              		.section	.text.USBH_GetFreePipe,"ax",%progbits
+  18              		.align	1
+  19              		.syntax unified
+  20              		.thumb
+  21              		.thumb_func
+  23              	USBH_GetFreePipe:
+  24              		@ args = 0, pretend = 0, frame = 0
+  25              		@ frame_needed = 0, uses_anonymous_args = 0
+  26              		@ link register save eliminated.
+  27 0000 0023     		movs	r3, #0
+  28              	.L2:
+  29 0002 0F2B     		cmp	r3, #15
+  30 0004 0CD8     		bhi	.L6
+  31 0006 03F1E002 		add	r2, r3, #224
+  32 000a 00EB8202 		add	r2, r0, r2, lsl #2
+  33 000e 5268     		ldr	r2, [r2, #4]
+  34 0010 12F4004F 		tst	r2, #32768
+  35 0014 02D0     		beq	.L7
+  36 0016 0133     		adds	r3, r3, #1
+  37 0018 DBB2     		uxtb	r3, r3
+  38 001a F2E7     		b	.L2
+  39              	.L7:
+  40 001c 1846     		mov	r0, r3
+  41 001e 7047     		bx	lr
+  42              	.L6:
+  43 0020 4FF6FF70 		movw	r0, #65535
+  44 0024 7047     		bx	lr
+  46              		.section	.text.USBH_OpenPipe,"ax",%progbits
+  47              		.align	1
+  48              		.global	USBH_OpenPipe
+  49              		.syntax unified
+  50              		.thumb
+  51              		.thumb_func
+  53              	USBH_OpenPipe:
+  54              		@ args = 12, pretend = 0, frame = 0
+  55              		@ frame_needed = 0, uses_anonymous_args = 0
+  56 0000 00B5     		push	{lr}
+  57 0002 85B0     		sub	sp, sp, #20
+  58 0004 BDF820C0 		ldrh	ip, [sp, #32]
+  59 0008 CDF808C0 		str	ip, [sp, #8]
+  60 000c 9DF81CC0 		ldrb	ip, [sp, #28]	@ zero_extendqisi2
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccmkRJUg.s 			page 2
+
+
+  61 0010 CDF804C0 		str	ip, [sp, #4]
+  62 0014 9DF818C0 		ldrb	ip, [sp, #24]	@ zero_extendqisi2
+  63 0018 CDF800C0 		str	ip, [sp]
+  64 001c FFF7FEFF 		bl	USBH_LL_OpenPipe
+  65 0020 0020     		movs	r0, #0
+  66 0022 05B0     		add	sp, sp, #20
+  67              		@ sp needed
+  68 0024 00BD     		pop	{pc}
+  70              		.section	.text.USBH_ClosePipe,"ax",%progbits
+  71              		.align	1
+  72              		.global	USBH_ClosePipe
+  73              		.syntax unified
+  74              		.thumb
+  75              		.thumb_func
+  77              	USBH_ClosePipe:
+  78              		@ args = 0, pretend = 0, frame = 0
+  79              		@ frame_needed = 0, uses_anonymous_args = 0
+  80 0000 08B5     		push	{r3, lr}
+  81 0002 FFF7FEFF 		bl	USBH_LL_ClosePipe
+  82 0006 0020     		movs	r0, #0
+  83 0008 08BD     		pop	{r3, pc}
+  85              		.section	.text.USBH_AllocPipe,"ax",%progbits
+  86              		.align	1
+  87              		.global	USBH_AllocPipe
+  88              		.syntax unified
+  89              		.thumb
+  90              		.thumb_func
+  92              	USBH_AllocPipe:
+  93              		@ args = 0, pretend = 0, frame = 0
+  94              		@ frame_needed = 0, uses_anonymous_args = 0
+  95 0000 38B5     		push	{r3, r4, r5, lr}
+  96 0002 0546     		mov	r5, r0
+  97 0004 0C46     		mov	r4, r1
+  98 0006 FFF7FEFF 		bl	USBH_GetFreePipe
+  99 000a 4FF6FF73 		movw	r3, #65535
+ 100 000e 9842     		cmp	r0, r3
+ 101 0010 07D0     		beq	.L13
+ 102 0012 00F00F03 		and	r3, r0, #15
+ 103 0016 44F40041 		orr	r1, r4, #32768
+ 104 001a E033     		adds	r3, r3, #224
+ 105 001c 05EB8303 		add	r3, r5, r3, lsl #2
+ 106 0020 5960     		str	r1, [r3, #4]
+ 107              	.L13:
+ 108 0022 C0B2     		uxtb	r0, r0
+ 109 0024 38BD     		pop	{r3, r4, r5, pc}
+ 111              		.section	.text.USBH_FreePipe,"ax",%progbits
+ 112              		.align	1
+ 113              		.global	USBH_FreePipe
+ 114              		.syntax unified
+ 115              		.thumb
+ 116              		.thumb_func
+ 118              	USBH_FreePipe:
+ 119              		@ args = 0, pretend = 0, frame = 0
+ 120              		@ frame_needed = 0, uses_anonymous_args = 0
+ 121              		@ link register save eliminated.
+ 122 0000 0F29     		cmp	r1, #15
+ 123 0002 06D8     		bhi	.L16
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccmkRJUg.s 			page 3
+
+
+ 124 0004 E031     		adds	r1, r1, #224
+ 125 0006 00EB8100 		add	r0, r0, r1, lsl #2
+ 126 000a 4368     		ldr	r3, [r0, #4]
+ 127 000c C3F30E03 		ubfx	r3, r3, #0, #15
+ 128 0010 4360     		str	r3, [r0, #4]
+ 129              	.L16:
+ 130 0012 0020     		movs	r0, #0
+ 131 0014 7047     		bx	lr
+ 133              		.ident	"GCC: (xPack GNU Arm Embedded GCC arm64) 15.2.1 20251203"
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccmkRJUg.s 			page 4
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 usbh_pipes.c
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccmkRJUg.s:18     .text.USBH_GetFreePipe:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccmkRJUg.s:23     .text.USBH_GetFreePipe:00000000 USBH_GetFreePipe
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccmkRJUg.s:47     .text.USBH_OpenPipe:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccmkRJUg.s:53     .text.USBH_OpenPipe:00000000 USBH_OpenPipe
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccmkRJUg.s:71     .text.USBH_ClosePipe:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccmkRJUg.s:77     .text.USBH_ClosePipe:00000000 USBH_ClosePipe
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccmkRJUg.s:86     .text.USBH_AllocPipe:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccmkRJUg.s:92     .text.USBH_AllocPipe:00000000 USBH_AllocPipe
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccmkRJUg.s:112    .text.USBH_FreePipe:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccmkRJUg.s:118    .text.USBH_FreePipe:00000000 USBH_FreePipe
+
+UNDEFINED SYMBOLS
+USBH_LL_OpenPipe
+USBH_LL_ClosePipe

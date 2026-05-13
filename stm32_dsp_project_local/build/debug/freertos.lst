@@ -1,0 +1,218 @@
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc77bPMA.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"freertos.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "Core/Src/freertos.c"
+  20              		.section	.text.vApplicationGetIdleTaskMemory,"ax",%progbits
+  21              		.align	1
+  22              		.global	vApplicationGetIdleTaskMemory
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	vApplicationGetIdleTaskMemory:
+  28              	.LVL0:
+  29              	.LFB139:
+   1:Core/Src/freertos.c **** /* USER CODE BEGIN Header */
+   2:Core/Src/freertos.c **** /**
+   3:Core/Src/freertos.c ****   ******************************************************************************
+   4:Core/Src/freertos.c ****   * File Name          : freertos.c
+   5:Core/Src/freertos.c ****   * Description        : Code for freertos applications
+   6:Core/Src/freertos.c ****   ******************************************************************************
+   7:Core/Src/freertos.c ****   * @attention
+   8:Core/Src/freertos.c ****   *
+   9:Core/Src/freertos.c ****   * Copyright (c) 2026 STMicroelectronics.
+  10:Core/Src/freertos.c ****   * All rights reserved.
+  11:Core/Src/freertos.c ****   *
+  12:Core/Src/freertos.c ****   * This software is licensed under terms that can be found in the LICENSE file
+  13:Core/Src/freertos.c ****   * in the root directory of this software component.
+  14:Core/Src/freertos.c ****   * If no LICENSE file comes with this software, it is provided AS-IS.
+  15:Core/Src/freertos.c ****   *
+  16:Core/Src/freertos.c ****   ******************************************************************************
+  17:Core/Src/freertos.c ****   */
+  18:Core/Src/freertos.c **** /* USER CODE END Header */
+  19:Core/Src/freertos.c **** 
+  20:Core/Src/freertos.c **** /* Includes ------------------------------------------------------------------*/
+  21:Core/Src/freertos.c **** #include "FreeRTOS.h"
+  22:Core/Src/freertos.c **** #include "task.h"
+  23:Core/Src/freertos.c **** #include "main.h"
+  24:Core/Src/freertos.c **** 
+  25:Core/Src/freertos.c **** /* Private includes ----------------------------------------------------------*/
+  26:Core/Src/freertos.c **** /* USER CODE BEGIN Includes */
+  27:Core/Src/freertos.c **** 
+  28:Core/Src/freertos.c **** /* USER CODE END Includes */
+  29:Core/Src/freertos.c **** 
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc77bPMA.s 			page 2
+
+
+  30:Core/Src/freertos.c **** /* Private typedef -----------------------------------------------------------*/
+  31:Core/Src/freertos.c **** /* USER CODE BEGIN PTD */
+  32:Core/Src/freertos.c **** 
+  33:Core/Src/freertos.c **** /* USER CODE END PTD */
+  34:Core/Src/freertos.c **** 
+  35:Core/Src/freertos.c **** /* Private define ------------------------------------------------------------*/
+  36:Core/Src/freertos.c **** /* USER CODE BEGIN PD */
+  37:Core/Src/freertos.c **** 
+  38:Core/Src/freertos.c **** /* USER CODE END PD */
+  39:Core/Src/freertos.c **** 
+  40:Core/Src/freertos.c **** /* Private macro -------------------------------------------------------------*/
+  41:Core/Src/freertos.c **** /* USER CODE BEGIN PM */
+  42:Core/Src/freertos.c **** 
+  43:Core/Src/freertos.c **** /* USER CODE END PM */
+  44:Core/Src/freertos.c **** 
+  45:Core/Src/freertos.c **** /* Private variables ---------------------------------------------------------*/
+  46:Core/Src/freertos.c **** /* USER CODE BEGIN Variables */
+  47:Core/Src/freertos.c **** 
+  48:Core/Src/freertos.c **** /* USER CODE END Variables */
+  49:Core/Src/freertos.c **** 
+  50:Core/Src/freertos.c **** /* Private function prototypes -----------------------------------------------*/
+  51:Core/Src/freertos.c **** /* USER CODE BEGIN FunctionPrototypes */
+  52:Core/Src/freertos.c **** 
+  53:Core/Src/freertos.c **** /* USER CODE END FunctionPrototypes */
+  54:Core/Src/freertos.c **** 
+  55:Core/Src/freertos.c **** /* GetIdleTaskMemory prototype (linked to static allocation support) */
+  56:Core/Src/freertos.c **** void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskS
+  57:Core/Src/freertos.c **** 
+  58:Core/Src/freertos.c **** /* USER CODE BEGIN GET_IDLE_TASK_MEMORY */
+  59:Core/Src/freertos.c **** static StaticTask_t xIdleTaskTCBBuffer;
+  60:Core/Src/freertos.c **** static StackType_t xIdleStack[configMINIMAL_STACK_SIZE];
+  61:Core/Src/freertos.c **** 
+  62:Core/Src/freertos.c **** void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskS
+  63:Core/Src/freertos.c **** {
+  30              		.loc 1 63 1 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		@ link register save eliminated.
+  64:Core/Src/freertos.c ****   *ppxIdleTaskTCBBuffer = &xIdleTaskTCBBuffer;
+  35              		.loc 1 64 3 view .LVU1
+  36              		.loc 1 64 25 is_stmt 0 view .LVU2
+  37 0000 034B     		ldr	r3, .L2
+  38 0002 0360     		str	r3, [r0]
+  65:Core/Src/freertos.c ****   *ppxIdleTaskStackBuffer = &xIdleStack[0];
+  39              		.loc 1 65 3 is_stmt 1 view .LVU3
+  40              		.loc 1 65 27 is_stmt 0 view .LVU4
+  41 0004 034B     		ldr	r3, .L2+4
+  42 0006 0B60     		str	r3, [r1]
+  66:Core/Src/freertos.c ****   *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
+  43              		.loc 1 66 3 is_stmt 1 view .LVU5
+  44              		.loc 1 66 25 is_stmt 0 view .LVU6
+  45 0008 8023     		movs	r3, #128
+  46 000a 1360     		str	r3, [r2]
+  67:Core/Src/freertos.c ****   /* place for user code */
+  68:Core/Src/freertos.c **** }
+  47              		.loc 1 68 1 view .LVU7
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc77bPMA.s 			page 3
+
+
+  48 000c 7047     		bx	lr
+  49              	.L3:
+  50 000e 00BF     		.align	2
+  51              	.L2:
+  52 0010 00000000 		.word	xIdleTaskTCBBuffer
+  53 0014 00000000 		.word	xIdleStack
+  54              		.cfi_endproc
+  55              	.LFE139:
+  57              		.section	.text.vApplicationMallocFailedHook,"ax",%progbits
+  58              		.align	1
+  59              		.global	vApplicationMallocFailedHook
+  60              		.syntax unified
+  61              		.thumb
+  62              		.thumb_func
+  64              	vApplicationMallocFailedHook:
+  65              	.LFB140:
+  69:Core/Src/freertos.c **** /* USER CODE END GET_IDLE_TASK_MEMORY */
+  70:Core/Src/freertos.c **** 
+  71:Core/Src/freertos.c **** /* Private application code --------------------------------------------------*/
+  72:Core/Src/freertos.c **** /* USER CODE BEGIN Application */
+  73:Core/Src/freertos.c **** void vApplicationMallocFailedHook(void)
+  74:Core/Src/freertos.c **** {
+  66              		.loc 1 74 1 is_stmt 1 view -0
+  67              		.cfi_startproc
+  68              		@ Volatile: function does not return.
+  69              		@ args = 0, pretend = 0, frame = 0
+  70              		@ frame_needed = 0, uses_anonymous_args = 0
+  71 0000 08B5     		push	{r3, lr}
+  72              		.cfi_def_cfa_offset 8
+  73              		.cfi_offset 3, -8
+  74              		.cfi_offset 14, -4
+  75:Core/Src/freertos.c ****     HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_SET);
+  75              		.loc 1 75 5 view .LVU9
+  76 0002 0122     		movs	r2, #1
+  77 0004 4FF48041 		mov	r1, #16384
+  78 0008 0148     		ldr	r0, .L7
+  79 000a FFF7FEFF 		bl	HAL_GPIO_WritePin
+  80              	.LVL1:
+  81              	.L5:
+  76:Core/Src/freertos.c **** 
+  77:Core/Src/freertos.c ****     while(1);
+  82              		.loc 1 77 5 view .LVU10
+  83              		.loc 1 77 10 view .LVU11
+  84 000e FEE7     		b	.L5
+  85              	.L8:
+  86              		.align	2
+  87              	.L7:
+  88 0010 000C0240 		.word	1073875968
+  89              		.cfi_endproc
+  90              	.LFE140:
+  92              		.section	.bss.xIdleStack,"aw",%nobits
+  93              		.align	2
+  96              	xIdleStack:
+  97 0000 00000000 		.space	512
+  97      00000000 
+  97      00000000 
+  97      00000000 
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc77bPMA.s 			page 4
+
+
+  97      00000000 
+  98              		.section	.bss.xIdleTaskTCBBuffer,"aw",%nobits
+  99              		.align	2
+ 102              	xIdleTaskTCBBuffer:
+ 103 0000 00000000 		.space	84
+ 103      00000000 
+ 103      00000000 
+ 103      00000000 
+ 103      00000000 
+ 104              		.text
+ 105              	.Letext0:
+ 106              		.file 2 "/Users/vibhasathishkumar/Library/Application Support/Code/User/globalStorage/bmd.stm32-fo
+ 107              		.file 3 "/Users/vibhasathishkumar/Library/Application Support/Code/User/globalStorage/bmd.stm32-fo
+ 108              		.file 4 "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h"
+ 109              		.file 5 "Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h"
+ 110              		.file 6 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
+ 111              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h"
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc77bPMA.s 			page 5
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 freertos.c
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc77bPMA.s:21     .text.vApplicationGetIdleTaskMemory:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc77bPMA.s:27     .text.vApplicationGetIdleTaskMemory:00000000 vApplicationGetIdleTaskMemory
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc77bPMA.s:52     .text.vApplicationGetIdleTaskMemory:00000010 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc77bPMA.s:102    .bss.xIdleTaskTCBBuffer:00000000 xIdleTaskTCBBuffer
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc77bPMA.s:96     .bss.xIdleStack:00000000 xIdleStack
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc77bPMA.s:58     .text.vApplicationMallocFailedHook:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc77bPMA.s:64     .text.vApplicationMallocFailedHook:00000000 vApplicationMallocFailedHook
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc77bPMA.s:88     .text.vApplicationMallocFailedHook:00000010 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc77bPMA.s:93     .bss.xIdleStack:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc77bPMA.s:99     .bss.xIdleTaskTCBBuffer:00000000 $d
+
+UNDEFINED SYMBOLS
+HAL_GPIO_WritePin

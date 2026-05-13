@@ -1,0 +1,265 @@
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc5NdSkd.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"spi_task.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "Core/Src/spi_task.c"
+  20              		.section	.text.StartSPITask,"ax",%progbits
+  21              		.align	1
+  22              		.global	StartSPITask
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	StartSPITask:
+  28              	.LFB139:
+   1:Core/Src/spi_task.c **** #include "spi_task.h"
+   2:Core/Src/spi_task.c **** #include "dsp_task.h"
+   3:Core/Src/spi_task.c **** #include "main.h"
+   4:Core/Src/spi_task.c **** 
+   5:Core/Src/spi_task.c **** extern SPI_HandleTypeDef hspi2;
+   6:Core/Src/spi_task.c **** 
+   7:Core/Src/spi_task.c **** /* SPI task: receives 3-byte command packets from the Raspberry Pi 4 (SPI master)
+   8:Core/Src/spi_task.c ****    and updates the shared audio effect parameters.
+   9:Core/Src/spi_task.c **** 
+  10:Core/Src/spi_task.c ****    Packet format: [CMD] [VAL_HI] [VAL_LO]
+  11:Core/Src/spi_task.c ****    The RPi must be configured as SPI master (SPI_MODE_0, MSB first, 8-bit)
+  12:Core/Src/spi_task.c ****    to match the STM32 SPI2 slave configuration.
+  13:Core/Src/spi_task.c **** 
+  14:Core/Src/spi_task.c ****    NOTE: SPI2 is configured with software NSS. If you use a hardware CS line from
+  15:Core/Src/spi_task.c ****    the RPi, change hspi2.Init.NSS to SPI_NSS_HARD_INPUT in main.c for reliable
+  16:Core/Src/spi_task.c ****    transaction framing. */
+  17:Core/Src/spi_task.c **** 
+  18:Core/Src/spi_task.c **** 
+  19:Core/Src/spi_task.c **** void StartSPITask(void const * argument)
+  20:Core/Src/spi_task.c **** {
+  29              		.loc 1 20 1 view -0
+  30              		.cfi_startproc
+  31              		@ Volatile: function does not return.
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              	.LVL0:
+  35              		.loc 1 20 1 is_stmt 0 view .LVU1
+  36 0000 08B5     		push	{r3, lr}
+  37              		.cfi_def_cfa_offset 8
+  38              		.cfi_offset 3, -8
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc5NdSkd.s 			page 2
+
+
+  39              		.cfi_offset 14, -4
+  40 0002 1CE0     		b	.L3
+  41              	.LVL1:
+  42              	.L8:
+  21:Core/Src/spi_task.c ****     for (;;)
+  22:Core/Src/spi_task.c ****     {
+  23:Core/Src/spi_task.c ****         if (osSemaphoreWait(spiSemHandle, osWaitForever) == osOK)
+  24:Core/Src/spi_task.c ****         {
+  25:Core/Src/spi_task.c ****             if (gesture == 1)
+  26:Core/Src/spi_task.c ****             {
+  27:Core/Src/spi_task.c ****                 HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_SET);
+  43              		.loc 1 27 17 is_stmt 1 view .LVU2
+  44 0004 2E4C     		ldr	r4, .L10
+  45 0006 0122     		movs	r2, #1
+  46 0008 4FF40051 		mov	r1, #8192
+  47 000c 2046     		mov	r0, r4
+  48 000e FFF7FEFF 		bl	HAL_GPIO_WritePin
+  49              	.LVL2:
+  28:Core/Src/spi_task.c **** 
+  29:Core/Src/spi_task.c ****                 g_audio_params.volume = intensity / 10.0f;
+  50              		.loc 1 29 17 view .LVU3
+  51              		.loc 1 29 51 is_stmt 0 view .LVU4
+  52 0012 2C4B     		ldr	r3, .L10+4
+  53 0014 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+  54 0016 07EE903A 		vmov	s15, r3	@ int
+  55 001a F8EEE77A 		vcvt.f32.s32	s15, s15
+  56 001e F2EE046A 		vmov.f32	s13, #1.0e+1
+  57 0022 87EEA67A 		vdiv.f32	s14, s15, s13
+  58              		.loc 1 29 39 view .LVU5
+  59 0026 284B     		ldr	r3, .L10+8
+  60 0028 83ED007A 		vstr.32	s14, [r3]
+  30:Core/Src/spi_task.c **** 
+  31:Core/Src/spi_task.c ****                 osDelay(100);
+  61              		.loc 1 31 17 is_stmt 1 view .LVU6
+  62 002c 6420     		movs	r0, #100
+  63 002e FFF7FEFF 		bl	osDelay
+  64              	.LVL3:
+  32:Core/Src/spi_task.c **** 
+  33:Core/Src/spi_task.c ****                 HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_RESET);
+  65              		.loc 1 33 17 view .LVU7
+  66 0032 0022     		movs	r2, #0
+  67 0034 4FF40051 		mov	r1, #8192
+  68 0038 2046     		mov	r0, r4
+  69 003a FFF7FEFF 		bl	HAL_GPIO_WritePin
+  70              	.LVL4:
+  71              	.L3:
+  21:Core/Src/spi_task.c ****     {
+  72              		.loc 1 21 5 view .LVU8
+  23:Core/Src/spi_task.c ****         {
+  73              		.loc 1 23 9 view .LVU9
+  23:Core/Src/spi_task.c ****         {
+  74              		.loc 1 23 13 is_stmt 0 view .LVU10
+  75 003e 4FF0FF31 		mov	r1, #-1
+  76 0042 224B     		ldr	r3, .L10+12
+  77 0044 1868     		ldr	r0, [r3]
+  78 0046 FFF7FEFF 		bl	osSemaphoreWait
+  79              	.LVL5:
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc5NdSkd.s 			page 3
+
+
+  23:Core/Src/spi_task.c ****         {
+  80              		.loc 1 23 12 discriminator 1 view .LVU11
+  81 004a 0028     		cmp	r0, #0
+  82 004c F7D1     		bne	.L3
+  25:Core/Src/spi_task.c ****             {
+  83              		.loc 1 25 13 is_stmt 1 view .LVU12
+  25:Core/Src/spi_task.c ****             {
+  84              		.loc 1 25 25 is_stmt 0 view .LVU13
+  85 004e 204B     		ldr	r3, .L10+16
+  86 0050 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+  25:Core/Src/spi_task.c ****             {
+  87              		.loc 1 25 16 view .LVU14
+  88 0052 012B     		cmp	r3, #1
+  89 0054 D6D0     		beq	.L8
+  34:Core/Src/spi_task.c ****             }
+  35:Core/Src/spi_task.c ****             else if (gesture == 2)
+  90              		.loc 1 35 18 is_stmt 1 view .LVU15
+  91              		.loc 1 35 30 is_stmt 0 view .LVU16
+  92 0056 1E4B     		ldr	r3, .L10+16
+  93 0058 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+  94              		.loc 1 35 21 view .LVU17
+  95 005a 022B     		cmp	r3, #2
+  96 005c 18D0     		beq	.L9
+  36:Core/Src/spi_task.c ****             {
+  37:Core/Src/spi_task.c ****                 HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_SET);
+  38:Core/Src/spi_task.c **** 
+  39:Core/Src/spi_task.c ****                 g_audio_params.delay_samples = intensity * 48;
+  40:Core/Src/spi_task.c **** 
+  41:Core/Src/spi_task.c ****                 osDelay(100);
+  42:Core/Src/spi_task.c **** 
+  43:Core/Src/spi_task.c ****                 HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_RESET);
+  44:Core/Src/spi_task.c ****             }
+  45:Core/Src/spi_task.c ****             else
+  46:Core/Src/spi_task.c ****             {
+  47:Core/Src/spi_task.c ****                 HAL_GPIO_TogglePin(GPIOD, LD5_Pin);
+  97              		.loc 1 47 17 is_stmt 1 view .LVU18
+  98 005e 184C     		ldr	r4, .L10
+  99 0060 4FF48041 		mov	r1, #16384
+ 100 0064 2046     		mov	r0, r4
+ 101 0066 FFF7FEFF 		bl	HAL_GPIO_TogglePin
+ 102              	.LVL6:
+  48:Core/Src/spi_task.c ****                 HAL_GPIO_TogglePin(GPIOD, LD3_Pin);
+ 103              		.loc 1 48 17 view .LVU19
+ 104 006a 4FF40051 		mov	r1, #8192
+ 105 006e 2046     		mov	r0, r4
+ 106 0070 FFF7FEFF 		bl	HAL_GPIO_TogglePin
+ 107              	.LVL7:
+  49:Core/Src/spi_task.c ****                 osDelay(100);
+ 108              		.loc 1 49 17 view .LVU20
+ 109 0074 6420     		movs	r0, #100
+ 110 0076 FFF7FEFF 		bl	osDelay
+ 111              	.LVL8:
+  50:Core/Src/spi_task.c ****                 HAL_GPIO_TogglePin(GPIOD, LD5_Pin);
+ 112              		.loc 1 50 17 view .LVU21
+ 113 007a 4FF48041 		mov	r1, #16384
+ 114 007e 2046     		mov	r0, r4
+ 115 0080 FFF7FEFF 		bl	HAL_GPIO_TogglePin
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc5NdSkd.s 			page 4
+
+
+ 116              	.LVL9:
+  51:Core/Src/spi_task.c ****                 HAL_GPIO_TogglePin(GPIOD, LD3_Pin);
+ 117              		.loc 1 51 17 view .LVU22
+ 118 0084 4FF40051 		mov	r1, #8192
+ 119 0088 2046     		mov	r0, r4
+ 120 008a FFF7FEFF 		bl	HAL_GPIO_TogglePin
+ 121              	.LVL10:
+ 122 008e D6E7     		b	.L3
+ 123              	.L9:
+  37:Core/Src/spi_task.c **** 
+ 124              		.loc 1 37 17 view .LVU23
+ 125 0090 0B4C     		ldr	r4, .L10
+ 126 0092 0122     		movs	r2, #1
+ 127 0094 4FF48041 		mov	r1, #16384
+ 128 0098 2046     		mov	r0, r4
+ 129 009a FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 130              	.LVL11:
+  39:Core/Src/spi_task.c **** 
+ 131              		.loc 1 39 17 view .LVU24
+  39:Core/Src/spi_task.c **** 
+ 132              		.loc 1 39 46 is_stmt 0 view .LVU25
+ 133 009e 094B     		ldr	r3, .L10+4
+ 134 00a0 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 135 00a2 03EB4303 		add	r3, r3, r3, lsl #1
+ 136 00a6 1B01     		lsls	r3, r3, #4
+ 137 00a8 074A     		ldr	r2, .L10+8
+ 138 00aa 1381     		strh	r3, [r2, #8]	@ movhi
+  41:Core/Src/spi_task.c **** 
+ 139              		.loc 1 41 17 is_stmt 1 view .LVU26
+ 140 00ac 6420     		movs	r0, #100
+ 141 00ae FFF7FEFF 		bl	osDelay
+ 142              	.LVL12:
+  43:Core/Src/spi_task.c ****             }
+ 143              		.loc 1 43 17 view .LVU27
+ 144 00b2 0022     		movs	r2, #0
+ 145 00b4 4FF48041 		mov	r1, #16384
+ 146 00b8 2046     		mov	r0, r4
+ 147 00ba FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 148              	.LVL13:
+ 149 00be BEE7     		b	.L3
+ 150              	.L11:
+ 151              		.align	2
+ 152              	.L10:
+ 153 00c0 000C0240 		.word	1073875968
+ 154 00c4 00000000 		.word	intensity
+ 155 00c8 00000000 		.word	g_audio_params
+ 156 00cc 00000000 		.word	spiSemHandle
+ 157 00d0 00000000 		.word	gesture
+ 158              		.cfi_endproc
+ 159              	.LFE139:
+ 161              		.text
+ 162              	.Letext0:
+ 163              		.file 2 "/Users/vibhasathishkumar/Library/Application Support/Code/User/globalStorage/bmd.stm32-fo
+ 164              		.file 3 "/Users/vibhasathishkumar/Library/Application Support/Code/User/globalStorage/bmd.stm32-fo
+ 165              		.file 4 "Middlewares/Third_Party/FreeRTOS/Source/include/queue.h"
+ 166              		.file 5 "Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h"
+ 167              		.file 6 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h"
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc5NdSkd.s 			page 5
+
+
+ 168              		.file 7 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
+ 169              		.file 8 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h"
+ 170              		.file 9 "Core/Inc/spi_task.h"
+ 171              		.file 10 "Core/Inc/dsp_task.h"
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc5NdSkd.s 			page 6
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 spi_task.c
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc5NdSkd.s:21     .text.StartSPITask:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc5NdSkd.s:27     .text.StartSPITask:00000000 StartSPITask
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc5NdSkd.s:153    .text.StartSPITask:000000c0 $d
+
+UNDEFINED SYMBOLS
+HAL_GPIO_WritePin
+osDelay
+osSemaphoreWait
+HAL_GPIO_TogglePin
+intensity
+g_audio_params
+spiSemHandle
+gesture

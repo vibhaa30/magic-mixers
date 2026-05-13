@@ -1,0 +1,299 @@
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc7MFPTb.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"usbh_ioreq.c"
+  16              		.text
+  17              		.section	.text.USBH_CtlSendSetup,"ax",%progbits
+  18              		.align	1
+  19              		.global	USBH_CtlSendSetup
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  24              	USBH_CtlSendSetup:
+  25              		@ args = 0, pretend = 0, frame = 0
+  26              		@ frame_needed = 0, uses_anonymous_args = 0
+  27 0000 10B5     		push	{r4, lr}
+  28 0002 84B0     		sub	sp, sp, #16
+  29 0004 0B46     		mov	r3, r1
+  30 0006 1146     		mov	r1, r2
+  31 0008 0024     		movs	r4, #0
+  32 000a 0394     		str	r4, [sp, #12]
+  33 000c 0822     		movs	r2, #8
+  34 000e 0292     		str	r2, [sp, #8]
+  35 0010 0193     		str	r3, [sp, #4]
+  36 0012 0094     		str	r4, [sp]
+  37 0014 2346     		mov	r3, r4
+  38 0016 2246     		mov	r2, r4
+  39 0018 FFF7FEFF 		bl	USBH_LL_SubmitURB
+  40 001c 2046     		mov	r0, r4
+  41 001e 04B0     		add	sp, sp, #16
+  42              		@ sp needed
+  43 0020 10BD     		pop	{r4, pc}
+  45              		.section	.text.USBH_CtlSendData,"ax",%progbits
+  46              		.align	1
+  47              		.global	USBH_CtlSendData
+  48              		.syntax unified
+  49              		.thumb
+  50              		.thumb_func
+  52              	USBH_CtlSendData:
+  53              		@ args = 4, pretend = 0, frame = 0
+  54              		@ frame_needed = 0, uses_anonymous_args = 0
+  55 0000 00B5     		push	{lr}
+  56 0002 85B0     		sub	sp, sp, #20
+  57 0004 8C46     		mov	ip, r1
+  58 0006 1946     		mov	r1, r3
+  59 0008 9DF81830 		ldrb	r3, [sp, #24]	@ zero_extendqisi2
+  60 000c 90F81DE3 		ldrb	lr, [r0, #797]	@ zero_extendqisi2
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc7MFPTb.s 			page 2
+
+
+  61 0010 BEF1000F 		cmp	lr, #0
+  62 0014 00D0     		beq	.L4
+  63 0016 0023     		movs	r3, #0
+  64              	.L4:
+  65 0018 0393     		str	r3, [sp, #12]
+  66 001a 0292     		str	r2, [sp, #8]
+  67 001c CDF804C0 		str	ip, [sp, #4]
+  68 0020 0123     		movs	r3, #1
+  69 0022 0093     		str	r3, [sp]
+  70 0024 0023     		movs	r3, #0
+  71 0026 1A46     		mov	r2, r3
+  72 0028 FFF7FEFF 		bl	USBH_LL_SubmitURB
+  73 002c 0020     		movs	r0, #0
+  74 002e 05B0     		add	sp, sp, #20
+  75              		@ sp needed
+  76 0030 00BD     		pop	{pc}
+  78              		.section	.text.USBH_CtlReceiveData,"ax",%progbits
+  79              		.align	1
+  80              		.global	USBH_CtlReceiveData
+  81              		.syntax unified
+  82              		.thumb
+  83              		.thumb_func
+  85              	USBH_CtlReceiveData:
+  86              		@ args = 0, pretend = 0, frame = 0
+  87              		@ frame_needed = 0, uses_anonymous_args = 0
+  88 0000 10B5     		push	{r4, lr}
+  89 0002 84B0     		sub	sp, sp, #16
+  90 0004 8C46     		mov	ip, r1
+  91 0006 1946     		mov	r1, r3
+  92 0008 0024     		movs	r4, #0
+  93 000a 0394     		str	r4, [sp, #12]
+  94 000c 0292     		str	r2, [sp, #8]
+  95 000e CDF804C0 		str	ip, [sp, #4]
+  96 0012 0122     		movs	r2, #1
+  97 0014 0092     		str	r2, [sp]
+  98 0016 2346     		mov	r3, r4
+  99 0018 FFF7FEFF 		bl	USBH_LL_SubmitURB
+ 100 001c 2046     		mov	r0, r4
+ 101 001e 04B0     		add	sp, sp, #16
+ 102              		@ sp needed
+ 103 0020 10BD     		pop	{r4, pc}
+ 105              		.section	.text.USBH_BulkSendData,"ax",%progbits
+ 106              		.align	1
+ 107              		.global	USBH_BulkSendData
+ 108              		.syntax unified
+ 109              		.thumb
+ 110              		.thumb_func
+ 112              	USBH_BulkSendData:
+ 113              		@ args = 4, pretend = 0, frame = 0
+ 114              		@ frame_needed = 0, uses_anonymous_args = 0
+ 115 0000 00B5     		push	{lr}
+ 116 0002 85B0     		sub	sp, sp, #20
+ 117 0004 8C46     		mov	ip, r1
+ 118 0006 1946     		mov	r1, r3
+ 119 0008 9DF81830 		ldrb	r3, [sp, #24]	@ zero_extendqisi2
+ 120 000c 90F81DE3 		ldrb	lr, [r0, #797]	@ zero_extendqisi2
+ 121 0010 BEF1000F 		cmp	lr, #0
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc7MFPTb.s 			page 3
+
+
+ 122 0014 00D0     		beq	.L10
+ 123 0016 0023     		movs	r3, #0
+ 124              	.L10:
+ 125 0018 0393     		str	r3, [sp, #12]
+ 126 001a 0292     		str	r2, [sp, #8]
+ 127 001c CDF804C0 		str	ip, [sp, #4]
+ 128 0020 0123     		movs	r3, #1
+ 129 0022 0093     		str	r3, [sp]
+ 130 0024 0223     		movs	r3, #2
+ 131 0026 0022     		movs	r2, #0
+ 132 0028 FFF7FEFF 		bl	USBH_LL_SubmitURB
+ 133 002c 0020     		movs	r0, #0
+ 134 002e 05B0     		add	sp, sp, #20
+ 135              		@ sp needed
+ 136 0030 00BD     		pop	{pc}
+ 138              		.section	.text.USBH_BulkReceiveData,"ax",%progbits
+ 139              		.align	1
+ 140              		.global	USBH_BulkReceiveData
+ 141              		.syntax unified
+ 142              		.thumb
+ 143              		.thumb_func
+ 145              	USBH_BulkReceiveData:
+ 146              		@ args = 0, pretend = 0, frame = 0
+ 147              		@ frame_needed = 0, uses_anonymous_args = 0
+ 148 0000 10B5     		push	{r4, lr}
+ 149 0002 84B0     		sub	sp, sp, #16
+ 150 0004 8C46     		mov	ip, r1
+ 151 0006 1946     		mov	r1, r3
+ 152 0008 0024     		movs	r4, #0
+ 153 000a 0394     		str	r4, [sp, #12]
+ 154 000c 0292     		str	r2, [sp, #8]
+ 155 000e CDF804C0 		str	ip, [sp, #4]
+ 156 0012 0122     		movs	r2, #1
+ 157 0014 0092     		str	r2, [sp]
+ 158 0016 0223     		movs	r3, #2
+ 159 0018 FFF7FEFF 		bl	USBH_LL_SubmitURB
+ 160 001c 2046     		mov	r0, r4
+ 161 001e 04B0     		add	sp, sp, #16
+ 162              		@ sp needed
+ 163 0020 10BD     		pop	{r4, pc}
+ 165              		.section	.text.USBH_InterruptReceiveData,"ax",%progbits
+ 166              		.align	1
+ 167              		.global	USBH_InterruptReceiveData
+ 168              		.syntax unified
+ 169              		.thumb
+ 170              		.thumb_func
+ 172              	USBH_InterruptReceiveData:
+ 173              		@ args = 0, pretend = 0, frame = 0
+ 174              		@ frame_needed = 0, uses_anonymous_args = 0
+ 175 0000 10B5     		push	{r4, lr}
+ 176 0002 84B0     		sub	sp, sp, #16
+ 177 0004 8C46     		mov	ip, r1
+ 178 0006 1946     		mov	r1, r3
+ 179 0008 0024     		movs	r4, #0
+ 180 000a 0394     		str	r4, [sp, #12]
+ 181 000c 0292     		str	r2, [sp, #8]
+ 182 000e CDF804C0 		str	ip, [sp, #4]
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc7MFPTb.s 			page 4
+
+
+ 183 0012 0122     		movs	r2, #1
+ 184 0014 0092     		str	r2, [sp]
+ 185 0016 0323     		movs	r3, #3
+ 186 0018 FFF7FEFF 		bl	USBH_LL_SubmitURB
+ 187 001c 2046     		mov	r0, r4
+ 188 001e 04B0     		add	sp, sp, #16
+ 189              		@ sp needed
+ 190 0020 10BD     		pop	{r4, pc}
+ 192              		.section	.text.USBH_InterruptSendData,"ax",%progbits
+ 193              		.align	1
+ 194              		.global	USBH_InterruptSendData
+ 195              		.syntax unified
+ 196              		.thumb
+ 197              		.thumb_func
+ 199              	USBH_InterruptSendData:
+ 200              		@ args = 0, pretend = 0, frame = 0
+ 201              		@ frame_needed = 0, uses_anonymous_args = 0
+ 202 0000 10B5     		push	{r4, lr}
+ 203 0002 84B0     		sub	sp, sp, #16
+ 204 0004 8C46     		mov	ip, r1
+ 205 0006 1946     		mov	r1, r3
+ 206 0008 0024     		movs	r4, #0
+ 207 000a 0394     		str	r4, [sp, #12]
+ 208 000c 0292     		str	r2, [sp, #8]
+ 209 000e CDF804C0 		str	ip, [sp, #4]
+ 210 0012 0123     		movs	r3, #1
+ 211 0014 0093     		str	r3, [sp]
+ 212 0016 0323     		movs	r3, #3
+ 213 0018 2246     		mov	r2, r4
+ 214 001a FFF7FEFF 		bl	USBH_LL_SubmitURB
+ 215 001e 2046     		mov	r0, r4
+ 216 0020 04B0     		add	sp, sp, #16
+ 217              		@ sp needed
+ 218 0022 10BD     		pop	{r4, pc}
+ 220              		.section	.text.USBH_IsocReceiveData,"ax",%progbits
+ 221              		.align	1
+ 222              		.global	USBH_IsocReceiveData
+ 223              		.syntax unified
+ 224              		.thumb
+ 225              		.thumb_func
+ 227              	USBH_IsocReceiveData:
+ 228              		@ args = 0, pretend = 0, frame = 0
+ 229              		@ frame_needed = 0, uses_anonymous_args = 0
+ 230 0000 10B5     		push	{r4, lr}
+ 231 0002 84B0     		sub	sp, sp, #16
+ 232 0004 8C46     		mov	ip, r1
+ 233 0006 1946     		mov	r1, r3
+ 234 0008 0024     		movs	r4, #0
+ 235 000a 0394     		str	r4, [sp, #12]
+ 236 000c 92B2     		uxth	r2, r2
+ 237 000e 0292     		str	r2, [sp, #8]
+ 238 0010 CDF804C0 		str	ip, [sp, #4]
+ 239 0014 0122     		movs	r2, #1
+ 240 0016 0092     		str	r2, [sp]
+ 241 0018 1346     		mov	r3, r2
+ 242 001a FFF7FEFF 		bl	USBH_LL_SubmitURB
+ 243 001e 2046     		mov	r0, r4
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc7MFPTb.s 			page 5
+
+
+ 244 0020 04B0     		add	sp, sp, #16
+ 245              		@ sp needed
+ 246 0022 10BD     		pop	{r4, pc}
+ 248              		.section	.text.USBH_IsocSendData,"ax",%progbits
+ 249              		.align	1
+ 250              		.global	USBH_IsocSendData
+ 251              		.syntax unified
+ 252              		.thumb
+ 253              		.thumb_func
+ 255              	USBH_IsocSendData:
+ 256              		@ args = 0, pretend = 0, frame = 0
+ 257              		@ frame_needed = 0, uses_anonymous_args = 0
+ 258 0000 10B5     		push	{r4, lr}
+ 259 0002 84B0     		sub	sp, sp, #16
+ 260 0004 8C46     		mov	ip, r1
+ 261 0006 1946     		mov	r1, r3
+ 262 0008 0024     		movs	r4, #0
+ 263 000a 0394     		str	r4, [sp, #12]
+ 264 000c 92B2     		uxth	r2, r2
+ 265 000e 0292     		str	r2, [sp, #8]
+ 266 0010 CDF804C0 		str	ip, [sp, #4]
+ 267 0014 0123     		movs	r3, #1
+ 268 0016 0093     		str	r3, [sp]
+ 269 0018 2246     		mov	r2, r4
+ 270 001a FFF7FEFF 		bl	USBH_LL_SubmitURB
+ 271 001e 2046     		mov	r0, r4
+ 272 0020 04B0     		add	sp, sp, #16
+ 273              		@ sp needed
+ 274 0022 10BD     		pop	{r4, pc}
+ 276              		.ident	"GCC: (xPack GNU Arm Embedded GCC arm64) 15.2.1 20251203"
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc7MFPTb.s 			page 6
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 usbh_ioreq.c
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc7MFPTb.s:18     .text.USBH_CtlSendSetup:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc7MFPTb.s:24     .text.USBH_CtlSendSetup:00000000 USBH_CtlSendSetup
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc7MFPTb.s:46     .text.USBH_CtlSendData:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc7MFPTb.s:52     .text.USBH_CtlSendData:00000000 USBH_CtlSendData
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc7MFPTb.s:79     .text.USBH_CtlReceiveData:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc7MFPTb.s:85     .text.USBH_CtlReceiveData:00000000 USBH_CtlReceiveData
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc7MFPTb.s:106    .text.USBH_BulkSendData:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc7MFPTb.s:112    .text.USBH_BulkSendData:00000000 USBH_BulkSendData
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc7MFPTb.s:139    .text.USBH_BulkReceiveData:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc7MFPTb.s:145    .text.USBH_BulkReceiveData:00000000 USBH_BulkReceiveData
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc7MFPTb.s:166    .text.USBH_InterruptReceiveData:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc7MFPTb.s:172    .text.USBH_InterruptReceiveData:00000000 USBH_InterruptReceiveData
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc7MFPTb.s:193    .text.USBH_InterruptSendData:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc7MFPTb.s:199    .text.USBH_InterruptSendData:00000000 USBH_InterruptSendData
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc7MFPTb.s:221    .text.USBH_IsocReceiveData:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc7MFPTb.s:227    .text.USBH_IsocReceiveData:00000000 USBH_IsocReceiveData
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc7MFPTb.s:249    .text.USBH_IsocSendData:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc7MFPTb.s:255    .text.USBH_IsocSendData:00000000 USBH_IsocSendData
+
+UNDEFINED SYMBOLS
+USBH_LL_SubmitURB

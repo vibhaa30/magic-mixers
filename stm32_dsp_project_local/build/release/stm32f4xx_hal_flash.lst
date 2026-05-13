@@ -1,0 +1,774 @@
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"stm32f4xx_hal_flash.c"
+  16              		.text
+  17              		.section	.text.FLASH_Program_DoubleWord,"ax",%progbits
+  18              		.align	1
+  19              		.syntax unified
+  20              		.thumb
+  21              		.thumb_func
+  23              	FLASH_Program_DoubleWord:
+  24              		@ args = 0, pretend = 0, frame = 0
+  25              		@ frame_needed = 0, uses_anonymous_args = 0
+  26              		@ link register save eliminated.
+  27 0000 0B49     		ldr	r1, .L2
+  28 0002 D1F810C0 		ldr	ip, [r1, #16]
+  29 0006 2CF4407C 		bic	ip, ip, #768
+  30 000a C1F810C0 		str	ip, [r1, #16]
+  31 000e D1F810C0 		ldr	ip, [r1, #16]
+  32 0012 4CF4407C 		orr	ip, ip, #768
+  33 0016 C1F810C0 		str	ip, [r1, #16]
+  34 001a D1F810C0 		ldr	ip, [r1, #16]
+  35 001e 4CF0010C 		orr	ip, ip, #1
+  36 0022 C1F810C0 		str	ip, [r1, #16]
+  37 0026 0260     		str	r2, [r0]
+  38              		.syntax unified
+  39              	@ 260 "Drivers/CMSIS/Include/cmsis_gcc.h" 1
+  40 0028 BFF36F8F 		isb 0xF
+  41              	@ 0 "" 2
+  42              		.thumb
+  43              		.syntax unified
+  44 002c 4360     		str	r3, [r0, #4]
+  45 002e 7047     		bx	lr
+  46              	.L3:
+  47              		.align	2
+  48              	.L2:
+  49 0030 003C0240 		.word	1073888256
+  51              		.section	.text.FLASH_Program_Word,"ax",%progbits
+  52              		.align	1
+  53              		.syntax unified
+  54              		.thumb
+  55              		.thumb_func
+  57              	FLASH_Program_Word:
+  58              		@ args = 0, pretend = 0, frame = 0
+  59              		@ frame_needed = 0, uses_anonymous_args = 0
+  60              		@ link register save eliminated.
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s 			page 2
+
+
+  61 0000 074B     		ldr	r3, .L5
+  62 0002 1A69     		ldr	r2, [r3, #16]
+  63 0004 22F44072 		bic	r2, r2, #768
+  64 0008 1A61     		str	r2, [r3, #16]
+  65 000a 1A69     		ldr	r2, [r3, #16]
+  66 000c 42F40072 		orr	r2, r2, #512
+  67 0010 1A61     		str	r2, [r3, #16]
+  68 0012 1A69     		ldr	r2, [r3, #16]
+  69 0014 42F00102 		orr	r2, r2, #1
+  70 0018 1A61     		str	r2, [r3, #16]
+  71 001a 0160     		str	r1, [r0]
+  72 001c 7047     		bx	lr
+  73              	.L6:
+  74 001e 00BF     		.align	2
+  75              	.L5:
+  76 0020 003C0240 		.word	1073888256
+  78              		.section	.text.FLASH_Program_HalfWord,"ax",%progbits
+  79              		.align	1
+  80              		.syntax unified
+  81              		.thumb
+  82              		.thumb_func
+  84              	FLASH_Program_HalfWord:
+  85              		@ args = 0, pretend = 0, frame = 0
+  86              		@ frame_needed = 0, uses_anonymous_args = 0
+  87              		@ link register save eliminated.
+  88 0000 074B     		ldr	r3, .L8
+  89 0002 1A69     		ldr	r2, [r3, #16]
+  90 0004 22F44072 		bic	r2, r2, #768
+  91 0008 1A61     		str	r2, [r3, #16]
+  92 000a 1A69     		ldr	r2, [r3, #16]
+  93 000c 42F48072 		orr	r2, r2, #256
+  94 0010 1A61     		str	r2, [r3, #16]
+  95 0012 1A69     		ldr	r2, [r3, #16]
+  96 0014 42F00102 		orr	r2, r2, #1
+  97 0018 1A61     		str	r2, [r3, #16]
+  98 001a 0180     		strh	r1, [r0]	@ movhi
+  99 001c 7047     		bx	lr
+ 100              	.L9:
+ 101 001e 00BF     		.align	2
+ 102              	.L8:
+ 103 0020 003C0240 		.word	1073888256
+ 105              		.section	.text.FLASH_Program_Byte,"ax",%progbits
+ 106              		.align	1
+ 107              		.syntax unified
+ 108              		.thumb
+ 109              		.thumb_func
+ 111              	FLASH_Program_Byte:
+ 112              		@ args = 0, pretend = 0, frame = 0
+ 113              		@ frame_needed = 0, uses_anonymous_args = 0
+ 114              		@ link register save eliminated.
+ 115 0000 064B     		ldr	r3, .L11
+ 116 0002 1A69     		ldr	r2, [r3, #16]
+ 117 0004 22F44072 		bic	r2, r2, #768
+ 118 0008 1A61     		str	r2, [r3, #16]
+ 119 000a 1A69     		ldr	r2, [r3, #16]
+ 120 000c 1A61     		str	r2, [r3, #16]
+ 121 000e 1A69     		ldr	r2, [r3, #16]
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s 			page 3
+
+
+ 122 0010 42F00102 		orr	r2, r2, #1
+ 123 0014 1A61     		str	r2, [r3, #16]
+ 124 0016 0170     		strb	r1, [r0]
+ 125 0018 7047     		bx	lr
+ 126              	.L12:
+ 127 001a 00BF     		.align	2
+ 128              	.L11:
+ 129 001c 003C0240 		.word	1073888256
+ 131              		.section	.text.FLASH_SetErrorCode,"ax",%progbits
+ 132              		.align	1
+ 133              		.syntax unified
+ 134              		.thumb
+ 135              		.thumb_func
+ 137              	FLASH_SetErrorCode:
+ 138              		@ args = 0, pretend = 0, frame = 0
+ 139              		@ frame_needed = 0, uses_anonymous_args = 0
+ 140              		@ link register save eliminated.
+ 141 0000 204B     		ldr	r3, .L19
+ 142 0002 DB68     		ldr	r3, [r3, #12]
+ 143 0004 13F0100F 		tst	r3, #16
+ 144 0008 07D0     		beq	.L14
+ 145 000a 1F4A     		ldr	r2, .L19+4
+ 146 000c D369     		ldr	r3, [r2, #28]
+ 147 000e 43F01003 		orr	r3, r3, #16
+ 148 0012 D361     		str	r3, [r2, #28]
+ 149 0014 1B4B     		ldr	r3, .L19
+ 150 0016 1022     		movs	r2, #16
+ 151 0018 DA60     		str	r2, [r3, #12]
+ 152              	.L14:
+ 153 001a 1A4B     		ldr	r3, .L19
+ 154 001c DB68     		ldr	r3, [r3, #12]
+ 155 001e 13F0200F 		tst	r3, #32
+ 156 0022 07D0     		beq	.L15
+ 157 0024 184A     		ldr	r2, .L19+4
+ 158 0026 D369     		ldr	r3, [r2, #28]
+ 159 0028 43F00803 		orr	r3, r3, #8
+ 160 002c D361     		str	r3, [r2, #28]
+ 161 002e 154B     		ldr	r3, .L19
+ 162 0030 2022     		movs	r2, #32
+ 163 0032 DA60     		str	r2, [r3, #12]
+ 164              	.L15:
+ 165 0034 134B     		ldr	r3, .L19
+ 166 0036 DB68     		ldr	r3, [r3, #12]
+ 167 0038 13F0400F 		tst	r3, #64
+ 168 003c 07D0     		beq	.L16
+ 169 003e 124A     		ldr	r2, .L19+4
+ 170 0040 D369     		ldr	r3, [r2, #28]
+ 171 0042 43F00403 		orr	r3, r3, #4
+ 172 0046 D361     		str	r3, [r2, #28]
+ 173 0048 0E4B     		ldr	r3, .L19
+ 174 004a 4022     		movs	r2, #64
+ 175 004c DA60     		str	r2, [r3, #12]
+ 176              	.L16:
+ 177 004e 0D4B     		ldr	r3, .L19
+ 178 0050 DB68     		ldr	r3, [r3, #12]
+ 179 0052 13F0800F 		tst	r3, #128
+ 180 0056 07D0     		beq	.L17
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s 			page 4
+
+
+ 181 0058 0B4A     		ldr	r2, .L19+4
+ 182 005a D369     		ldr	r3, [r2, #28]
+ 183 005c 43F00203 		orr	r3, r3, #2
+ 184 0060 D361     		str	r3, [r2, #28]
+ 185 0062 084B     		ldr	r3, .L19
+ 186 0064 8022     		movs	r2, #128
+ 187 0066 DA60     		str	r2, [r3, #12]
+ 188              	.L17:
+ 189 0068 064B     		ldr	r3, .L19
+ 190 006a DB68     		ldr	r3, [r3, #12]
+ 191 006c 13F0020F 		tst	r3, #2
+ 192 0070 07D0     		beq	.L13
+ 193 0072 054A     		ldr	r2, .L19+4
+ 194 0074 D369     		ldr	r3, [r2, #28]
+ 195 0076 43F02003 		orr	r3, r3, #32
+ 196 007a D361     		str	r3, [r2, #28]
+ 197 007c 014B     		ldr	r3, .L19
+ 198 007e 0222     		movs	r2, #2
+ 199 0080 DA60     		str	r2, [r3, #12]
+ 200              	.L13:
+ 201 0082 7047     		bx	lr
+ 202              	.L20:
+ 203              		.align	2
+ 204              	.L19:
+ 205 0084 003C0240 		.word	1073888256
+ 206 0088 00000000 		.word	pFlash
+ 208              		.section	.text.HAL_FLASH_Program_IT,"ax",%progbits
+ 209              		.align	1
+ 210              		.global	HAL_FLASH_Program_IT
+ 211              		.syntax unified
+ 212              		.thumb
+ 213              		.thumb_func
+ 215              	HAL_FLASH_Program_IT:
+ 216              		@ args = 0, pretend = 0, frame = 0
+ 217              		@ frame_needed = 0, uses_anonymous_args = 0
+ 218 0000 08B5     		push	{r3, lr}
+ 219 0002 8646     		mov	lr, r0
+ 220 0004 0846     		mov	r0, r1
+ 221 0006 1549     		ldr	r1, .L30
+ 222 0008 D1F810C0 		ldr	ip, [r1, #16]
+ 223 000c 4CF0807C 		orr	ip, ip, #16777216
+ 224 0010 C1F810C0 		str	ip, [r1, #16]
+ 225 0014 D1F810C0 		ldr	ip, [r1, #16]
+ 226 0018 4CF0007C 		orr	ip, ip, #33554432
+ 227 001c C1F810C0 		str	ip, [r1, #16]
+ 228 0020 0F49     		ldr	r1, .L30+4
+ 229 0022 4FF0030C 		mov	ip, #3
+ 230 0026 81F800C0 		strb	ip, [r1]
+ 231 002a 4861     		str	r0, [r1, #20]
+ 232 002c BEF1000F 		cmp	lr, #0
+ 233 0030 08D0     		beq	.L27
+ 234 0032 7146     		mov	r1, lr
+ 235 0034 0129     		cmp	r1, #1
+ 236 0036 09D0     		beq	.L28
+ 237 0038 0229     		cmp	r1, #2
+ 238 003a 0BD0     		beq	.L29
+ 239 003c FFF7FEFF 		bl	FLASH_Program_DoubleWord
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s 			page 5
+
+
+ 240              	.L23:
+ 241 0040 0020     		movs	r0, #0
+ 242 0042 08BD     		pop	{r3, pc}
+ 243              	.L27:
+ 244 0044 D1B2     		uxtb	r1, r2
+ 245 0046 FFF7FEFF 		bl	FLASH_Program_Byte
+ 246 004a F9E7     		b	.L23
+ 247              	.L28:
+ 248 004c 91B2     		uxth	r1, r2
+ 249 004e FFF7FEFF 		bl	FLASH_Program_HalfWord
+ 250 0052 F5E7     		b	.L23
+ 251              	.L29:
+ 252 0054 1146     		mov	r1, r2
+ 253 0056 FFF7FEFF 		bl	FLASH_Program_Word
+ 254 005a F1E7     		b	.L23
+ 255              	.L31:
+ 256              		.align	2
+ 257              	.L30:
+ 258 005c 003C0240 		.word	1073888256
+ 259 0060 00000000 		.word	pFlash
+ 261              		.section	.text.HAL_FLASH_EndOfOperationCallback,"ax",%progbits
+ 262              		.align	1
+ 263              		.weak	HAL_FLASH_EndOfOperationCallback
+ 264              		.syntax unified
+ 265              		.thumb
+ 266              		.thumb_func
+ 268              	HAL_FLASH_EndOfOperationCallback:
+ 269              		@ args = 0, pretend = 0, frame = 0
+ 270              		@ frame_needed = 0, uses_anonymous_args = 0
+ 271              		@ link register save eliminated.
+ 272 0000 7047     		bx	lr
+ 274              		.section	.text.HAL_FLASH_OperationErrorCallback,"ax",%progbits
+ 275              		.align	1
+ 276              		.weak	HAL_FLASH_OperationErrorCallback
+ 277              		.syntax unified
+ 278              		.thumb
+ 279              		.thumb_func
+ 281              	HAL_FLASH_OperationErrorCallback:
+ 282              		@ args = 0, pretend = 0, frame = 0
+ 283              		@ frame_needed = 0, uses_anonymous_args = 0
+ 284              		@ link register save eliminated.
+ 285 0000 7047     		bx	lr
+ 287              		.section	.text.HAL_FLASH_IRQHandler,"ax",%progbits
+ 288              		.align	1
+ 289              		.global	HAL_FLASH_IRQHandler
+ 290              		.syntax unified
+ 291              		.thumb
+ 292              		.thumb_func
+ 294              	HAL_FLASH_IRQHandler:
+ 295              		@ args = 0, pretend = 0, frame = 0
+ 296              		@ frame_needed = 0, uses_anonymous_args = 0
+ 297 0000 10B5     		push	{r4, lr}
+ 298 0002 384B     		ldr	r3, .L50
+ 299 0004 DB68     		ldr	r3, [r3, #12]
+ 300 0006 13F0F20F 		tst	r3, #242
+ 301 000a 12D0     		beq	.L35
+ 302 000c 364B     		ldr	r3, .L50+4
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s 			page 6
+
+
+ 303 000e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 304 0010 012B     		cmp	r3, #1
+ 305 0012 36D0     		beq	.L46
+ 306 0014 344B     		ldr	r3, .L50+4
+ 307 0016 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 308 0018 022B     		cmp	r3, #2
+ 309 001a 39D0     		beq	.L47
+ 310 001c 324B     		ldr	r3, .L50+4
+ 311 001e 5B69     		ldr	r3, [r3, #20]
+ 312 0020 1C46     		mov	r4, r3
+ 313              	.L37:
+ 314 0022 FFF7FEFF 		bl	FLASH_SetErrorCode
+ 315 0026 2046     		mov	r0, r4
+ 316 0028 FFF7FEFF 		bl	HAL_FLASH_OperationErrorCallback
+ 317 002c 2E4B     		ldr	r3, .L50+4
+ 318 002e 0022     		movs	r2, #0
+ 319 0030 1A70     		strb	r2, [r3]
+ 320              	.L35:
+ 321 0032 2C4B     		ldr	r3, .L50
+ 322 0034 DB68     		ldr	r3, [r3, #12]
+ 323 0036 13F0010F 		tst	r3, #1
+ 324 003a 11D0     		beq	.L39
+ 325 003c 294B     		ldr	r3, .L50
+ 326 003e 0122     		movs	r2, #1
+ 327 0040 DA60     		str	r2, [r3, #12]
+ 328 0042 294B     		ldr	r3, .L50+4
+ 329 0044 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 330 0046 9342     		cmp	r3, r2
+ 331 0048 26D0     		beq	.L48
+ 332 004a 274B     		ldr	r3, .L50+4
+ 333 004c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 334 004e 022B     		cmp	r3, #2
+ 335 0050 41D0     		beq	.L49
+ 336 0052 254B     		ldr	r3, .L50+4
+ 337 0054 5869     		ldr	r0, [r3, #20]
+ 338 0056 FFF7FEFF 		bl	HAL_FLASH_EndOfOperationCallback
+ 339              	.L43:
+ 340 005a 234B     		ldr	r3, .L50+4
+ 341 005c 0022     		movs	r2, #0
+ 342 005e 1A70     		strb	r2, [r3]
+ 343              	.L39:
+ 344 0060 214B     		ldr	r3, .L50+4
+ 345 0062 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 346 0064 63B9     		cbnz	r3, .L34
+ 347 0066 1F4B     		ldr	r3, .L50
+ 348 0068 1A69     		ldr	r2, [r3, #16]
+ 349 006a 22F07F02 		bic	r2, r2, #127
+ 350 006e 1A61     		str	r2, [r3, #16]
+ 351 0070 1A69     		ldr	r2, [r3, #16]
+ 352 0072 22F08072 		bic	r2, r2, #16777216
+ 353 0076 1A61     		str	r2, [r3, #16]
+ 354 0078 1A69     		ldr	r2, [r3, #16]
+ 355 007a 22F00072 		bic	r2, r2, #33554432
+ 356 007e 1A61     		str	r2, [r3, #16]
+ 357              	.L34:
+ 358 0080 10BD     		pop	{r4, pc}
+ 359              	.L46:
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s 			page 7
+
+
+ 360 0082 194B     		ldr	r3, .L50+4
+ 361 0084 DA68     		ldr	r2, [r3, #12]
+ 362 0086 1446     		mov	r4, r2
+ 363 0088 4FF0FF32 		mov	r2, #-1
+ 364 008c DA60     		str	r2, [r3, #12]
+ 365 008e C8E7     		b	.L37
+ 366              	.L47:
+ 367 0090 154B     		ldr	r3, .L50+4
+ 368 0092 1B69     		ldr	r3, [r3, #16]
+ 369 0094 1C46     		mov	r4, r3
+ 370 0096 C4E7     		b	.L37
+ 371              	.L48:
+ 372 0098 134B     		ldr	r3, .L50+4
+ 373 009a 5A68     		ldr	r2, [r3, #4]
+ 374 009c 013A     		subs	r2, r2, #1
+ 375 009e 5A60     		str	r2, [r3, #4]
+ 376 00a0 5B68     		ldr	r3, [r3, #4]
+ 377 00a2 5BB1     		cbz	r3, .L41
+ 378 00a4 104C     		ldr	r4, .L50+4
+ 379 00a6 E068     		ldr	r0, [r4, #12]
+ 380 00a8 FFF7FEFF 		bl	HAL_FLASH_EndOfOperationCallback
+ 381 00ac E368     		ldr	r3, [r4, #12]
+ 382 00ae 0133     		adds	r3, r3, #1
+ 383 00b0 E360     		str	r3, [r4, #12]
+ 384 00b2 E068     		ldr	r0, [r4, #12]
+ 385 00b4 217A     		ldrb	r1, [r4, #8]	@ zero_extendqisi2
+ 386 00b6 FFF7FEFF 		bl	FLASH_Erase_Sector
+ 387 00ba D1E7     		b	.L39
+ 388              	.L41:
+ 389 00bc 0A4B     		ldr	r3, .L50+4
+ 390 00be 4FF0FF32 		mov	r2, #-1
+ 391 00c2 DA60     		str	r2, [r3, #12]
+ 392 00c4 0022     		movs	r2, #0
+ 393 00c6 1A70     		strb	r2, [r3]
+ 394 00c8 FFF7FEFF 		bl	FLASH_FlushCaches
+ 395 00cc 4FF0FF30 		mov	r0, #-1
+ 396 00d0 FFF7FEFF 		bl	HAL_FLASH_EndOfOperationCallback
+ 397 00d4 C4E7     		b	.L39
+ 398              	.L49:
+ 399 00d6 FFF7FEFF 		bl	FLASH_FlushCaches
+ 400 00da 034B     		ldr	r3, .L50+4
+ 401 00dc 1869     		ldr	r0, [r3, #16]
+ 402 00de FFF7FEFF 		bl	HAL_FLASH_EndOfOperationCallback
+ 403 00e2 BAE7     		b	.L43
+ 404              	.L51:
+ 405              		.align	2
+ 406              	.L50:
+ 407 00e4 003C0240 		.word	1073888256
+ 408 00e8 00000000 		.word	pFlash
+ 410              		.section	.text.HAL_FLASH_Unlock,"ax",%progbits
+ 411              		.align	1
+ 412              		.global	HAL_FLASH_Unlock
+ 413              		.syntax unified
+ 414              		.thumb
+ 415              		.thumb_func
+ 417              	HAL_FLASH_Unlock:
+ 418              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s 			page 8
+
+
+ 419              		@ frame_needed = 0, uses_anonymous_args = 0
+ 420              		@ link register save eliminated.
+ 421 0000 094B     		ldr	r3, .L57
+ 422 0002 1B69     		ldr	r3, [r3, #16]
+ 423 0004 002B     		cmp	r3, #0
+ 424 0006 01DB     		blt	.L56
+ 425 0008 0020     		movs	r0, #0
+ 426 000a 7047     		bx	lr
+ 427              	.L56:
+ 428 000c 064B     		ldr	r3, .L57
+ 429 000e 074A     		ldr	r2, .L57+4
+ 430 0010 5A60     		str	r2, [r3, #4]
+ 431 0012 02F18832 		add	r2, r2, #-2004318072
+ 432 0016 5A60     		str	r2, [r3, #4]
+ 433 0018 1B69     		ldr	r3, [r3, #16]
+ 434 001a 002B     		cmp	r3, #0
+ 435 001c 01DB     		blt	.L55
+ 436 001e 0020     		movs	r0, #0
+ 437 0020 7047     		bx	lr
+ 438              	.L55:
+ 439 0022 0120     		movs	r0, #1
+ 440 0024 7047     		bx	lr
+ 441              	.L58:
+ 442 0026 00BF     		.align	2
+ 443              	.L57:
+ 444 0028 003C0240 		.word	1073888256
+ 445 002c 23016745 		.word	1164378403
+ 447              		.section	.text.HAL_FLASH_Lock,"ax",%progbits
+ 448              		.align	1
+ 449              		.global	HAL_FLASH_Lock
+ 450              		.syntax unified
+ 451              		.thumb
+ 452              		.thumb_func
+ 454              	HAL_FLASH_Lock:
+ 455              		@ args = 0, pretend = 0, frame = 0
+ 456              		@ frame_needed = 0, uses_anonymous_args = 0
+ 457              		@ link register save eliminated.
+ 458 0000 034A     		ldr	r2, .L60
+ 459 0002 1369     		ldr	r3, [r2, #16]
+ 460 0004 43F00043 		orr	r3, r3, #-2147483648
+ 461 0008 1361     		str	r3, [r2, #16]
+ 462 000a 0020     		movs	r0, #0
+ 463 000c 7047     		bx	lr
+ 464              	.L61:
+ 465 000e 00BF     		.align	2
+ 466              	.L60:
+ 467 0010 003C0240 		.word	1073888256
+ 469              		.section	.text.HAL_FLASH_OB_Unlock,"ax",%progbits
+ 470              		.align	1
+ 471              		.global	HAL_FLASH_OB_Unlock
+ 472              		.syntax unified
+ 473              		.thumb
+ 474              		.thumb_func
+ 476              	HAL_FLASH_OB_Unlock:
+ 477              		@ args = 0, pretend = 0, frame = 0
+ 478              		@ frame_needed = 0, uses_anonymous_args = 0
+ 479              		@ link register save eliminated.
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s 			page 9
+
+
+ 480 0000 074B     		ldr	r3, .L65
+ 481 0002 5B69     		ldr	r3, [r3, #20]
+ 482 0004 13F0010F 		tst	r3, #1
+ 483 0008 07D0     		beq	.L64
+ 484 000a 054B     		ldr	r3, .L65
+ 485 000c 054A     		ldr	r2, .L65+4
+ 486 000e 9A60     		str	r2, [r3, #8]
+ 487 0010 02F14432 		add	r2, r2, #1145324612
+ 488 0014 9A60     		str	r2, [r3, #8]
+ 489 0016 0020     		movs	r0, #0
+ 490 0018 7047     		bx	lr
+ 491              	.L64:
+ 492 001a 0120     		movs	r0, #1
+ 493 001c 7047     		bx	lr
+ 494              	.L66:
+ 495 001e 00BF     		.align	2
+ 496              	.L65:
+ 497 0020 003C0240 		.word	1073888256
+ 498 0024 3B2A1908 		.word	135866939
+ 500              		.section	.text.HAL_FLASH_OB_Lock,"ax",%progbits
+ 501              		.align	1
+ 502              		.global	HAL_FLASH_OB_Lock
+ 503              		.syntax unified
+ 504              		.thumb
+ 505              		.thumb_func
+ 507              	HAL_FLASH_OB_Lock:
+ 508              		@ args = 0, pretend = 0, frame = 0
+ 509              		@ frame_needed = 0, uses_anonymous_args = 0
+ 510              		@ link register save eliminated.
+ 511 0000 034A     		ldr	r2, .L68
+ 512 0002 5369     		ldr	r3, [r2, #20]
+ 513 0004 43F00103 		orr	r3, r3, #1
+ 514 0008 5361     		str	r3, [r2, #20]
+ 515 000a 0020     		movs	r0, #0
+ 516 000c 7047     		bx	lr
+ 517              	.L69:
+ 518 000e 00BF     		.align	2
+ 519              	.L68:
+ 520 0010 003C0240 		.word	1073888256
+ 522              		.section	.text.HAL_FLASH_GetError,"ax",%progbits
+ 523              		.align	1
+ 524              		.global	HAL_FLASH_GetError
+ 525              		.syntax unified
+ 526              		.thumb
+ 527              		.thumb_func
+ 529              	HAL_FLASH_GetError:
+ 530              		@ args = 0, pretend = 0, frame = 0
+ 531              		@ frame_needed = 0, uses_anonymous_args = 0
+ 532              		@ link register save eliminated.
+ 533 0000 014B     		ldr	r3, .L71
+ 534 0002 D869     		ldr	r0, [r3, #28]
+ 535 0004 7047     		bx	lr
+ 536              	.L72:
+ 537 0006 00BF     		.align	2
+ 538              	.L71:
+ 539 0008 00000000 		.word	pFlash
+ 541              		.section	.text.FLASH_WaitForLastOperation,"ax",%progbits
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s 			page 10
+
+
+ 542              		.align	1
+ 543              		.global	FLASH_WaitForLastOperation
+ 544              		.syntax unified
+ 545              		.thumb
+ 546              		.thumb_func
+ 548              	FLASH_WaitForLastOperation:
+ 549              		@ args = 0, pretend = 0, frame = 0
+ 550              		@ frame_needed = 0, uses_anonymous_args = 0
+ 551 0000 38B5     		push	{r3, r4, r5, lr}
+ 552 0002 0446     		mov	r4, r0
+ 553 0004 144B     		ldr	r3, .L84
+ 554 0006 0022     		movs	r2, #0
+ 555 0008 DA61     		str	r2, [r3, #28]
+ 556 000a FFF7FEFF 		bl	HAL_GetTick
+ 557 000e 0546     		mov	r5, r0
+ 558              	.L75:
+ 559 0010 124B     		ldr	r3, .L84+4
+ 560 0012 DB68     		ldr	r3, [r3, #12]
+ 561 0014 13F4803F 		tst	r3, #65536
+ 562 0018 0AD0     		beq	.L82
+ 563 001a B4F1FF3F 		cmp	r4, #-1
+ 564 001e F7D0     		beq	.L75
+ 565 0020 24B1     		cbz	r4, .L76
+ 566 0022 FFF7FEFF 		bl	HAL_GetTick
+ 567 0026 401B     		subs	r0, r0, r5
+ 568 0028 A042     		cmp	r0, r4
+ 569 002a F1D9     		bls	.L75
+ 570              	.L76:
+ 571 002c 0320     		movs	r0, #3
+ 572 002e 0DE0     		b	.L77
+ 573              	.L82:
+ 574 0030 0A4B     		ldr	r3, .L84+4
+ 575 0032 DB68     		ldr	r3, [r3, #12]
+ 576 0034 13F0010F 		tst	r3, #1
+ 577 0038 02D0     		beq	.L79
+ 578 003a 084B     		ldr	r3, .L84+4
+ 579 003c 0122     		movs	r2, #1
+ 580 003e DA60     		str	r2, [r3, #12]
+ 581              	.L79:
+ 582 0040 064B     		ldr	r3, .L84+4
+ 583 0042 DB68     		ldr	r3, [r3, #12]
+ 584 0044 13F0F20F 		tst	r3, #242
+ 585 0048 01D1     		bne	.L83
+ 586 004a 0020     		movs	r0, #0
+ 587              	.L77:
+ 588 004c 38BD     		pop	{r3, r4, r5, pc}
+ 589              	.L83:
+ 590 004e FFF7FEFF 		bl	FLASH_SetErrorCode
+ 591 0052 0120     		movs	r0, #1
+ 592 0054 FAE7     		b	.L77
+ 593              	.L85:
+ 594 0056 00BF     		.align	2
+ 595              	.L84:
+ 596 0058 00000000 		.word	pFlash
+ 597 005c 003C0240 		.word	1073888256
+ 599              		.section	.text.HAL_FLASH_Program,"ax",%progbits
+ 600              		.align	1
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s 			page 11
+
+
+ 601              		.global	HAL_FLASH_Program
+ 602              		.syntax unified
+ 603              		.thumb
+ 604              		.thumb_func
+ 606              	HAL_FLASH_Program:
+ 607              		@ args = 0, pretend = 0, frame = 0
+ 608              		@ frame_needed = 0, uses_anonymous_args = 0
+ 609 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 610 0002 1646     		mov	r6, r2
+ 611 0004 1B4A     		ldr	r2, .L98
+ 612 0006 127E     		ldrb	r2, [r2, #24]	@ zero_extendqisi2
+ 613 0008 012A     		cmp	r2, #1
+ 614 000a 30D0     		beq	.L93
+ 615 000c 0446     		mov	r4, r0
+ 616 000e 0D46     		mov	r5, r1
+ 617 0010 1F46     		mov	r7, r3
+ 618 0012 184B     		ldr	r3, .L98
+ 619 0014 0122     		movs	r2, #1
+ 620 0016 1A76     		strb	r2, [r3, #24]
+ 621 0018 4CF25030 		movw	r0, #50000
+ 622 001c FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 623 0020 90B9     		cbnz	r0, .L88
+ 624 0022 ACB1     		cbz	r4, .L95
+ 625 0024 012C     		cmp	r4, #1
+ 626 0026 18D0     		beq	.L96
+ 627 0028 022C     		cmp	r4, #2
+ 628 002a 1BD0     		beq	.L97
+ 629 002c 3246     		mov	r2, r6
+ 630 002e 3B46     		mov	r3, r7
+ 631 0030 2846     		mov	r0, r5
+ 632 0032 FFF7FEFF 		bl	FLASH_Program_DoubleWord
+ 633              	.L90:
+ 634 0036 4CF25030 		movw	r0, #50000
+ 635 003a FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 636 003e 0E4A     		ldr	r2, .L98+4
+ 637 0040 1369     		ldr	r3, [r2, #16]
+ 638 0042 23F00103 		bic	r3, r3, #1
+ 639 0046 1361     		str	r3, [r2, #16]
+ 640              	.L88:
+ 641 0048 0A4B     		ldr	r3, .L98
+ 642 004a 0022     		movs	r2, #0
+ 643 004c 1A76     		strb	r2, [r3, #24]
+ 644              	.L87:
+ 645 004e F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 646              	.L95:
+ 647 0050 F1B2     		uxtb	r1, r6
+ 648 0052 2846     		mov	r0, r5
+ 649 0054 FFF7FEFF 		bl	FLASH_Program_Byte
+ 650 0058 EDE7     		b	.L90
+ 651              	.L96:
+ 652 005a B1B2     		uxth	r1, r6
+ 653 005c 2846     		mov	r0, r5
+ 654 005e FFF7FEFF 		bl	FLASH_Program_HalfWord
+ 655 0062 E8E7     		b	.L90
+ 656              	.L97:
+ 657 0064 3146     		mov	r1, r6
+ 658 0066 2846     		mov	r0, r5
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s 			page 12
+
+
+ 659 0068 FFF7FEFF 		bl	FLASH_Program_Word
+ 660 006c E3E7     		b	.L90
+ 661              	.L93:
+ 662 006e 0220     		movs	r0, #2
+ 663 0070 EDE7     		b	.L87
+ 664              	.L99:
+ 665 0072 00BF     		.align	2
+ 666              	.L98:
+ 667 0074 00000000 		.word	pFlash
+ 668 0078 003C0240 		.word	1073888256
+ 670              		.section	.text.HAL_FLASH_OB_Launch,"ax",%progbits
+ 671              		.align	1
+ 672              		.global	HAL_FLASH_OB_Launch
+ 673              		.syntax unified
+ 674              		.thumb
+ 675              		.thumb_func
+ 677              	HAL_FLASH_OB_Launch:
+ 678              		@ args = 0, pretend = 0, frame = 0
+ 679              		@ frame_needed = 0, uses_anonymous_args = 0
+ 680 0000 08B5     		push	{r3, lr}
+ 681 0002 054A     		ldr	r2, .L102
+ 682 0004 137D     		ldrb	r3, [r2, #20]	@ zero_extendqisi2
+ 683 0006 43F00203 		orr	r3, r3, #2
+ 684 000a 1375     		strb	r3, [r2, #20]
+ 685 000c 4CF25030 		movw	r0, #50000
+ 686 0010 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 687 0014 08BD     		pop	{r3, pc}
+ 688              	.L103:
+ 689 0016 00BF     		.align	2
+ 690              	.L102:
+ 691 0018 003C0240 		.word	1073888256
+ 693              		.global	pFlash
+ 694              		.section	.data.pFlash,"aw"
+ 695              		.align	2
+ 698              	pFlash:
+ 699 0000 00       		.byte	0
+ 700 0001 000000   		.space	3
+ 701 0004 00000000 		.word	0
+ 702 0008 00       		.byte	0
+ 703 0009 000000   		.space	3
+ 704 000c 00000000 		.word	0
+ 705 0010 01000000 		.word	1
+ 706 0014 00000000 		.word	0
+ 707 0018 00       		.byte	0
+ 708 0019 000000   		.space	3
+ 709 001c 00000000 		.word	0
+ 710              		.ident	"GCC: (xPack GNU Arm Embedded GCC arm64) 15.2.1 20251203"
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s 			page 13
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f4xx_hal_flash.c
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:18     .text.FLASH_Program_DoubleWord:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:23     .text.FLASH_Program_DoubleWord:00000000 FLASH_Program_DoubleWord
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:49     .text.FLASH_Program_DoubleWord:00000030 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:52     .text.FLASH_Program_Word:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:57     .text.FLASH_Program_Word:00000000 FLASH_Program_Word
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:76     .text.FLASH_Program_Word:00000020 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:79     .text.FLASH_Program_HalfWord:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:84     .text.FLASH_Program_HalfWord:00000000 FLASH_Program_HalfWord
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:103    .text.FLASH_Program_HalfWord:00000020 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:106    .text.FLASH_Program_Byte:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:111    .text.FLASH_Program_Byte:00000000 FLASH_Program_Byte
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:129    .text.FLASH_Program_Byte:0000001c $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:132    .text.FLASH_SetErrorCode:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:137    .text.FLASH_SetErrorCode:00000000 FLASH_SetErrorCode
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:205    .text.FLASH_SetErrorCode:00000084 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:698    .data.pFlash:00000000 pFlash
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:209    .text.HAL_FLASH_Program_IT:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:215    .text.HAL_FLASH_Program_IT:00000000 HAL_FLASH_Program_IT
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:258    .text.HAL_FLASH_Program_IT:0000005c $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:262    .text.HAL_FLASH_EndOfOperationCallback:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:268    .text.HAL_FLASH_EndOfOperationCallback:00000000 HAL_FLASH_EndOfOperationCallback
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:275    .text.HAL_FLASH_OperationErrorCallback:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:281    .text.HAL_FLASH_OperationErrorCallback:00000000 HAL_FLASH_OperationErrorCallback
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:288    .text.HAL_FLASH_IRQHandler:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:294    .text.HAL_FLASH_IRQHandler:00000000 HAL_FLASH_IRQHandler
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:407    .text.HAL_FLASH_IRQHandler:000000e4 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:411    .text.HAL_FLASH_Unlock:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:417    .text.HAL_FLASH_Unlock:00000000 HAL_FLASH_Unlock
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:444    .text.HAL_FLASH_Unlock:00000028 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:448    .text.HAL_FLASH_Lock:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:454    .text.HAL_FLASH_Lock:00000000 HAL_FLASH_Lock
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:467    .text.HAL_FLASH_Lock:00000010 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:470    .text.HAL_FLASH_OB_Unlock:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:476    .text.HAL_FLASH_OB_Unlock:00000000 HAL_FLASH_OB_Unlock
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:497    .text.HAL_FLASH_OB_Unlock:00000020 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:501    .text.HAL_FLASH_OB_Lock:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:507    .text.HAL_FLASH_OB_Lock:00000000 HAL_FLASH_OB_Lock
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:520    .text.HAL_FLASH_OB_Lock:00000010 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:523    .text.HAL_FLASH_GetError:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:529    .text.HAL_FLASH_GetError:00000000 HAL_FLASH_GetError
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:539    .text.HAL_FLASH_GetError:00000008 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:542    .text.FLASH_WaitForLastOperation:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:548    .text.FLASH_WaitForLastOperation:00000000 FLASH_WaitForLastOperation
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:596    .text.FLASH_WaitForLastOperation:00000058 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:600    .text.HAL_FLASH_Program:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:606    .text.HAL_FLASH_Program:00000000 HAL_FLASH_Program
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:667    .text.HAL_FLASH_Program:00000074 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:671    .text.HAL_FLASH_OB_Launch:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:677    .text.HAL_FLASH_OB_Launch:00000000 HAL_FLASH_OB_Launch
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:691    .text.HAL_FLASH_OB_Launch:00000018 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s:695    .data.pFlash:00000000 $d
+
+UNDEFINED SYMBOLS
+FLASH_Erase_Sector
+FLASH_FlushCaches
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccZUWXNv.s 			page 14
+
+
+HAL_GetTick
