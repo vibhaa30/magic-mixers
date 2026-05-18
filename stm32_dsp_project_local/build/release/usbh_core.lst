@@ -1,0 +1,1463 @@
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"usbh_core.c"
+  16              		.text
+  17              		.section	.text.USBH_HandleSof,"ax",%progbits
+  18              		.align	1
+  19              		.syntax unified
+  20              		.thumb
+  21              		.thumb_func
+  23              	USBH_HandleSof:
+  24              		@ args = 0, pretend = 0, frame = 0
+  25              		@ frame_needed = 0, uses_anonymous_args = 0
+  26 0000 08B5     		push	{r3, lr}
+  27 0002 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+  28 0004 0B2B     		cmp	r3, #11
+  29 0006 00D0     		beq	.L4
+  30              	.L1:
+  31 0008 08BD     		pop	{r3, pc}
+  32              	.L4:
+  33 000a D0F87C33 		ldr	r3, [r0, #892]
+  34 000e 002B     		cmp	r3, #0
+  35 0010 FAD0     		beq	.L1
+  36 0012 9B69     		ldr	r3, [r3, #24]
+  37 0014 9847     		blx	r3
+  38 0016 F7E7     		b	.L1
+  40              		.section	.text.DeInitStateMachine,"ax",%progbits
+  41              		.align	1
+  42              		.syntax unified
+  43              		.thumb
+  44              		.thumb_func
+  46              	DeInitStateMachine:
+  47              		@ args = 0, pretend = 0, frame = 0
+  48              		@ frame_needed = 0, uses_anonymous_args = 0
+  49 0000 38B5     		push	{r3, r4, r5, lr}
+  50 0002 0446     		mov	r4, r0
+  51 0004 0023     		movs	r3, #0
+  52 0006 06E0     		b	.L6
+  53              	.L7:
+  54 0008 03F1E002 		add	r2, r3, #224
+  55 000c 04EB8202 		add	r2, r4, r2, lsl #2
+  56 0010 0021     		movs	r1, #0
+  57 0012 5160     		str	r1, [r2, #4]
+  58 0014 0133     		adds	r3, r3, #1
+  59              	.L6:
+  60 0016 0F2B     		cmp	r3, #15
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s 			page 2
+
+
+  61 0018 F6D9     		bls	.L7
+  62 001a 0023     		movs	r3, #0
+  63 001c 04E0     		b	.L8
+  64              	.L9:
+  65 001e E218     		adds	r2, r4, r3
+  66 0020 0021     		movs	r1, #0
+  67 0022 82F81C11 		strb	r1, [r2, #284]
+  68 0026 0133     		adds	r3, r3, #1
+  69              	.L8:
+  70 0028 B3F5007F 		cmp	r3, #512
+  71 002c F7D3     		bcc	.L9
+  72 002e 0025     		movs	r5, #0
+  73 0030 2570     		strb	r5, [r4]
+  74 0032 6570     		strb	r5, [r4, #1]
+  75 0034 0123     		movs	r3, #1
+  76 0036 A370     		strb	r3, [r4, #2]
+  77 0038 C4F8C453 		str	r5, [r4, #964]
+  78 003c 2376     		strb	r3, [r4, #24]
+  79 003e 4022     		movs	r2, #64
+  80 0040 A271     		strb	r2, [r4, #6]
+  81 0042 6576     		strb	r5, [r4, #25]
+  82 0044 84F81C53 		strb	r5, [r4, #796]
+  83 0048 84F81D33 		strb	r3, [r4, #797]
+  84 004c 84F81F53 		strb	r5, [r4, #799]
+  85 0050 84F81E53 		strb	r5, [r4, #798]
+  86 0054 4FF48072 		mov	r2, #256
+  87 0058 2946     		mov	r1, r5
+  88 005a 04F11C00 		add	r0, r4, #28
+  89 005e FFF7FEFF 		bl	memset
+  90 0062 4FF40072 		mov	r2, #512
+  91 0066 2946     		mov	r1, r5
+  92 0068 04F58E70 		add	r0, r4, #284
+  93 006c FFF7FEFF 		bl	memset
+  94 0070 C4F82653 		str	r5, [r4, #806]	@ unaligned
+  95 0074 C4F82A53 		str	r5, [r4, #810]	@ unaligned
+  96 0078 C4F82E53 		str	r5, [r4, #814]	@ unaligned
+  97 007c C4F83253 		str	r5, [r4, #818]	@ unaligned
+  98 0080 A4F83653 		strh	r5, [r4, #822]	@ unaligned
+  99 0084 3E22     		movs	r2, #62
+ 100 0086 2946     		mov	r1, r5
+ 101 0088 04F54E70 		add	r0, r4, #824
+ 102 008c FFF7FEFF 		bl	memset
+ 103 0090 2846     		mov	r0, r5
+ 104 0092 38BD     		pop	{r3, r4, r5, pc}
+ 106              		.section	.text.USBH_Init,"ax",%progbits
+ 107              		.align	1
+ 108              		.global	USBH_Init
+ 109              		.syntax unified
+ 110              		.thumb
+ 111              		.thumb_func
+ 113              	USBH_Init:
+ 114              		@ args = 0, pretend = 0, frame = 48
+ 115              		@ frame_needed = 0, uses_anonymous_args = 0
+ 116 0000 0028     		cmp	r0, #0
+ 117 0002 3CD0     		beq	.L14
+ 118 0004 70B5     		push	{r4, r5, r6, lr}
+ 119 0006 8CB0     		sub	sp, sp, #48
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s 			page 3
+
+
+ 120 0008 0E46     		mov	r6, r1
+ 121 000a 0546     		mov	r5, r0
+ 122 000c 80F8CC23 		strb	r2, [r0, #972]
+ 123 0010 0024     		movs	r4, #0
+ 124 0012 C0F87C43 		str	r4, [r0, #892]
+ 125 0016 C0F88043 		str	r4, [r0, #896]
+ 126 001a FFF7FEFF 		bl	DeInitStateMachine
+ 127 001e 85F82343 		strb	r4, [r5, #803]
+ 128 0022 85F82043 		strb	r4, [r5, #800]
+ 129 0026 85F82143 		strb	r4, [r5, #801]
+ 130 002a 85F82243 		strb	r4, [r5, #802]
+ 131 002e 0EB1     		cbz	r6, .L13
+ 132 0030 C5F8D463 		str	r6, [r5, #980]
+ 133              	.L13:
+ 134 0034 134C     		ldr	r4, .L19
+ 135 0036 0DF1200C 		add	ip, sp, #32
+ 136 003a 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 137 003e 8CE80F00 		stm	ip, {r0, r1, r2, r3}
+ 138 0042 0021     		movs	r1, #0
+ 139 0044 6046     		mov	r0, ip
+ 140 0046 FFF7FEFF 		bl	osMessageCreate
+ 141 004a C5F8D803 		str	r0, [r5, #984]
+ 142 004e 0DF1040E 		add	lr, sp, #4
+ 143 0052 04F1100C 		add	ip, r4, #16
+ 144 0056 BCE80F00 		ldmia	ip!, {r0, r1, r2, r3}
+ 145 005a AEE80F00 		stmia	lr!, {r0, r1, r2, r3}
+ 146 005e 9CE80700 		ldm	ip, {r0, r1, r2}
+ 147 0062 8EE80700 		stm	lr, {r0, r1, r2}
+ 148 0066 2946     		mov	r1, r5
+ 149 0068 01A8     		add	r0, sp, #4
+ 150 006a FFF7FEFF 		bl	osThreadCreate
+ 151 006e C5F8DC03 		str	r0, [r5, #988]
+ 152 0072 2846     		mov	r0, r5
+ 153 0074 FFF7FEFF 		bl	USBH_LL_Init
+ 154 0078 0020     		movs	r0, #0
+ 155 007a 0CB0     		add	sp, sp, #48
+ 156              		@ sp needed
+ 157 007c 70BD     		pop	{r4, r5, r6, pc}
+ 158              	.L14:
+ 159 007e 0220     		movs	r0, #2
+ 160 0080 7047     		bx	lr
+ 161              	.L20:
+ 162 0082 00BF     		.align	2
+ 163              	.L19:
+ 164 0084 00000000 		.word	.LANCHOR0
+ 166              		.section	.text.USBH_DeInit,"ax",%progbits
+ 167              		.align	1
+ 168              		.global	USBH_DeInit
+ 169              		.syntax unified
+ 170              		.thumb
+ 171              		.thumb_func
+ 173              	USBH_DeInit:
+ 174              		@ args = 0, pretend = 0, frame = 0
+ 175              		@ frame_needed = 0, uses_anonymous_args = 0
+ 176 0000 10B5     		push	{r4, lr}
+ 177 0002 0446     		mov	r4, r0
+ 178 0004 FFF7FEFF 		bl	DeInitStateMachine
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s 			page 4
+
+
+ 179 0008 0023     		movs	r3, #0
+ 180 000a 84F82333 		strb	r3, [r4, #803]
+ 181 000e 84F82033 		strb	r3, [r4, #800]
+ 182 0012 84F82133 		strb	r3, [r4, #801]
+ 183 0016 84F82233 		strb	r3, [r4, #802]
+ 184 001a 84F81F33 		strb	r3, [r4, #799]
+ 185 001e 84F81E33 		strb	r3, [r4, #798]
+ 186 0022 D4F8D033 		ldr	r3, [r4, #976]
+ 187 0026 13B1     		cbz	r3, .L22
+ 188 0028 2046     		mov	r0, r4
+ 189 002a FFF7FEFF 		bl	USBH_LL_Stop
+ 190              	.L22:
+ 191 002e D4F8DC03 		ldr	r0, [r4, #988]
+ 192 0032 FFF7FEFF 		bl	osThreadTerminate
+ 193 0036 D4F8D803 		ldr	r0, [r4, #984]
+ 194 003a FFF7FEFF 		bl	osMessageDelete
+ 195 003e 0020     		movs	r0, #0
+ 196 0040 10BD     		pop	{r4, pc}
+ 198              		.section	.text.USBH_RegisterClass,"ax",%progbits
+ 199              		.align	1
+ 200              		.global	USBH_RegisterClass
+ 201              		.syntax unified
+ 202              		.thumb
+ 203              		.thumb_func
+ 205              	USBH_RegisterClass:
+ 206              		@ args = 0, pretend = 0, frame = 0
+ 207              		@ frame_needed = 0, uses_anonymous_args = 0
+ 208              		@ link register save eliminated.
+ 209 0000 0A46     		mov	r2, r1
+ 210 0002 51B1     		cbz	r1, .L26
+ 211 0004 D0F88033 		ldr	r3, [r0, #896]
+ 212 0008 4BB9     		cbnz	r3, .L27
+ 213 000a 591C     		adds	r1, r3, #1
+ 214 000c C0F88013 		str	r1, [r0, #896]
+ 215 0010 DE33     		adds	r3, r3, #222
+ 216 0012 40F82320 		str	r2, [r0, r3, lsl #2]
+ 217 0016 0020     		movs	r0, #0
+ 218 0018 7047     		bx	lr
+ 219              	.L26:
+ 220 001a 0220     		movs	r0, #2
+ 221 001c 7047     		bx	lr
+ 222              	.L27:
+ 223 001e 0220     		movs	r0, #2
+ 224 0020 7047     		bx	lr
+ 226              		.section	.text.USBH_SelectInterface,"ax",%progbits
+ 227              		.align	1
+ 228              		.global	USBH_SelectInterface
+ 229              		.syntax unified
+ 230              		.thumb
+ 231              		.thumb_func
+ 233              	USBH_SelectInterface:
+ 234              		@ args = 0, pretend = 0, frame = 0
+ 235              		@ frame_needed = 0, uses_anonymous_args = 0
+ 236              		@ link register save eliminated.
+ 237 0000 90F83C33 		ldrb	r3, [r0, #828]	@ zero_extendqisi2
+ 238 0004 8B42     		cmp	r3, r1
+ 239 0006 03D9     		bls	.L30
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s 			page 5
+
+
+ 240 0008 80F82413 		strb	r1, [r0, #804]
+ 241 000c 0020     		movs	r0, #0
+ 242 000e 7047     		bx	lr
+ 243              	.L30:
+ 244 0010 0220     		movs	r0, #2
+ 245 0012 7047     		bx	lr
+ 247              		.section	.text.USBH_GetActiveClass,"ax",%progbits
+ 248              		.align	1
+ 249              		.global	USBH_GetActiveClass
+ 250              		.syntax unified
+ 251              		.thumb
+ 252              		.thumb_func
+ 254              	USBH_GetActiveClass:
+ 255              		@ args = 0, pretend = 0, frame = 0
+ 256              		@ frame_needed = 0, uses_anonymous_args = 0
+ 257              		@ link register save eliminated.
+ 258 0000 90F84703 		ldrb	r0, [r0, #839]	@ zero_extendqisi2
+ 259 0004 7047     		bx	lr
+ 261              		.section	.text.USBH_FindInterface,"ax",%progbits
+ 262              		.align	1
+ 263              		.global	USBH_FindInterface
+ 264              		.syntax unified
+ 265              		.thumb
+ 266              		.thumb_func
+ 268              	USBH_FindInterface:
+ 269              		@ args = 0, pretend = 0, frame = 0
+ 270              		@ frame_needed = 0, uses_anonymous_args = 0
+ 271 0000 10B5     		push	{r4, lr}
+ 272 0002 0446     		mov	r4, r0
+ 273 0004 0020     		movs	r0, #0
+ 274 0006 0BE0     		b	.L33
+ 275              	.L36:
+ 276 0008 4FF01A0C 		mov	ip, #26
+ 277 000c 0CFB0E4E 		mla	lr, ip, lr, r4
+ 278 0010 9EF849C3 		ldrb	ip, [lr, #841]	@ zero_extendqisi2
+ 279 0014 9C45     		cmp	ip, r3
+ 280 0016 1CD0     		beq	.L37
+ 281 0018 FF2B     		cmp	r3, #255
+ 282 001a 1AD0     		beq	.L37
+ 283              	.L35:
+ 284 001c 0130     		adds	r0, r0, #1
+ 285 001e C0B2     		uxtb	r0, r0
+ 286              	.L33:
+ 287 0020 0128     		cmp	r0, #1
+ 288 0022 15D8     		bhi	.L40
+ 289 0024 8646     		mov	lr, r0
+ 290 0026 4FF01A0C 		mov	ip, #26
+ 291 002a 0CFB004C 		mla	ip, ip, r0, r4
+ 292 002e 9CF847C3 		ldrb	ip, [ip, #839]	@ zero_extendqisi2
+ 293 0032 8C45     		cmp	ip, r1
+ 294 0034 01D0     		beq	.L34
+ 295 0036 FF29     		cmp	r1, #255
+ 296 0038 F0D1     		bne	.L35
+ 297              	.L34:
+ 298 003a 4FF01A0C 		mov	ip, #26
+ 299 003e 0CFB0E4C 		mla	ip, ip, lr, r4
+ 300 0042 9CF848C3 		ldrb	ip, [ip, #840]	@ zero_extendqisi2
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s 			page 6
+
+
+ 301 0046 9445     		cmp	ip, r2
+ 302 0048 DED0     		beq	.L36
+ 303 004a FF2A     		cmp	r2, #255
+ 304 004c E6D1     		bne	.L35
+ 305 004e DBE7     		b	.L36
+ 306              	.L40:
+ 307 0050 FF20     		movs	r0, #255
+ 308              	.L37:
+ 309 0052 10BD     		pop	{r4, pc}
+ 311              		.section	.text.USBH_FindInterfaceIndex,"ax",%progbits
+ 312              		.align	1
+ 313              		.global	USBH_FindInterfaceIndex
+ 314              		.syntax unified
+ 315              		.thumb
+ 316              		.thumb_func
+ 318              	USBH_FindInterfaceIndex:
+ 319              		@ args = 0, pretend = 0, frame = 0
+ 320              		@ frame_needed = 0, uses_anonymous_args = 0
+ 321              		@ link register save eliminated.
+ 322 0000 8446     		mov	ip, r0
+ 323 0002 0020     		movs	r0, #0
+ 324 0004 01E0     		b	.L42
+ 325              	.L43:
+ 326 0006 0130     		adds	r0, r0, #1
+ 327 0008 C0B2     		uxtb	r0, r0
+ 328              	.L42:
+ 329 000a 0128     		cmp	r0, #1
+ 330 000c 0ED8     		bhi	.L46
+ 331 000e 1A23     		movs	r3, #26
+ 332 0010 03FB00C3 		mla	r3, r3, r0, ip
+ 333 0014 93F84433 		ldrb	r3, [r3, #836]	@ zero_extendqisi2
+ 334 0018 8B42     		cmp	r3, r1
+ 335 001a F4D1     		bne	.L43
+ 336 001c 1A23     		movs	r3, #26
+ 337 001e 03FB00C3 		mla	r3, r3, r0, ip
+ 338 0022 93F84533 		ldrb	r3, [r3, #837]	@ zero_extendqisi2
+ 339 0026 9342     		cmp	r3, r2
+ 340 0028 EDD1     		bne	.L43
+ 341 002a 00E0     		b	.L44
+ 342              	.L46:
+ 343 002c FF20     		movs	r0, #255
+ 344              	.L44:
+ 345 002e 7047     		bx	lr
+ 347              		.section	.text.USBH_Start,"ax",%progbits
+ 348              		.align	1
+ 349              		.global	USBH_Start
+ 350              		.syntax unified
+ 351              		.thumb
+ 352              		.thumb_func
+ 354              	USBH_Start:
+ 355              		@ args = 0, pretend = 0, frame = 0
+ 356              		@ frame_needed = 0, uses_anonymous_args = 0
+ 357 0000 10B5     		push	{r4, lr}
+ 358 0002 0446     		mov	r4, r0
+ 359 0004 FFF7FEFF 		bl	USBH_LL_Start
+ 360 0008 0121     		movs	r1, #1
+ 361 000a 2046     		mov	r0, r4
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s 			page 7
+
+
+ 362 000c FFF7FEFF 		bl	USBH_LL_DriverVBUS
+ 363 0010 0020     		movs	r0, #0
+ 364 0012 10BD     		pop	{r4, pc}
+ 366              		.section	.text.USBH_Stop,"ax",%progbits
+ 367              		.align	1
+ 368              		.global	USBH_Stop
+ 369              		.syntax unified
+ 370              		.thumb
+ 371              		.thumb_func
+ 373              	USBH_Stop:
+ 374              		@ args = 0, pretend = 0, frame = 0
+ 375              		@ frame_needed = 0, uses_anonymous_args = 0
+ 376 0000 10B5     		push	{r4, lr}
+ 377 0002 0446     		mov	r4, r0
+ 378 0004 0021     		movs	r1, #0
+ 379 0006 FFF7FEFF 		bl	USBH_LL_DriverVBUS
+ 380 000a 2046     		mov	r0, r4
+ 381 000c FFF7FEFF 		bl	USBH_LL_Stop
+ 382 0010 2179     		ldrb	r1, [r4, #4]	@ zero_extendqisi2
+ 383 0012 2046     		mov	r0, r4
+ 384 0014 FFF7FEFF 		bl	USBH_FreePipe
+ 385 0018 6179     		ldrb	r1, [r4, #5]	@ zero_extendqisi2
+ 386 001a 2046     		mov	r0, r4
+ 387 001c FFF7FEFF 		bl	USBH_FreePipe
+ 388 0020 0020     		movs	r0, #0
+ 389 0022 10BD     		pop	{r4, pc}
+ 391              		.section	.text.USBH_LL_SetTimer,"ax",%progbits
+ 392              		.align	1
+ 393              		.global	USBH_LL_SetTimer
+ 394              		.syntax unified
+ 395              		.thumb
+ 396              		.thumb_func
+ 398              	USBH_LL_SetTimer:
+ 399              		@ args = 0, pretend = 0, frame = 0
+ 400              		@ frame_needed = 0, uses_anonymous_args = 0
+ 401              		@ link register save eliminated.
+ 402 0000 C0F8C413 		str	r1, [r0, #964]
+ 403 0004 7047     		bx	lr
+ 405              		.section	.text.USBH_LL_IncTimer,"ax",%progbits
+ 406              		.align	1
+ 407              		.global	USBH_LL_IncTimer
+ 408              		.syntax unified
+ 409              		.thumb
+ 410              		.thumb_func
+ 412              	USBH_LL_IncTimer:
+ 413              		@ args = 0, pretend = 0, frame = 0
+ 414              		@ frame_needed = 0, uses_anonymous_args = 0
+ 415 0000 08B5     		push	{r3, lr}
+ 416 0002 D0F8C423 		ldr	r2, [r0, #964]
+ 417 0006 0132     		adds	r2, r2, #1
+ 418 0008 C0F8C423 		str	r2, [r0, #964]
+ 419 000c FFF7FEFF 		bl	USBH_HandleSof
+ 420 0010 08BD     		pop	{r3, pc}
+ 422              		.section	.text.USBH_LL_PortDisabled,"ax",%progbits
+ 423              		.align	1
+ 424              		.global	USBH_LL_PortDisabled
+ 425              		.syntax unified
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s 			page 8
+
+
+ 426              		.thumb
+ 427              		.thumb_func
+ 429              	USBH_LL_PortDisabled:
+ 430              		@ args = 0, pretend = 0, frame = 0
+ 431              		@ frame_needed = 0, uses_anonymous_args = 0
+ 432              		@ link register save eliminated.
+ 433 0000 0023     		movs	r3, #0
+ 434 0002 80F82333 		strb	r3, [r0, #803]
+ 435 0006 0123     		movs	r3, #1
+ 436 0008 80F82133 		strb	r3, [r0, #801]
+ 437 000c 7047     		bx	lr
+ 439              		.section	.text.USBH_IsPortEnabled,"ax",%progbits
+ 440              		.align	1
+ 441              		.global	USBH_IsPortEnabled
+ 442              		.syntax unified
+ 443              		.thumb
+ 444              		.thumb_func
+ 446              	USBH_IsPortEnabled:
+ 447              		@ args = 0, pretend = 0, frame = 0
+ 448              		@ frame_needed = 0, uses_anonymous_args = 0
+ 449              		@ link register save eliminated.
+ 450 0000 90F82303 		ldrb	r0, [r0, #803]	@ zero_extendqisi2
+ 451 0004 7047     		bx	lr
+ 453              		.section	.text.USBH_OS_PutMessage,"ax",%progbits
+ 454              		.align	1
+ 455              		.global	USBH_OS_PutMessage
+ 456              		.syntax unified
+ 457              		.thumb
+ 458              		.thumb_func
+ 460              	USBH_OS_PutMessage:
+ 461              		@ args = 0, pretend = 0, frame = 0
+ 462              		@ frame_needed = 0, uses_anonymous_args = 0
+ 463 0000 38B5     		push	{r3, r4, r5, lr}
+ 464 0002 0446     		mov	r4, r0
+ 465 0004 1546     		mov	r5, r2
+ 466 0006 C0F8E013 		str	r1, [r0, #992]
+ 467 000a D0F8D803 		ldr	r0, [r0, #984]
+ 468 000e FFF7FEFF 		bl	osMessageWaiting
+ 469 0012 1028     		cmp	r0, #16
+ 470 0014 00D1     		bne	.L59
+ 471              	.L56:
+ 472 0016 38BD     		pop	{r3, r4, r5, pc}
+ 473              	.L59:
+ 474 0018 2A46     		mov	r2, r5
+ 475 001a D4F8E013 		ldr	r1, [r4, #992]
+ 476 001e D4F8D803 		ldr	r0, [r4, #984]
+ 477 0022 FFF7FEFF 		bl	osMessagePut
+ 478 0026 F6E7     		b	.L56
+ 480              		.section	.text.USBH_ReEnumerate,"ax",%progbits
+ 481              		.align	1
+ 482              		.global	USBH_ReEnumerate
+ 483              		.syntax unified
+ 484              		.thumb
+ 485              		.thumb_func
+ 487              	USBH_ReEnumerate:
+ 488              		@ args = 0, pretend = 0, frame = 0
+ 489              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s 			page 9
+
+
+ 490 0000 38B5     		push	{r3, r4, r5, lr}
+ 491 0002 0546     		mov	r5, r0
+ 492 0004 FFF7FEFF 		bl	USBH_IsPortEnabled
+ 493 0008 38B9     		cbnz	r0, .L63
+ 494              	.L61:
+ 495 000a 0023     		movs	r3, #0
+ 496 000c 1A46     		mov	r2, r3
+ 497 000e 0121     		movs	r1, #1
+ 498 0010 2846     		mov	r0, r5
+ 499 0012 FFF7FEFF 		bl	USBH_OS_PutMessage
+ 500 0016 0020     		movs	r0, #0
+ 501 0018 38BD     		pop	{r3, r4, r5, pc}
+ 502              	.L63:
+ 503 001a 4FF00104 		mov	r4, #1
+ 504 001e 85F82243 		strb	r4, [r5, #802]
+ 505 0022 2846     		mov	r0, r5
+ 506 0024 FFF7FEFF 		bl	USBH_Stop
+ 507 0028 85F82143 		strb	r4, [r5, #801]
+ 508 002c EDE7     		b	.L61
+ 510              		.section	.text.USBH_HandleEnum,"ax",%progbits
+ 511              		.align	1
+ 512              		.syntax unified
+ 513              		.thumb
+ 514              		.thumb_func
+ 516              	USBH_HandleEnum:
+ 517              		@ args = 0, pretend = 0, frame = 0
+ 518              		@ frame_needed = 0, uses_anonymous_args = 0
+ 519 0000 30B5     		push	{r4, r5, lr}
+ 520 0002 85B0     		sub	sp, sp, #20
+ 521 0004 0546     		mov	r5, r0
+ 522 0006 4478     		ldrb	r4, [r0, #1]	@ zero_extendqisi2
+ 523 0008 042C     		cmp	r4, #4
+ 524 000a 00F0E880 		beq	.L65
+ 525 000e 1ED8     		bhi	.L66
+ 526 0010 022C     		cmp	r4, #2
+ 527 0012 00F09480 		beq	.L67
+ 528 0016 0CD8     		bhi	.L68
+ 529 0018 ACB3     		cbz	r4, .L69
+ 530 001a 012C     		cmp	r4, #1
+ 531 001c 07D1     		bne	.L97
+ 532 001e 1221     		movs	r1, #18
+ 533 0020 FFF7FEFF 		bl	USBH_Get_DevDesc
+ 534 0024 0028     		cmp	r0, #0
+ 535 0026 70D1     		bne	.L78
+ 536 0028 0223     		movs	r3, #2
+ 537 002a 6B70     		strb	r3, [r5, #1]
+ 538 002c 41E1     		b	.L71
+ 539              	.L97:
+ 540 002e 0124     		movs	r4, #1
+ 541 0030 3FE1     		b	.L71
+ 542              	.L68:
+ 543 0032 032C     		cmp	r4, #3
+ 544 0034 09D1     		bne	.L98
+ 545 0036 0921     		movs	r1, #9
+ 546 0038 FFF7FEFF 		bl	USBH_Get_CfgDesc
+ 547 003c 0028     		cmp	r0, #0
+ 548 003e 40F0B180 		bne	.L81
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s 			page 10
+
+
+ 549 0042 0423     		movs	r3, #4
+ 550 0044 6B70     		strb	r3, [r5, #1]
+ 551 0046 0124     		movs	r4, #1
+ 552 0048 33E1     		b	.L71
+ 553              	.L98:
+ 554 004a 0124     		movs	r4, #1
+ 555 004c 31E1     		b	.L71
+ 556              	.L66:
+ 557 004e 062C     		cmp	r4, #6
+ 558 0050 00F00881 		beq	.L73
+ 559 0054 072C     		cmp	r4, #7
+ 560 0056 00F02981 		beq	.L74
+ 561 005a 052C     		cmp	r4, #5
+ 562 005c 11D1     		bne	.L99
+ 563 005e 90F83413 		ldrb	r1, [r0, #820]	@ zero_extendqisi2
+ 564 0062 0029     		cmp	r1, #0
+ 565 0064 00F0F580 		beq	.L85
+ 566 0068 FF23     		movs	r3, #255
+ 567 006a 00F58E72 		add	r2, r0, #284
+ 568 006e FFF7FEFF 		bl	USBH_Get_StringDesc
+ 569 0072 0028     		cmp	r0, #0
+ 570 0074 00F0D980 		beq	.L100
+ 571 0078 0328     		cmp	r0, #3
+ 572 007a 00F0E080 		beq	.L101
+ 573 007e 0124     		movs	r4, #1
+ 574 0080 17E1     		b	.L71
+ 575              	.L99:
+ 576 0082 0124     		movs	r4, #1
+ 577 0084 15E1     		b	.L71
+ 578              	.L69:
+ 579 0086 0821     		movs	r1, #8
+ 580 0088 FFF7FEFF 		bl	USBH_Get_DevDesc
+ 581 008c 18B1     		cbz	r0, .L102
+ 582 008e 0328     		cmp	r0, #3
+ 583 0090 23D0     		beq	.L103
+ 584 0092 0124     		movs	r4, #1
+ 585 0094 0DE1     		b	.L71
+ 586              	.L102:
+ 587 0096 95F82D33 		ldrb	r3, [r5, #813]	@ zero_extendqisi2
+ 588 009a AB71     		strb	r3, [r5, #6]
+ 589 009c 4FF00102 		mov	r2, #1
+ 590 00a0 6A70     		strb	r2, [r5, #1]
+ 591 00a2 0293     		str	r3, [sp, #8]
+ 592 00a4 0446     		mov	r4, r0
+ 593 00a6 0190     		str	r0, [sp, #4]
+ 594 00a8 95F81D33 		ldrb	r3, [r5, #797]	@ zero_extendqisi2
+ 595 00ac 0093     		str	r3, [sp]
+ 596 00ae 95F81C33 		ldrb	r3, [r5, #796]	@ zero_extendqisi2
+ 597 00b2 8022     		movs	r2, #128
+ 598 00b4 2979     		ldrb	r1, [r5, #4]	@ zero_extendqisi2
+ 599 00b6 2846     		mov	r0, r5
+ 600 00b8 FFF7FEFF 		bl	USBH_OpenPipe
+ 601 00bc AB79     		ldrb	r3, [r5, #6]	@ zero_extendqisi2
+ 602 00be 0293     		str	r3, [sp, #8]
+ 603 00c0 0194     		str	r4, [sp, #4]
+ 604 00c2 95F81D33 		ldrb	r3, [r5, #797]	@ zero_extendqisi2
+ 605 00c6 0093     		str	r3, [sp]
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s 			page 11
+
+
+ 606 00c8 95F81C33 		ldrb	r3, [r5, #796]	@ zero_extendqisi2
+ 607 00cc 2246     		mov	r2, r4
+ 608 00ce 6979     		ldrb	r1, [r5, #5]	@ zero_extendqisi2
+ 609 00d0 2846     		mov	r0, r5
+ 610 00d2 FFF7FEFF 		bl	USBH_OpenPipe
+ 611 00d6 0124     		movs	r4, #1
+ 612 00d8 EBE0     		b	.L71
+ 613              	.L103:
+ 614 00da 95F81E33 		ldrb	r3, [r5, #798]	@ zero_extendqisi2
+ 615 00de 0133     		adds	r3, r3, #1
+ 616 00e0 DBB2     		uxtb	r3, r3
+ 617 00e2 85F81E33 		strb	r3, [r5, #798]
+ 618 00e6 032B     		cmp	r3, #3
+ 619 00e8 03D9     		bls	.L77
+ 620 00ea 0D23     		movs	r3, #13
+ 621 00ec 2B70     		strb	r3, [r5]
+ 622 00ee 0124     		movs	r4, #1
+ 623 00f0 DFE0     		b	.L71
+ 624              	.L77:
+ 625 00f2 6979     		ldrb	r1, [r5, #5]	@ zero_extendqisi2
+ 626 00f4 2846     		mov	r0, r5
+ 627 00f6 FFF7FEFF 		bl	USBH_FreePipe
+ 628 00fa 2979     		ldrb	r1, [r5, #4]	@ zero_extendqisi2
+ 629 00fc 2846     		mov	r0, r5
+ 630 00fe FFF7FEFF 		bl	USBH_FreePipe
+ 631 0102 0023     		movs	r3, #0
+ 632 0104 2B70     		strb	r3, [r5]
+ 633 0106 0124     		movs	r4, #1
+ 634 0108 D3E0     		b	.L71
+ 635              	.L78:
+ 636 010a 0328     		cmp	r0, #3
+ 637 010c 40F0D180 		bne	.L71
+ 638 0110 95F81E33 		ldrb	r3, [r5, #798]	@ zero_extendqisi2
+ 639 0114 0133     		adds	r3, r3, #1
+ 640 0116 DBB2     		uxtb	r3, r3
+ 641 0118 85F81E33 		strb	r3, [r5, #798]
+ 642 011c 032B     		cmp	r3, #3
+ 643 011e 02D9     		bls	.L79
+ 644 0120 0D23     		movs	r3, #13
+ 645 0122 2B70     		strb	r3, [r5]
+ 646 0124 C5E0     		b	.L71
+ 647              	.L79:
+ 648 0126 6979     		ldrb	r1, [r5, #5]	@ zero_extendqisi2
+ 649 0128 2846     		mov	r0, r5
+ 650 012a FFF7FEFF 		bl	USBH_FreePipe
+ 651 012e 2979     		ldrb	r1, [r5, #4]	@ zero_extendqisi2
+ 652 0130 2846     		mov	r0, r5
+ 653 0132 FFF7FEFF 		bl	USBH_FreePipe
+ 654 0136 0023     		movs	r3, #0
+ 655 0138 6B70     		strb	r3, [r5, #1]
+ 656 013a 2B70     		strb	r3, [r5]
+ 657 013c B9E0     		b	.L71
+ 658              	.L67:
+ 659 013e 0121     		movs	r1, #1
+ 660 0140 FFF7FEFF 		bl	USBH_SetAddress
+ 661 0144 18B1     		cbz	r0, .L104
+ 662 0146 0328     		cmp	r0, #3
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s 			page 12
+
+
+ 663 0148 26D0     		beq	.L105
+ 664 014a 0124     		movs	r4, #1
+ 665 014c B1E0     		b	.L71
+ 666              	.L104:
+ 667 014e 0220     		movs	r0, #2
+ 668 0150 FFF7FEFF 		bl	USBH_Delay
+ 669 0154 4FF00103 		mov	r3, #1
+ 670 0158 85F81C33 		strb	r3, [r5, #796]
+ 671 015c 0323     		movs	r3, #3
+ 672 015e 6B70     		strb	r3, [r5, #1]
+ 673 0160 AB79     		ldrb	r3, [r5, #6]	@ zero_extendqisi2
+ 674 0162 0293     		str	r3, [sp, #8]
+ 675 0164 0024     		movs	r4, #0
+ 676 0166 0194     		str	r4, [sp, #4]
+ 677 0168 95F81D33 		ldrb	r3, [r5, #797]	@ zero_extendqisi2
+ 678 016c 0093     		str	r3, [sp]
+ 679 016e 0123     		movs	r3, #1
+ 680 0170 8022     		movs	r2, #128
+ 681 0172 2979     		ldrb	r1, [r5, #4]	@ zero_extendqisi2
+ 682 0174 2846     		mov	r0, r5
+ 683 0176 FFF7FEFF 		bl	USBH_OpenPipe
+ 684 017a AB79     		ldrb	r3, [r5, #6]	@ zero_extendqisi2
+ 685 017c 0293     		str	r3, [sp, #8]
+ 686 017e 0194     		str	r4, [sp, #4]
+ 687 0180 95F81D33 		ldrb	r3, [r5, #797]	@ zero_extendqisi2
+ 688 0184 0093     		str	r3, [sp]
+ 689 0186 95F81C33 		ldrb	r3, [r5, #796]	@ zero_extendqisi2
+ 690 018a 2246     		mov	r2, r4
+ 691 018c 6979     		ldrb	r1, [r5, #5]	@ zero_extendqisi2
+ 692 018e 2846     		mov	r0, r5
+ 693 0190 FFF7FEFF 		bl	USBH_OpenPipe
+ 694 0194 0124     		movs	r4, #1
+ 695 0196 8CE0     		b	.L71
+ 696              	.L105:
+ 697 0198 0D23     		movs	r3, #13
+ 698 019a 2B70     		strb	r3, [r5]
+ 699 019c 0023     		movs	r3, #0
+ 700 019e 6B70     		strb	r3, [r5, #1]
+ 701 01a0 0124     		movs	r4, #1
+ 702 01a2 86E0     		b	.L71
+ 703              	.L81:
+ 704 01a4 0328     		cmp	r0, #3
+ 705 01a6 01D0     		beq	.L106
+ 706 01a8 0124     		movs	r4, #1
+ 707 01aa 82E0     		b	.L71
+ 708              	.L106:
+ 709 01ac 95F81E33 		ldrb	r3, [r5, #798]	@ zero_extendqisi2
+ 710 01b0 0133     		adds	r3, r3, #1
+ 711 01b2 DBB2     		uxtb	r3, r3
+ 712 01b4 85F81E33 		strb	r3, [r5, #798]
+ 713 01b8 032B     		cmp	r3, #3
+ 714 01ba 03D9     		bls	.L82
+ 715 01bc 0D23     		movs	r3, #13
+ 716 01be 2B70     		strb	r3, [r5]
+ 717 01c0 0124     		movs	r4, #1
+ 718 01c2 76E0     		b	.L71
+ 719              	.L82:
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s 			page 13
+
+
+ 720 01c4 6979     		ldrb	r1, [r5, #5]	@ zero_extendqisi2
+ 721 01c6 2846     		mov	r0, r5
+ 722 01c8 FFF7FEFF 		bl	USBH_FreePipe
+ 723 01cc 2979     		ldrb	r1, [r5, #4]	@ zero_extendqisi2
+ 724 01ce 2846     		mov	r0, r5
+ 725 01d0 FFF7FEFF 		bl	USBH_FreePipe
+ 726 01d4 0023     		movs	r3, #0
+ 727 01d6 6B70     		strb	r3, [r5, #1]
+ 728 01d8 2B70     		strb	r3, [r5]
+ 729 01da 0124     		movs	r4, #1
+ 730 01dc 69E0     		b	.L71
+ 731              	.L65:
+ 732 01de B0F83A13 		ldrh	r1, [r0, #826]
+ 733 01e2 FFF7FEFF 		bl	USBH_Get_CfgDesc
+ 734 01e6 18B9     		cbnz	r0, .L83
+ 735 01e8 0523     		movs	r3, #5
+ 736 01ea 6B70     		strb	r3, [r5, #1]
+ 737 01ec 0124     		movs	r4, #1
+ 738 01ee 60E0     		b	.L71
+ 739              	.L83:
+ 740 01f0 0328     		cmp	r0, #3
+ 741 01f2 01D0     		beq	.L107
+ 742 01f4 0124     		movs	r4, #1
+ 743 01f6 5CE0     		b	.L71
+ 744              	.L107:
+ 745 01f8 95F81E33 		ldrb	r3, [r5, #798]	@ zero_extendqisi2
+ 746 01fc 0133     		adds	r3, r3, #1
+ 747 01fe DBB2     		uxtb	r3, r3
+ 748 0200 85F81E33 		strb	r3, [r5, #798]
+ 749 0204 032B     		cmp	r3, #3
+ 750 0206 03D9     		bls	.L84
+ 751 0208 0D23     		movs	r3, #13
+ 752 020a 2B70     		strb	r3, [r5]
+ 753 020c 0124     		movs	r4, #1
+ 754 020e 50E0     		b	.L71
+ 755              	.L84:
+ 756 0210 6979     		ldrb	r1, [r5, #5]	@ zero_extendqisi2
+ 757 0212 2846     		mov	r0, r5
+ 758 0214 FFF7FEFF 		bl	USBH_FreePipe
+ 759 0218 2979     		ldrb	r1, [r5, #4]	@ zero_extendqisi2
+ 760 021a 2846     		mov	r0, r5
+ 761 021c FFF7FEFF 		bl	USBH_FreePipe
+ 762 0220 0023     		movs	r3, #0
+ 763 0222 6B70     		strb	r3, [r5, #1]
+ 764 0224 2B70     		strb	r3, [r5]
+ 765 0226 0124     		movs	r4, #1
+ 766 0228 43E0     		b	.L71
+ 767              	.L100:
+ 768 022a 0623     		movs	r3, #6
+ 769 022c 6B70     		strb	r3, [r5, #1]
+ 770 022e 0346     		mov	r3, r0
+ 771 0230 0246     		mov	r2, r0
+ 772 0232 0521     		movs	r1, #5
+ 773 0234 2846     		mov	r0, r5
+ 774 0236 FFF7FEFF 		bl	USBH_OS_PutMessage
+ 775 023a 0124     		movs	r4, #1
+ 776 023c 39E0     		b	.L71
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s 			page 14
+
+
+ 777              	.L101:
+ 778 023e 0623     		movs	r3, #6
+ 779 0240 6B70     		strb	r3, [r5, #1]
+ 780 0242 0023     		movs	r3, #0
+ 781 0244 1A46     		mov	r2, r3
+ 782 0246 0521     		movs	r1, #5
+ 783 0248 2846     		mov	r0, r5
+ 784 024a FFF7FEFF 		bl	USBH_OS_PutMessage
+ 785 024e 0124     		movs	r4, #1
+ 786 0250 2FE0     		b	.L71
+ 787              	.L85:
+ 788 0252 0623     		movs	r3, #6
+ 789 0254 4370     		strb	r3, [r0, #1]
+ 790 0256 0B46     		mov	r3, r1
+ 791 0258 0A46     		mov	r2, r1
+ 792 025a 0521     		movs	r1, #5
+ 793 025c FFF7FEFF 		bl	USBH_OS_PutMessage
+ 794 0260 0124     		movs	r4, #1
+ 795 0262 26E0     		b	.L71
+ 796              	.L73:
+ 797 0264 90F83513 		ldrb	r1, [r0, #821]	@ zero_extendqisi2
+ 798 0268 B9B1     		cbz	r1, .L87
+ 799 026a FF23     		movs	r3, #255
+ 800 026c 00F58E72 		add	r2, r0, #284
+ 801 0270 FFF7FEFF 		bl	USBH_Get_StringDesc
+ 802 0274 18B9     		cbnz	r0, .L88
+ 803 0276 0723     		movs	r3, #7
+ 804 0278 6B70     		strb	r3, [r5, #1]
+ 805 027a 0124     		movs	r4, #1
+ 806 027c 19E0     		b	.L71
+ 807              	.L88:
+ 808 027e 0328     		cmp	r0, #3
+ 809 0280 01D0     		beq	.L108
+ 810 0282 0124     		movs	r4, #1
+ 811 0284 15E0     		b	.L71
+ 812              	.L108:
+ 813 0286 0723     		movs	r3, #7
+ 814 0288 6B70     		strb	r3, [r5, #1]
+ 815 028a 0023     		movs	r3, #0
+ 816 028c 1A46     		mov	r2, r3
+ 817 028e 0521     		movs	r1, #5
+ 818 0290 2846     		mov	r0, r5
+ 819 0292 FFF7FEFF 		bl	USBH_OS_PutMessage
+ 820 0296 0124     		movs	r4, #1
+ 821 0298 0BE0     		b	.L71
+ 822              	.L87:
+ 823 029a 0723     		movs	r3, #7
+ 824 029c 4370     		strb	r3, [r0, #1]
+ 825 029e 0B46     		mov	r3, r1
+ 826 02a0 0A46     		mov	r2, r1
+ 827 02a2 0521     		movs	r1, #5
+ 828 02a4 FFF7FEFF 		bl	USBH_OS_PutMessage
+ 829 02a8 0124     		movs	r4, #1
+ 830 02aa 02E0     		b	.L71
+ 831              	.L74:
+ 832 02ac 90F83643 		ldrb	r4, [r0, #822]	@ zero_extendqisi2
+ 833 02b0 14B9     		cbnz	r4, .L109
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s 			page 15
+
+
+ 834              	.L71:
+ 835 02b2 2046     		mov	r0, r4
+ 836 02b4 05B0     		add	sp, sp, #20
+ 837              		@ sp needed
+ 838 02b6 30BD     		pop	{r4, r5, pc}
+ 839              	.L109:
+ 840 02b8 FF23     		movs	r3, #255
+ 841 02ba 00F58E72 		add	r2, r0, #284
+ 842 02be 2146     		mov	r1, r4
+ 843 02c0 FFF7FEFF 		bl	USBH_Get_StringDesc
+ 844 02c4 0446     		mov	r4, r0
+ 845 02c6 0028     		cmp	r0, #0
+ 846 02c8 F3D0     		beq	.L71
+ 847 02ca 0328     		cmp	r0, #3
+ 848 02cc 01D0     		beq	.L95
+ 849 02ce 0124     		movs	r4, #1
+ 850 02d0 EFE7     		b	.L71
+ 851              	.L95:
+ 852 02d2 0024     		movs	r4, #0
+ 853 02d4 EDE7     		b	.L71
+ 855              		.section	.text.USBH_Process,"ax",%progbits
+ 856              		.align	1
+ 857              		.global	USBH_Process
+ 858              		.syntax unified
+ 859              		.thumb
+ 860              		.thumb_func
+ 862              	USBH_Process:
+ 863              		@ args = 0, pretend = 0, frame = 8
+ 864              		@ frame_needed = 0, uses_anonymous_args = 0
+ 865 0000 30B5     		push	{r4, r5, lr}
+ 866 0002 87B0     		sub	sp, sp, #28
+ 867 0004 0446     		mov	r4, r0
+ 868 0006 0223     		movs	r3, #2
+ 869 0008 8DF81730 		strb	r3, [sp, #23]
+ 870 000c 90F82133 		ldrb	r3, [r0, #801]	@ zero_extendqisi2
+ 871 0010 012B     		cmp	r3, #1
+ 872 0012 1FD0     		beq	.L153
+ 873              	.L111:
+ 874 0014 2278     		ldrb	r2, [r4]	@ zero_extendqisi2
+ 875 0016 D3B2     		uxtb	r3, r2
+ 876 0018 062A     		cmp	r2, #6
+ 877 001a 00F03A81 		beq	.L112
+ 878 001e 062B     		cmp	r3, #6
+ 879 0020 1BD9     		bls	.L154
+ 880 0022 092B     		cmp	r3, #9
+ 881 0024 00F0E180 		beq	.L121
+ 882 0028 53D8     		bhi	.L122
+ 883 002a 072B     		cmp	r3, #7
+ 884 002c 00F0CE80 		beq	.L123
+ 885 0030 082B     		cmp	r3, #8
+ 886 0032 40F0E780 		bne	.L118
+ 887 0036 94F83D13 		ldrb	r1, [r4, #829]	@ zero_extendqisi2
+ 888 003a 2046     		mov	r0, r4
+ 889 003c FFF7FEFF 		bl	USBH_SetCfg
+ 890 0040 08B9     		cbnz	r0, .L134
+ 891 0042 0923     		movs	r3, #9
+ 892 0044 2370     		strb	r3, [r4]
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s 			page 16
+
+
+ 893              	.L134:
+ 894 0046 0023     		movs	r3, #0
+ 895 0048 1A46     		mov	r2, r3
+ 896 004a 0121     		movs	r1, #1
+ 897 004c 2046     		mov	r0, r4
+ 898 004e FFF7FEFF 		bl	USBH_OS_PutMessage
+ 899 0052 D7E0     		b	.L118
+ 900              	.L153:
+ 901 0054 0323     		movs	r3, #3
+ 902 0056 0370     		strb	r3, [r0]
+ 903 0058 DCE7     		b	.L111
+ 904              	.L154:
+ 905 005a 022B     		cmp	r3, #2
+ 906 005c 77D0     		beq	.L114
+ 907 005e 18D8     		bhi	.L115
+ 908 0060 002B     		cmp	r3, #0
+ 909 0062 45D0     		beq	.L116
+ 910 0064 012B     		cmp	r3, #1
+ 911 0066 40F0CD80 		bne	.L118
+ 912 006a 94F82333 		ldrb	r3, [r4, #803]	@ zero_extendqisi2
+ 913 006e 012B     		cmp	r3, #1
+ 914 0070 57D0     		beq	.L155
+ 915 0072 D4F8C833 		ldr	r3, [r4, #968]
+ 916 0076 B3F57A7F 		cmp	r3, #1000
+ 917 007a 61D9     		bls	.L129
+ 918 007c 94F81F33 		ldrb	r3, [r4, #799]	@ zero_extendqisi2
+ 919 0080 0133     		adds	r3, r3, #1
+ 920 0082 DBB2     		uxtb	r3, r3
+ 921 0084 84F81F33 		strb	r3, [r4, #799]
+ 922 0088 032B     		cmp	r3, #3
+ 923 008a 56D9     		bls	.L130
+ 924 008c 0D23     		movs	r3, #13
+ 925 008e 2370     		strb	r3, [r4]
+ 926 0090 4CE0     		b	.L128
+ 927              	.L115:
+ 928 0092 032B     		cmp	r3, #3
+ 929 0094 00F01B81 		beq	.L119
+ 930 0098 052B     		cmp	r3, #5
+ 931 009a 40F0B380 		bne	.L118
+ 932 009e 2046     		mov	r0, r4
+ 933 00a0 FFF7FEFF 		bl	USBH_HandleEnum
+ 934 00a4 8DF81700 		strb	r0, [sp, #23]
+ 935 00a8 9DF81730 		ldrb	r3, [sp, #23]	@ zero_extendqisi2
+ 936 00ac 002B     		cmp	r3, #0
+ 937 00ae 40F0A980 		bne	.L118
+ 938 00b2 84F82433 		strb	r3, [r4, #804]
+ 939 00b6 94F83733 		ldrb	r3, [r4, #823]	@ zero_extendqisi2
+ 940 00ba 012B     		cmp	r3, #1
+ 941 00bc 00F08380 		beq	.L156
+ 942 00c0 0723     		movs	r3, #7
+ 943 00c2 2370     		strb	r3, [r4]
+ 944              	.L133:
+ 945 00c4 0023     		movs	r3, #0
+ 946 00c6 1A46     		mov	r2, r3
+ 947 00c8 0521     		movs	r1, #5
+ 948 00ca 2046     		mov	r0, r4
+ 949 00cc FFF7FEFF 		bl	USBH_OS_PutMessage
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s 			page 17
+
+
+ 950 00d0 98E0     		b	.L118
+ 951              	.L122:
+ 952 00d2 0A2B     		cmp	r3, #10
+ 953 00d4 00F0AC80 		beq	.L125
+ 954 00d8 0B2B     		cmp	r3, #11
+ 955 00da 40F09380 		bne	.L118
+ 956 00de D4F87C33 		ldr	r3, [r4, #892]
+ 957 00e2 002B     		cmp	r3, #0
+ 958 00e4 00F08E80 		beq	.L118
+ 959 00e8 5B69     		ldr	r3, [r3, #20]
+ 960 00ea 2046     		mov	r0, r4
+ 961 00ec 9847     		blx	r3
+ 962 00ee 89E0     		b	.L118
+ 963              	.L116:
+ 964 00f0 94F82033 		ldrb	r3, [r4, #800]	@ zero_extendqisi2
+ 965 00f4 002B     		cmp	r3, #0
+ 966 00f6 00F08580 		beq	.L118
+ 967 00fa 4FF00103 		mov	r3, #1
+ 968 00fe 2370     		strb	r3, [r4]
+ 969 0100 C820     		movs	r0, #200
+ 970 0102 FFF7FEFF 		bl	USBH_Delay
+ 971 0106 2046     		mov	r0, r4
+ 972 0108 FFF7FEFF 		bl	USBH_LL_ResetPort
+ 973 010c 0022     		movs	r2, #0
+ 974 010e 84F81C23 		strb	r2, [r4, #796]
+ 975 0112 C4F8C823 		str	r2, [r4, #968]
+ 976 0116 1346     		mov	r3, r2
+ 977 0118 0121     		movs	r1, #1
+ 978 011a 2046     		mov	r0, r4
+ 979 011c FFF7FEFF 		bl	USBH_OS_PutMessage
+ 980 0120 70E0     		b	.L118
+ 981              	.L155:
+ 982 0122 0023     		movs	r3, #0
+ 983 0124 84F81F33 		strb	r3, [r4, #799]
+ 984 0128 0223     		movs	r3, #2
+ 985 012a 2370     		strb	r3, [r4]
+ 986              	.L128:
+ 987 012c 0023     		movs	r3, #0
+ 988 012e 1A46     		mov	r2, r3
+ 989 0130 0121     		movs	r1, #1
+ 990 0132 2046     		mov	r0, r4
+ 991 0134 FFF7FEFF 		bl	USBH_OS_PutMessage
+ 992 0138 64E0     		b	.L118
+ 993              	.L130:
+ 994 013a 0023     		movs	r3, #0
+ 995 013c 2370     		strb	r3, [r4]
+ 996 013e F5E7     		b	.L128
+ 997              	.L129:
+ 998 0140 0A33     		adds	r3, r3, #10
+ 999 0142 C4F8C833 		str	r3, [r4, #968]
+ 1000 0146 0A20     		movs	r0, #10
+ 1001 0148 FFF7FEFF 		bl	USBH_Delay
+ 1002 014c EEE7     		b	.L128
+ 1003              	.L114:
+ 1004 014e D4F8D433 		ldr	r3, [r4, #980]
+ 1005 0152 13B1     		cbz	r3, .L131
+ 1006 0154 0421     		movs	r1, #4
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s 			page 18
+
+
+ 1007 0156 2046     		mov	r0, r4
+ 1008 0158 9847     		blx	r3
+ 1009              	.L131:
+ 1010 015a 6420     		movs	r0, #100
+ 1011 015c FFF7FEFF 		bl	USBH_Delay
+ 1012 0160 2046     		mov	r0, r4
+ 1013 0162 FFF7FEFF 		bl	USBH_LL_GetSpeed
+ 1014 0166 84F81D03 		strb	r0, [r4, #797]
+ 1015 016a 0523     		movs	r3, #5
+ 1016 016c 2370     		strb	r3, [r4]
+ 1017 016e 0021     		movs	r1, #0
+ 1018 0170 2046     		mov	r0, r4
+ 1019 0172 FFF7FEFF 		bl	USBH_AllocPipe
+ 1020 0176 6071     		strb	r0, [r4, #5]
+ 1021 0178 8021     		movs	r1, #128
+ 1022 017a 2046     		mov	r0, r4
+ 1023 017c FFF7FEFF 		bl	USBH_AllocPipe
+ 1024 0180 0146     		mov	r1, r0
+ 1025 0182 2071     		strb	r0, [r4, #4]
+ 1026 0184 A379     		ldrb	r3, [r4, #6]	@ zero_extendqisi2
+ 1027 0186 0293     		str	r3, [sp, #8]
+ 1028 0188 0025     		movs	r5, #0
+ 1029 018a 0195     		str	r5, [sp, #4]
+ 1030 018c 94F81D33 		ldrb	r3, [r4, #797]	@ zero_extendqisi2
+ 1031 0190 0093     		str	r3, [sp]
+ 1032 0192 94F81C33 		ldrb	r3, [r4, #796]	@ zero_extendqisi2
+ 1033 0196 8022     		movs	r2, #128
+ 1034 0198 2046     		mov	r0, r4
+ 1035 019a FFF7FEFF 		bl	USBH_OpenPipe
+ 1036 019e A379     		ldrb	r3, [r4, #6]	@ zero_extendqisi2
+ 1037 01a0 0293     		str	r3, [sp, #8]
+ 1038 01a2 0195     		str	r5, [sp, #4]
+ 1039 01a4 94F81D33 		ldrb	r3, [r4, #797]	@ zero_extendqisi2
+ 1040 01a8 0093     		str	r3, [sp]
+ 1041 01aa 94F81C33 		ldrb	r3, [r4, #796]	@ zero_extendqisi2
+ 1042 01ae 2A46     		mov	r2, r5
+ 1043 01b0 6179     		ldrb	r1, [r4, #5]	@ zero_extendqisi2
+ 1044 01b2 2046     		mov	r0, r4
+ 1045 01b4 FFF7FEFF 		bl	USBH_OpenPipe
+ 1046 01b8 2B46     		mov	r3, r5
+ 1047 01ba 2A46     		mov	r2, r5
+ 1048 01bc 0121     		movs	r1, #1
+ 1049 01be 2046     		mov	r0, r4
+ 1050 01c0 FFF7FEFF 		bl	USBH_OS_PutMessage
+ 1051 01c4 1EE0     		b	.L118
+ 1052              	.L156:
+ 1053 01c6 0823     		movs	r3, #8
+ 1054 01c8 2370     		strb	r3, [r4]
+ 1055 01ca 7BE7     		b	.L133
+ 1056              	.L123:
+ 1057 01cc D4F8D433 		ldr	r3, [r4, #980]
+ 1058 01d0 C3B1     		cbz	r3, .L118
+ 1059 01d2 0121     		movs	r1, #1
+ 1060 01d4 2046     		mov	r0, r4
+ 1061 01d6 9847     		blx	r3
+ 1062 01d8 0823     		movs	r3, #8
+ 1063 01da 2370     		strb	r3, [r4]
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s 			page 19
+
+
+ 1064 01dc 0023     		movs	r3, #0
+ 1065 01de 1A46     		mov	r2, r3
+ 1066 01e0 0521     		movs	r1, #5
+ 1067 01e2 2046     		mov	r0, r4
+ 1068 01e4 FFF7FEFF 		bl	USBH_OS_PutMessage
+ 1069 01e8 0CE0     		b	.L118
+ 1070              	.L121:
+ 1071 01ea 94F83F33 		ldrb	r3, [r4, #831]	@ zero_extendqisi2
+ 1072 01ee 13F0200F 		tst	r3, #32
+ 1073 01f2 0AD1     		bne	.L157
+ 1074 01f4 0A23     		movs	r3, #10
+ 1075 01f6 2370     		strb	r3, [r4]
+ 1076              	.L137:
+ 1077 01f8 0023     		movs	r3, #0
+ 1078 01fa 1A46     		mov	r2, r3
+ 1079 01fc 0121     		movs	r1, #1
+ 1080 01fe 2046     		mov	r0, r4
+ 1081 0200 FFF7FEFF 		bl	USBH_OS_PutMessage
+ 1082              	.L118:
+ 1083 0204 0020     		movs	r0, #0
+ 1084 0206 07B0     		add	sp, sp, #28
+ 1085              		@ sp needed
+ 1086 0208 30BD     		pop	{r4, r5, pc}
+ 1087              	.L157:
+ 1088 020a 0121     		movs	r1, #1
+ 1089 020c 2046     		mov	r0, r4
+ 1090 020e FFF7FEFF 		bl	USBH_SetFeature
+ 1091 0212 8DF81700 		strb	r0, [sp, #23]
+ 1092 0216 9DF81730 		ldrb	r3, [sp, #23]	@ zero_extendqisi2
+ 1093 021a 13B9     		cbnz	r3, .L136
+ 1094 021c 0A23     		movs	r3, #10
+ 1095 021e 2370     		strb	r3, [r4]
+ 1096 0220 EAE7     		b	.L137
+ 1097              	.L136:
+ 1098 0222 9DF81730 		ldrb	r3, [sp, #23]	@ zero_extendqisi2
+ 1099 0226 032B     		cmp	r3, #3
+ 1100 0228 E6D1     		bne	.L137
+ 1101 022a 0A23     		movs	r3, #10
+ 1102 022c 2370     		strb	r3, [r4]
+ 1103 022e E3E7     		b	.L137
+ 1104              	.L125:
+ 1105 0230 D4F88033 		ldr	r3, [r4, #896]
+ 1106 0234 8BB1     		cbz	r3, .L138
+ 1107 0236 0023     		movs	r3, #0
+ 1108 0238 C4F87C33 		str	r3, [r4, #892]
+ 1109              	.L139:
+ 1110 023c A3B1     		cbz	r3, .L142
+ 1111              	.L141:
+ 1112 023e D4F87C33 		ldr	r3, [r4, #892]
+ 1113 0242 1BB3     		cbz	r3, .L143
+ 1114 0244 9B68     		ldr	r3, [r3, #8]
+ 1115 0246 2046     		mov	r0, r4
+ 1116 0248 9847     		blx	r3
+ 1117 024a E0B9     		cbnz	r0, .L144
+ 1118 024c 0623     		movs	r3, #6
+ 1119 024e 2370     		strb	r3, [r4]
+ 1120 0250 D4F8D433 		ldr	r3, [r4, #980]
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s 			page 20
+
+
+ 1121 0254 0321     		movs	r1, #3
+ 1122 0256 2046     		mov	r0, r4
+ 1123 0258 9847     		blx	r3
+ 1124              	.L138:
+ 1125 025a 0023     		movs	r3, #0
+ 1126 025c 1A46     		mov	r2, r3
+ 1127 025e 0521     		movs	r1, #5
+ 1128 0260 2046     		mov	r0, r4
+ 1129 0262 FFF7FEFF 		bl	USBH_OS_PutMessage
+ 1130 0266 CDE7     		b	.L118
+ 1131              	.L142:
+ 1132 0268 03F1DE02 		add	r2, r3, #222
+ 1133 026c 54F82220 		ldr	r2, [r4, r2, lsl #2]
+ 1134 0270 1079     		ldrb	r0, [r2, #4]	@ zero_extendqisi2
+ 1135 0272 94F84713 		ldrb	r1, [r4, #839]	@ zero_extendqisi2
+ 1136 0276 8842     		cmp	r0, r1
+ 1137 0278 02D0     		beq	.L158
+ 1138 027a 0133     		adds	r3, r3, #1
+ 1139 027c DBB2     		uxtb	r3, r3
+ 1140 027e DDE7     		b	.L139
+ 1141              	.L158:
+ 1142 0280 C4F87C23 		str	r2, [r4, #892]
+ 1143 0284 DBE7     		b	.L141
+ 1144              	.L144:
+ 1145 0286 0D23     		movs	r3, #13
+ 1146 0288 2370     		strb	r3, [r4]
+ 1147 028a E6E7     		b	.L138
+ 1148              	.L143:
+ 1149 028c 0D23     		movs	r3, #13
+ 1150 028e 2370     		strb	r3, [r4]
+ 1151 0290 E3E7     		b	.L138
+ 1152              	.L112:
+ 1153 0292 D4F87C33 		ldr	r3, [r4, #892]
+ 1154 0296 BBB1     		cbz	r3, .L145
+ 1155 0298 1B69     		ldr	r3, [r3, #16]
+ 1156 029a 2046     		mov	r0, r4
+ 1157 029c 9847     		blx	r3
+ 1158 029e 8DF81700 		strb	r0, [sp, #23]
+ 1159 02a2 9DF81730 		ldrb	r3, [sp, #23]	@ zero_extendqisi2
+ 1160 02a6 43B9     		cbnz	r3, .L146
+ 1161 02a8 0B23     		movs	r3, #11
+ 1162 02aa 2370     		strb	r3, [r4]
+ 1163              	.L147:
+ 1164 02ac 0023     		movs	r3, #0
+ 1165 02ae 1A46     		mov	r2, r3
+ 1166 02b0 0521     		movs	r1, #5
+ 1167 02b2 2046     		mov	r0, r4
+ 1168 02b4 FFF7FEFF 		bl	USBH_OS_PutMessage
+ 1169 02b8 A4E7     		b	.L118
+ 1170              	.L146:
+ 1171 02ba 9DF81730 		ldrb	r3, [sp, #23]	@ zero_extendqisi2
+ 1172 02be 022B     		cmp	r3, #2
+ 1173 02c0 F4D1     		bne	.L147
+ 1174 02c2 0D23     		movs	r3, #13
+ 1175 02c4 2370     		strb	r3, [r4]
+ 1176 02c6 F1E7     		b	.L147
+ 1177              	.L145:
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s 			page 21
+
+
+ 1178 02c8 0D23     		movs	r3, #13
+ 1179 02ca 2370     		strb	r3, [r4]
+ 1180 02cc EEE7     		b	.L147
+ 1181              	.L119:
+ 1182 02ce 0023     		movs	r3, #0
+ 1183 02d0 84F82133 		strb	r3, [r4, #801]
+ 1184 02d4 2046     		mov	r0, r4
+ 1185 02d6 FFF7FEFF 		bl	DeInitStateMachine
+ 1186 02da D4F87C33 		ldr	r3, [r4, #892]
+ 1187 02de 2BB1     		cbz	r3, .L148
+ 1188 02e0 DB68     		ldr	r3, [r3, #12]
+ 1189 02e2 2046     		mov	r0, r4
+ 1190 02e4 9847     		blx	r3
+ 1191 02e6 0023     		movs	r3, #0
+ 1192 02e8 C4F87C33 		str	r3, [r4, #892]
+ 1193              	.L148:
+ 1194 02ec D4F8D433 		ldr	r3, [r4, #980]
+ 1195 02f0 13B1     		cbz	r3, .L149
+ 1196 02f2 0521     		movs	r1, #5
+ 1197 02f4 2046     		mov	r0, r4
+ 1198 02f6 9847     		blx	r3
+ 1199              	.L149:
+ 1200 02f8 94F82233 		ldrb	r3, [r4, #802]	@ zero_extendqisi2
+ 1201 02fc 012B     		cmp	r3, #1
+ 1202 02fe 09D0     		beq	.L159
+ 1203 0300 2046     		mov	r0, r4
+ 1204 0302 FFF7FEFF 		bl	USBH_LL_Start
+ 1205              	.L151:
+ 1206 0306 0023     		movs	r3, #0
+ 1207 0308 1A46     		mov	r2, r3
+ 1208 030a 0121     		movs	r1, #1
+ 1209 030c 2046     		mov	r0, r4
+ 1210 030e FFF7FEFF 		bl	USBH_OS_PutMessage
+ 1211 0312 77E7     		b	.L118
+ 1212              	.L159:
+ 1213 0314 0023     		movs	r3, #0
+ 1214 0316 84F82233 		strb	r3, [r4, #802]
+ 1215 031a 2046     		mov	r0, r4
+ 1216 031c FFF7FEFF 		bl	USBH_Start
+ 1217 0320 F1E7     		b	.L151
+ 1219              		.section	.text.USBH_Process_OS,"ax",%progbits
+ 1220              		.align	1
+ 1221              		.syntax unified
+ 1222              		.thumb
+ 1223              		.thumb_func
+ 1225              	USBH_Process_OS:
+ 1226              		@ Volatile: function does not return.
+ 1227              		@ args = 0, pretend = 0, frame = 16
+ 1228              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1229 0000 00B5     		push	{lr}
+ 1230 0002 85B0     		sub	sp, sp, #20
+ 1231 0004 0446     		mov	r4, r0
+ 1232              	.L161:
+ 1233 0006 4FF0FF32 		mov	r2, #-1
+ 1234 000a D4F8D813 		ldr	r1, [r4, #984]
+ 1235 000e 01A8     		add	r0, sp, #4
+ 1236 0010 FFF7FEFF 		bl	osMessageGet
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s 			page 22
+
+
+ 1237 0014 019B     		ldr	r3, [sp, #4]
+ 1238 0016 102B     		cmp	r3, #16
+ 1239 0018 F5D1     		bne	.L161
+ 1240 001a 2046     		mov	r0, r4
+ 1241 001c FFF7FEFF 		bl	USBH_Process
+ 1242 0020 F1E7     		b	.L161
+ 1244              		.section	.text.USBH_LL_PortEnabled,"ax",%progbits
+ 1245              		.align	1
+ 1246              		.global	USBH_LL_PortEnabled
+ 1247              		.syntax unified
+ 1248              		.thumb
+ 1249              		.thumb_func
+ 1251              	USBH_LL_PortEnabled:
+ 1252              		@ args = 0, pretend = 0, frame = 0
+ 1253              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1254 0000 08B5     		push	{r3, lr}
+ 1255 0002 0121     		movs	r1, #1
+ 1256 0004 80F82313 		strb	r1, [r0, #803]
+ 1257 0008 0023     		movs	r3, #0
+ 1258 000a 1A46     		mov	r2, r3
+ 1259 000c FFF7FEFF 		bl	USBH_OS_PutMessage
+ 1260 0010 08BD     		pop	{r3, pc}
+ 1262              		.section	.text.USBH_LL_Connect,"ax",%progbits
+ 1263              		.align	1
+ 1264              		.global	USBH_LL_Connect
+ 1265              		.syntax unified
+ 1266              		.thumb
+ 1267              		.thumb_func
+ 1269              	USBH_LL_Connect:
+ 1270              		@ args = 0, pretend = 0, frame = 0
+ 1271              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1272 0000 10B5     		push	{r4, lr}
+ 1273 0002 0121     		movs	r1, #1
+ 1274 0004 80F82013 		strb	r1, [r0, #800]
+ 1275 0008 0024     		movs	r4, #0
+ 1276 000a 80F82143 		strb	r4, [r0, #801]
+ 1277 000e 80F82243 		strb	r4, [r0, #802]
+ 1278 0012 2346     		mov	r3, r4
+ 1279 0014 2246     		mov	r2, r4
+ 1280 0016 FFF7FEFF 		bl	USBH_OS_PutMessage
+ 1281 001a 2046     		mov	r0, r4
+ 1282 001c 10BD     		pop	{r4, pc}
+ 1284              		.section	.text.USBH_LL_Disconnect,"ax",%progbits
+ 1285              		.align	1
+ 1286              		.global	USBH_LL_Disconnect
+ 1287              		.syntax unified
+ 1288              		.thumb
+ 1289              		.thumb_func
+ 1291              	USBH_LL_Disconnect:
+ 1292              		@ args = 0, pretend = 0, frame = 0
+ 1293              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1294 0000 70B5     		push	{r4, r5, r6, lr}
+ 1295 0002 0446     		mov	r4, r0
+ 1296 0004 0126     		movs	r6, #1
+ 1297 0006 80F82163 		strb	r6, [r0, #801]
+ 1298 000a 0025     		movs	r5, #0
+ 1299 000c 80F82053 		strb	r5, [r0, #800]
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s 			page 23
+
+
+ 1300 0010 80F82353 		strb	r5, [r0, #803]
+ 1301 0014 FFF7FEFF 		bl	USBH_LL_Stop
+ 1302 0018 2179     		ldrb	r1, [r4, #4]	@ zero_extendqisi2
+ 1303 001a 2046     		mov	r0, r4
+ 1304 001c FFF7FEFF 		bl	USBH_FreePipe
+ 1305 0020 6179     		ldrb	r1, [r4, #5]	@ zero_extendqisi2
+ 1306 0022 2046     		mov	r0, r4
+ 1307 0024 FFF7FEFF 		bl	USBH_FreePipe
+ 1308 0028 2B46     		mov	r3, r5
+ 1309 002a 2A46     		mov	r2, r5
+ 1310 002c 3146     		mov	r1, r6
+ 1311 002e 2046     		mov	r0, r4
+ 1312 0030 FFF7FEFF 		bl	USBH_OS_PutMessage
+ 1313 0034 2846     		mov	r0, r5
+ 1314 0036 70BD     		pop	{r4, r5, r6, pc}
+ 1316              		.section	.text.USBH_LL_NotifyURBChange,"ax",%progbits
+ 1317              		.align	1
+ 1318              		.global	USBH_LL_NotifyURBChange
+ 1319              		.syntax unified
+ 1320              		.thumb
+ 1321              		.thumb_func
+ 1323              	USBH_LL_NotifyURBChange:
+ 1324              		@ args = 0, pretend = 0, frame = 0
+ 1325              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1326 0000 08B5     		push	{r3, lr}
+ 1327 0002 0023     		movs	r3, #0
+ 1328 0004 1A46     		mov	r2, r3
+ 1329 0006 0121     		movs	r1, #1
+ 1330 0008 FFF7FEFF 		bl	USBH_OS_PutMessage
+ 1331 000c 0020     		movs	r0, #0
+ 1332 000e 08BD     		pop	{r3, pc}
+ 1334              		.section	.rodata.str1.4,"aMS",%progbits,1
+ 1335              		.align	2
+ 1336              	.LC1:
+ 1337 0000 55534248 		.ascii	"USBH_Thread\000"
+ 1337      5F546872 
+ 1337      65616400 
+ 1338              		.section	.rodata
+ 1339              		.align	2
+ 1340              		.set	.LANCHOR0,. + 0
+ 1341              	.LC0:
+ 1342 0000 10000000 		.word	16
+ 1343 0004 02000000 		.word	2
+ 1344 0008 00000000 		.word	0
+ 1345 000c 00000000 		.word	0
+ 1346              	.LC3:
+ 1347 0010 00000000 		.word	.LC1
+ 1348 0014 00000000 		.word	USBH_Process_OS
+ 1349 0018 0000     		.short	0
+ 1350 001a 0000     		.space	2
+ 1351 001c 00000000 		.word	0
+ 1352 0020 80000000 		.word	128
+ 1353 0024 00000000 		.word	0
+ 1354 0028 00000000 		.word	0
+ 1355              		.ident	"GCC: (xPack GNU Arm Embedded GCC arm64) 15.2.1 20251203"
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s 			page 24
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 usbh_core.c
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:18     .text.USBH_HandleSof:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:23     .text.USBH_HandleSof:00000000 USBH_HandleSof
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:41     .text.DeInitStateMachine:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:46     .text.DeInitStateMachine:00000000 DeInitStateMachine
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:107    .text.USBH_Init:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:113    .text.USBH_Init:00000000 USBH_Init
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:164    .text.USBH_Init:00000084 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:167    .text.USBH_DeInit:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:173    .text.USBH_DeInit:00000000 USBH_DeInit
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:199    .text.USBH_RegisterClass:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:205    .text.USBH_RegisterClass:00000000 USBH_RegisterClass
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:227    .text.USBH_SelectInterface:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:233    .text.USBH_SelectInterface:00000000 USBH_SelectInterface
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:248    .text.USBH_GetActiveClass:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:254    .text.USBH_GetActiveClass:00000000 USBH_GetActiveClass
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:262    .text.USBH_FindInterface:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:268    .text.USBH_FindInterface:00000000 USBH_FindInterface
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:312    .text.USBH_FindInterfaceIndex:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:318    .text.USBH_FindInterfaceIndex:00000000 USBH_FindInterfaceIndex
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:348    .text.USBH_Start:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:354    .text.USBH_Start:00000000 USBH_Start
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:367    .text.USBH_Stop:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:373    .text.USBH_Stop:00000000 USBH_Stop
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:392    .text.USBH_LL_SetTimer:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:398    .text.USBH_LL_SetTimer:00000000 USBH_LL_SetTimer
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:406    .text.USBH_LL_IncTimer:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:412    .text.USBH_LL_IncTimer:00000000 USBH_LL_IncTimer
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:423    .text.USBH_LL_PortDisabled:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:429    .text.USBH_LL_PortDisabled:00000000 USBH_LL_PortDisabled
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:440    .text.USBH_IsPortEnabled:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:446    .text.USBH_IsPortEnabled:00000000 USBH_IsPortEnabled
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:454    .text.USBH_OS_PutMessage:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:460    .text.USBH_OS_PutMessage:00000000 USBH_OS_PutMessage
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:481    .text.USBH_ReEnumerate:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:487    .text.USBH_ReEnumerate:00000000 USBH_ReEnumerate
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:511    .text.USBH_HandleEnum:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:516    .text.USBH_HandleEnum:00000000 USBH_HandleEnum
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:856    .text.USBH_Process:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:862    .text.USBH_Process:00000000 USBH_Process
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:1220   .text.USBH_Process_OS:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:1225   .text.USBH_Process_OS:00000000 USBH_Process_OS
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:1245   .text.USBH_LL_PortEnabled:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:1251   .text.USBH_LL_PortEnabled:00000000 USBH_LL_PortEnabled
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:1263   .text.USBH_LL_Connect:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:1269   .text.USBH_LL_Connect:00000000 USBH_LL_Connect
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:1285   .text.USBH_LL_Disconnect:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:1291   .text.USBH_LL_Disconnect:00000000 USBH_LL_Disconnect
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:1317   .text.USBH_LL_NotifyURBChange:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:1323   .text.USBH_LL_NotifyURBChange:00000000 USBH_LL_NotifyURBChange
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:1335   .rodata.str1.4:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s:1339   .rodata:00000000 $d
+
+UNDEFINED SYMBOLS
+memset
+osMessageCreate
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccNBwsDy.s 			page 25
+
+
+osThreadCreate
+USBH_LL_Init
+USBH_LL_Stop
+osThreadTerminate
+osMessageDelete
+USBH_LL_Start
+USBH_LL_DriverVBUS
+USBH_FreePipe
+osMessageWaiting
+osMessagePut
+USBH_Get_DevDesc
+USBH_Get_CfgDesc
+USBH_Get_StringDesc
+USBH_OpenPipe
+USBH_SetAddress
+USBH_Delay
+USBH_SetCfg
+USBH_LL_ResetPort
+USBH_LL_GetSpeed
+USBH_AllocPipe
+USBH_SetFeature
+osMessageGet

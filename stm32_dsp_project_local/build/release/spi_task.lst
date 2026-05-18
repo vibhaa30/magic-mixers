@@ -1,0 +1,119 @@
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc9cwmvZ.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"spi_task.c"
+  16              		.text
+  17              		.section	.text.StartSPITask,"ax",%progbits
+  18              		.align	1
+  19              		.global	StartSPITask
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  24              	StartSPITask:
+  25              		@ Volatile: function does not return.
+  26              		@ args = 0, pretend = 0, frame = 0
+  27              		@ frame_needed = 0, uses_anonymous_args = 0
+  28 0000 08B5     		push	{r3, lr}
+  29 0002 1CE0     		b	.L3
+  30              	.L8:
+  31 0004 254C     		ldr	r4, .L10
+  32 0006 0122     		movs	r2, #1
+  33 0008 4FF48051 		mov	r1, #4096
+  34 000c 2046     		mov	r0, r4
+  35 000e FFF7FEFF 		bl	HAL_GPIO_WritePin
+  36 0012 234B     		ldr	r3, .L10+4
+  37 0014 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+  38 0016 07EE903A 		vmov	s15, r3	@ int
+  39 001a F8EEE77A 		vcvt.f32.s32	s15, s15
+  40 001e F2EE046A 		vmov.f32	s13, #1.0e+1
+  41 0022 87EEA67A 		vdiv.f32	s14, s15, s13
+  42 0026 1F4B     		ldr	r3, .L10+8
+  43 0028 83ED007A 		vstr.32	s14, [r3]
+  44 002c 6420     		movs	r0, #100
+  45 002e FFF7FEFF 		bl	osDelay
+  46 0032 0022     		movs	r2, #0
+  47 0034 4FF48051 		mov	r1, #4096
+  48 0038 2046     		mov	r0, r4
+  49 003a FFF7FEFF 		bl	HAL_GPIO_WritePin
+  50              	.L3:
+  51 003e 4FF0FF31 		mov	r1, #-1
+  52 0042 194B     		ldr	r3, .L10+12
+  53 0044 1868     		ldr	r0, [r3]
+  54 0046 FFF7FEFF 		bl	osSemaphoreWait
+  55 004a 0028     		cmp	r0, #0
+  56 004c F7D1     		bne	.L3
+  57 004e 174B     		ldr	r3, .L10+16
+  58 0050 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc9cwmvZ.s 			page 2
+
+
+  59 0052 012B     		cmp	r3, #1
+  60 0054 D6D0     		beq	.L8
+  61 0056 154B     		ldr	r3, .L10+16
+  62 0058 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+  63 005a 022B     		cmp	r3, #2
+  64 005c 05D0     		beq	.L9
+  65 005e 4FF48041 		mov	r1, #16384
+  66 0062 0E48     		ldr	r0, .L10
+  67 0064 FFF7FEFF 		bl	HAL_GPIO_TogglePin
+  68 0068 E9E7     		b	.L3
+  69              	.L9:
+  70 006a 0C4C     		ldr	r4, .L10
+  71 006c 0122     		movs	r2, #1
+  72 006e 4FF40051 		mov	r1, #8192
+  73 0072 2046     		mov	r0, r4
+  74 0074 FFF7FEFF 		bl	HAL_GPIO_WritePin
+  75 0078 094B     		ldr	r3, .L10+4
+  76 007a 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+  77 007c 03EB4303 		add	r3, r3, r3, lsl #1
+  78 0080 1B01     		lsls	r3, r3, #4
+  79 0082 084A     		ldr	r2, .L10+8
+  80 0084 1381     		strh	r3, [r2, #8]	@ movhi
+  81 0086 6420     		movs	r0, #100
+  82 0088 FFF7FEFF 		bl	osDelay
+  83 008c 0022     		movs	r2, #0
+  84 008e 4FF40051 		mov	r1, #8192
+  85 0092 2046     		mov	r0, r4
+  86 0094 FFF7FEFF 		bl	HAL_GPIO_WritePin
+  87 0098 D1E7     		b	.L3
+  88              	.L11:
+  89 009a 00BF     		.align	2
+  90              	.L10:
+  91 009c 000C0240 		.word	1073875968
+  92 00a0 00000000 		.word	intensity
+  93 00a4 00000000 		.word	g_audio_params
+  94 00a8 00000000 		.word	spiSemHandle
+  95 00ac 00000000 		.word	gesture
+  97              		.ident	"GCC: (xPack GNU Arm Embedded GCC arm64) 15.2.1 20251203"
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc9cwmvZ.s 			page 3
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 spi_task.c
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc9cwmvZ.s:18     .text.StartSPITask:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc9cwmvZ.s:24     .text.StartSPITask:00000000 StartSPITask
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc9cwmvZ.s:91     .text.StartSPITask:0000009c $d
+
+UNDEFINED SYMBOLS
+HAL_GPIO_WritePin
+osDelay
+osSemaphoreWait
+HAL_GPIO_TogglePin
+intensity
+g_audio_params
+spiSemHandle
+gesture

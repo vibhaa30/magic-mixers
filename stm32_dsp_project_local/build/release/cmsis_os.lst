@@ -1,0 +1,1968 @@
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"cmsis_os.c"
+  16              		.text
+  17              		.section	.text.makeFreeRtosPriority,"ax",%progbits
+  18              		.align	1
+  19              		.syntax unified
+  20              		.thumb
+  21              		.thumb_func
+  23              	makeFreeRtosPriority:
+  24              		@ args = 0, pretend = 0, frame = 0
+  25              		@ frame_needed = 0, uses_anonymous_args = 0
+  26              		@ link register save eliminated.
+  27 0000 8428     		cmp	r0, #132
+  28 0002 01D0     		beq	.L3
+  29 0004 0330     		adds	r0, r0, #3
+  30 0006 7047     		bx	lr
+  31              	.L3:
+  32 0008 0020     		movs	r0, #0
+  33 000a 7047     		bx	lr
+  35              		.section	.text.makeCmsisPriority,"ax",%progbits
+  36              		.align	1
+  37              		.syntax unified
+  38              		.thumb
+  39              		.thumb_func
+  41              	makeCmsisPriority:
+  42              		@ args = 0, pretend = 0, frame = 0
+  43              		@ frame_needed = 0, uses_anonymous_args = 0
+  44              		@ link register save eliminated.
+  45 0000 0628     		cmp	r0, #6
+  46 0002 02D8     		bhi	.L6
+  47 0004 0338     		subs	r0, r0, #3
+  48 0006 00B2     		sxth	r0, r0
+  49 0008 7047     		bx	lr
+  50              	.L6:
+  51 000a 8420     		movs	r0, #132
+  52 000c 7047     		bx	lr
+  54              		.section	.text.inHandlerMode,"ax",%progbits
+  55              		.align	1
+  56              		.syntax unified
+  57              		.thumb
+  58              		.thumb_func
+  60              	inHandlerMode:
+  61              		@ args = 0, pretend = 0, frame = 0
+  62              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 2
+
+
+  63              		@ link register save eliminated.
+  64              		.syntax unified
+  65              	@ 1031 "Drivers/CMSIS/Include/cmsis_gcc.h" 1
+  66 0000 EFF30580 		MRS r0, ipsr
+  67              	@ 0 "" 2
+  68              		.thumb
+  69              		.syntax unified
+  70 0004 0038     		subs	r0, r0, #0
+  71 0006 18BF     		it	ne
+  72 0008 0120     		movne	r0, #1
+  73 000a 7047     		bx	lr
+  75              		.section	.text.osKernelStart,"ax",%progbits
+  76              		.align	1
+  77              		.global	osKernelStart
+  78              		.syntax unified
+  79              		.thumb
+  80              		.thumb_func
+  82              	osKernelStart:
+  83              		@ args = 0, pretend = 0, frame = 0
+  84              		@ frame_needed = 0, uses_anonymous_args = 0
+  85 0000 08B5     		push	{r3, lr}
+  86 0002 FFF7FEFF 		bl	vTaskStartScheduler
+  87 0006 0020     		movs	r0, #0
+  88 0008 08BD     		pop	{r3, pc}
+  90              		.section	.text.osKernelRunning,"ax",%progbits
+  91              		.align	1
+  92              		.global	osKernelRunning
+  93              		.syntax unified
+  94              		.thumb
+  95              		.thumb_func
+  97              	osKernelRunning:
+  98              		@ args = 0, pretend = 0, frame = 0
+  99              		@ frame_needed = 0, uses_anonymous_args = 0
+ 100 0000 08B5     		push	{r3, lr}
+ 101 0002 FFF7FEFF 		bl	xTaskGetSchedulerState
+ 102 0006 0128     		cmp	r0, #1
+ 103 0008 01D0     		beq	.L14
+ 104 000a 0120     		movs	r0, #1
+ 105              	.L10:
+ 106 000c 08BD     		pop	{r3, pc}
+ 107              	.L14:
+ 108 000e 0020     		movs	r0, #0
+ 109 0010 FCE7     		b	.L10
+ 111              		.section	.text.osKernelSysTick,"ax",%progbits
+ 112              		.align	1
+ 113              		.global	osKernelSysTick
+ 114              		.syntax unified
+ 115              		.thumb
+ 116              		.thumb_func
+ 118              	osKernelSysTick:
+ 119              		@ args = 0, pretend = 0, frame = 0
+ 120              		@ frame_needed = 0, uses_anonymous_args = 0
+ 121 0000 08B5     		push	{r3, lr}
+ 122 0002 FFF7FEFF 		bl	inHandlerMode
+ 123 0006 10B1     		cbz	r0, .L16
+ 124 0008 FFF7FEFF 		bl	xTaskGetTickCountFromISR
+ 125              	.L15:
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 3
+
+
+ 126 000c 08BD     		pop	{r3, pc}
+ 127              	.L16:
+ 128 000e FFF7FEFF 		bl	xTaskGetTickCount
+ 129 0012 FBE7     		b	.L15
+ 131              		.section	.text.osThreadCreate,"ax",%progbits
+ 132              		.align	1
+ 133              		.global	osThreadCreate
+ 134              		.syntax unified
+ 135              		.thumb
+ 136              		.thumb_func
+ 138              	osThreadCreate:
+ 139              		@ args = 0, pretend = 0, frame = 16
+ 140              		@ frame_needed = 0, uses_anonymous_args = 0
+ 141 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 142 0004 88B0     		sub	sp, sp, #32
+ 143 0006 0F46     		mov	r7, r1
+ 144 0008 4469     		ldr	r4, [r0, #20]
+ 145 000a C4B1     		cbz	r4, .L20
+ 146 000c 8846     		mov	r8, r1
+ 147 000e 8569     		ldr	r5, [r0, #24]
+ 148 0010 ADB1     		cbz	r5, .L20
+ 149 0012 4668     		ldr	r6, [r0, #4]
+ 150 0014 0768     		ldr	r7, [r0]
+ 151 0016 0269     		ldr	r2, [r0, #16]
+ 152 0018 0592     		str	r2, [sp, #20]
+ 153 001a B0F90800 		ldrsh	r0, [r0, #8]
+ 154 001e FFF7FEFF 		bl	makeFreeRtosPriority
+ 155 0022 0295     		str	r5, [sp, #8]
+ 156 0024 0194     		str	r4, [sp, #4]
+ 157 0026 0090     		str	r0, [sp]
+ 158 0028 4346     		mov	r3, r8
+ 159 002a 059A     		ldr	r2, [sp, #20]
+ 160 002c 3946     		mov	r1, r7
+ 161 002e 3046     		mov	r0, r6
+ 162 0030 FFF7FEFF 		bl	xTaskCreateStatic
+ 163 0034 0790     		str	r0, [sp, #28]
+ 164              	.L21:
+ 165 0036 0798     		ldr	r0, [sp, #28]
+ 166              	.L19:
+ 167 0038 08B0     		add	sp, sp, #32
+ 168              		@ sp needed
+ 169 003a BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 170              	.L20:
+ 171 003e 4468     		ldr	r4, [r0, #4]
+ 172 0040 0568     		ldr	r5, [r0]
+ 173 0042 0669     		ldr	r6, [r0, #16]
+ 174 0044 B0F90800 		ldrsh	r0, [r0, #8]
+ 175 0048 FFF7FEFF 		bl	makeFreeRtosPriority
+ 176 004c 07AB     		add	r3, sp, #28
+ 177 004e 0193     		str	r3, [sp, #4]
+ 178 0050 0090     		str	r0, [sp]
+ 179 0052 3B46     		mov	r3, r7
+ 180 0054 B2B2     		uxth	r2, r6
+ 181 0056 2946     		mov	r1, r5
+ 182 0058 2046     		mov	r0, r4
+ 183 005a FFF7FEFF 		bl	xTaskCreate
+ 184 005e 0128     		cmp	r0, #1
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 4
+
+
+ 185 0060 E9D0     		beq	.L21
+ 186 0062 0020     		movs	r0, #0
+ 187 0064 E8E7     		b	.L19
+ 189              		.section	.text.osThreadGetId,"ax",%progbits
+ 190              		.align	1
+ 191              		.global	osThreadGetId
+ 192              		.syntax unified
+ 193              		.thumb
+ 194              		.thumb_func
+ 196              	osThreadGetId:
+ 197              		@ args = 0, pretend = 0, frame = 0
+ 198              		@ frame_needed = 0, uses_anonymous_args = 0
+ 199 0000 08B5     		push	{r3, lr}
+ 200 0002 FFF7FEFF 		bl	xTaskGetCurrentTaskHandle
+ 201 0006 08BD     		pop	{r3, pc}
+ 203              		.section	.text.osThreadTerminate,"ax",%progbits
+ 204              		.align	1
+ 205              		.global	osThreadTerminate
+ 206              		.syntax unified
+ 207              		.thumb
+ 208              		.thumb_func
+ 210              	osThreadTerminate:
+ 211              		@ args = 0, pretend = 0, frame = 0
+ 212              		@ frame_needed = 0, uses_anonymous_args = 0
+ 213 0000 08B5     		push	{r3, lr}
+ 214 0002 FFF7FEFF 		bl	vTaskDelete
+ 215 0006 0020     		movs	r0, #0
+ 216 0008 08BD     		pop	{r3, pc}
+ 218              		.section	.text.osThreadYield,"ax",%progbits
+ 219              		.align	1
+ 220              		.global	osThreadYield
+ 221              		.syntax unified
+ 222              		.thumb
+ 223              		.thumb_func
+ 225              	osThreadYield:
+ 226              		@ args = 0, pretend = 0, frame = 0
+ 227              		@ frame_needed = 0, uses_anonymous_args = 0
+ 228              		@ link register save eliminated.
+ 229 0000 4FF0E023 		mov	r3, #-536813568
+ 230 0004 4FF08052 		mov	r2, #268435456
+ 231 0008 C3F8042D 		str	r2, [r3, #3332]
+ 232              		.syntax unified
+ 233              	@ 272 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c" 1
+ 234 000c BFF34F8F 		dsb
+ 235              	@ 0 "" 2
+ 236              	@ 272 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c" 1
+ 237 0010 BFF36F8F 		isb
+ 238              	@ 0 "" 2
+ 239              		.thumb
+ 240              		.syntax unified
+ 241 0014 0020     		movs	r0, #0
+ 242 0016 7047     		bx	lr
+ 244              		.section	.text.osThreadSetPriority,"ax",%progbits
+ 245              		.align	1
+ 246              		.global	osThreadSetPriority
+ 247              		.syntax unified
+ 248              		.thumb
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 5
+
+
+ 249              		.thumb_func
+ 251              	osThreadSetPriority:
+ 252              		@ args = 0, pretend = 0, frame = 0
+ 253              		@ frame_needed = 0, uses_anonymous_args = 0
+ 254 0000 10B5     		push	{r4, lr}
+ 255 0002 0446     		mov	r4, r0
+ 256 0004 0846     		mov	r0, r1
+ 257 0006 FFF7FEFF 		bl	makeFreeRtosPriority
+ 258 000a 0146     		mov	r1, r0
+ 259 000c 2046     		mov	r0, r4
+ 260 000e FFF7FEFF 		bl	vTaskPrioritySet
+ 261 0012 0020     		movs	r0, #0
+ 262 0014 10BD     		pop	{r4, pc}
+ 264              		.section	.text.osThreadGetPriority,"ax",%progbits
+ 265              		.align	1
+ 266              		.global	osThreadGetPriority
+ 267              		.syntax unified
+ 268              		.thumb
+ 269              		.thumb_func
+ 271              	osThreadGetPriority:
+ 272              		@ args = 0, pretend = 0, frame = 0
+ 273              		@ frame_needed = 0, uses_anonymous_args = 0
+ 274 0000 10B5     		push	{r4, lr}
+ 275 0002 0446     		mov	r4, r0
+ 276 0004 FFF7FEFF 		bl	inHandlerMode
+ 277 0008 28B1     		cbz	r0, .L33
+ 278 000a 2046     		mov	r0, r4
+ 279 000c FFF7FEFF 		bl	uxTaskPriorityGetFromISR
+ 280 0010 FFF7FEFF 		bl	makeCmsisPriority
+ 281              	.L34:
+ 282 0014 10BD     		pop	{r4, pc}
+ 283              	.L33:
+ 284 0016 2046     		mov	r0, r4
+ 285 0018 FFF7FEFF 		bl	uxTaskPriorityGet
+ 286 001c FFF7FEFF 		bl	makeCmsisPriority
+ 287 0020 F8E7     		b	.L34
+ 289              		.section	.text.osDelay,"ax",%progbits
+ 290              		.align	1
+ 291              		.global	osDelay
+ 292              		.syntax unified
+ 293              		.thumb
+ 294              		.thumb_func
+ 296              	osDelay:
+ 297              		@ args = 0, pretend = 0, frame = 0
+ 298              		@ frame_needed = 0, uses_anonymous_args = 0
+ 299 0000 08B5     		push	{r3, lr}
+ 300 0002 00B9     		cbnz	r0, .L37
+ 301 0004 0120     		movs	r0, #1
+ 302              	.L37:
+ 303 0006 FFF7FEFF 		bl	vTaskDelay
+ 304 000a 0020     		movs	r0, #0
+ 305 000c 08BD     		pop	{r3, pc}
+ 307              		.section	.text.osTimerCreate,"ax",%progbits
+ 308              		.align	1
+ 309              		.global	osTimerCreate
+ 310              		.syntax unified
+ 311              		.thumb
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 6
+
+
+ 312              		.thumb_func
+ 314              	osTimerCreate:
+ 315              		@ args = 0, pretend = 0, frame = 0
+ 316              		@ frame_needed = 0, uses_anonymous_args = 0
+ 317              		@ link register save eliminated.
+ 318 0000 0020     		movs	r0, #0
+ 319 0002 7047     		bx	lr
+ 321              		.section	.text.osTimerStart,"ax",%progbits
+ 322              		.align	1
+ 323              		.global	osTimerStart
+ 324              		.syntax unified
+ 325              		.thumb
+ 326              		.thumb_func
+ 328              	osTimerStart:
+ 329              		@ args = 0, pretend = 0, frame = 0
+ 330              		@ frame_needed = 0, uses_anonymous_args = 0
+ 331              		@ link register save eliminated.
+ 332 0000 FF20     		movs	r0, #255
+ 333 0002 7047     		bx	lr
+ 335              		.section	.text.osTimerStop,"ax",%progbits
+ 336              		.align	1
+ 337              		.global	osTimerStop
+ 338              		.syntax unified
+ 339              		.thumb
+ 340              		.thumb_func
+ 342              	osTimerStop:
+ 343              		@ args = 0, pretend = 0, frame = 0
+ 344              		@ frame_needed = 0, uses_anonymous_args = 0
+ 345              		@ link register save eliminated.
+ 346 0000 FF20     		movs	r0, #255
+ 347 0002 7047     		bx	lr
+ 349              		.section	.text.osTimerDelete,"ax",%progbits
+ 350              		.align	1
+ 351              		.global	osTimerDelete
+ 352              		.syntax unified
+ 353              		.thumb
+ 354              		.thumb_func
+ 356              	osTimerDelete:
+ 357              		@ args = 0, pretend = 0, frame = 0
+ 358              		@ frame_needed = 0, uses_anonymous_args = 0
+ 359              		@ link register save eliminated.
+ 360 0000 FF20     		movs	r0, #255
+ 361 0002 7047     		bx	lr
+ 363              		.section	.text.osSignalSet,"ax",%progbits
+ 364              		.align	1
+ 365              		.global	osSignalSet
+ 366              		.syntax unified
+ 367              		.thumb
+ 368              		.thumb_func
+ 370              	osSignalSet:
+ 371              		@ args = 0, pretend = 0, frame = 8
+ 372              		@ frame_needed = 0, uses_anonymous_args = 0
+ 373 0000 30B5     		push	{r4, r5, lr}
+ 374 0002 85B0     		sub	sp, sp, #20
+ 375 0004 0546     		mov	r5, r0
+ 376 0006 0C46     		mov	r4, r1
+ 377 0008 0023     		movs	r3, #0
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 7
+
+
+ 378 000a 0393     		str	r3, [sp, #12]
+ 379 000c 0293     		str	r3, [sp, #8]
+ 380 000e FFF7FEFF 		bl	inHandlerMode
+ 381 0012 B0B1     		cbz	r0, .L45
+ 382 0014 03AB     		add	r3, sp, #12
+ 383 0016 0093     		str	r3, [sp]
+ 384 0018 02AB     		add	r3, sp, #8
+ 385 001a 0122     		movs	r2, #1
+ 386 001c 2146     		mov	r1, r4
+ 387 001e 2846     		mov	r0, r5
+ 388 0020 FFF7FEFF 		bl	xTaskGenericNotifyFromISR
+ 389 0024 0128     		cmp	r0, #1
+ 390 0026 17D1     		bne	.L48
+ 391 0028 039B     		ldr	r3, [sp, #12]
+ 392 002a 93B1     		cbz	r3, .L47
+ 393 002c 4FF0E023 		mov	r3, #-536813568
+ 394 0030 4FF08052 		mov	r2, #268435456
+ 395 0034 C3F8042D 		str	r2, [r3, #3332]
+ 396              		.syntax unified
+ 397              	@ 513 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c" 1
+ 398 0038 BFF34F8F 		dsb
+ 399              	@ 0 "" 2
+ 400              	@ 513 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c" 1
+ 401 003c BFF36F8F 		isb
+ 402              	@ 0 "" 2
+ 403              		.thumb
+ 404              		.syntax unified
+ 405 0040 07E0     		b	.L47
+ 406              	.L45:
+ 407 0042 02AB     		add	r3, sp, #8
+ 408 0044 0122     		movs	r2, #1
+ 409 0046 2146     		mov	r1, r4
+ 410 0048 2846     		mov	r0, r5
+ 411 004a FFF7FEFF 		bl	xTaskGenericNotify
+ 412 004e 0128     		cmp	r0, #1
+ 413 0050 05D1     		bne	.L49
+ 414              	.L47:
+ 415 0052 0298     		ldr	r0, [sp, #8]
+ 416              	.L44:
+ 417 0054 05B0     		add	sp, sp, #20
+ 418              		@ sp needed
+ 419 0056 30BD     		pop	{r4, r5, pc}
+ 420              	.L48:
+ 421 0058 4FF00040 		mov	r0, #-2147483648
+ 422 005c FAE7     		b	.L44
+ 423              	.L49:
+ 424 005e 4FF00040 		mov	r0, #-2147483648
+ 425 0062 F7E7     		b	.L44
+ 427              		.section	.text.osSignalWait,"ax",%progbits
+ 428              		.align	1
+ 429              		.global	osSignalWait
+ 430              		.syntax unified
+ 431              		.thumb
+ 432              		.thumb_func
+ 434              	osSignalWait:
+ 435              		@ args = 0, pretend = 0, frame = 16
+ 436              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 8
+
+
+ 437 0000 70B5     		push	{r4, r5, r6, lr}
+ 438 0002 84B0     		sub	sp, sp, #16
+ 439 0004 0446     		mov	r4, r0
+ 440 0006 0E46     		mov	r6, r1
+ 441 0008 1546     		mov	r5, r2
+ 442 000a 0023     		movs	r3, #0
+ 443 000c 0293     		str	r3, [sp, #8]
+ 444 000e FFF7FEFF 		bl	inHandlerMode
+ 445 0012 48B1     		cbz	r0, .L52
+ 446 0014 8223     		movs	r3, #130
+ 447 0016 0193     		str	r3, [sp, #4]
+ 448              	.L53:
+ 449 0018 04AB     		add	r3, sp, #16
+ 450 001a 13E90700 		ldmdb	r3, {r0, r1, r2}
+ 451 001e 84E80700 		stm	r4, {r0, r1, r2}
+ 452 0022 2046     		mov	r0, r4
+ 453 0024 04B0     		add	sp, sp, #16
+ 454              		@ sp needed
+ 455 0026 70BD     		pop	{r4, r5, r6, pc}
+ 456              	.L52:
+ 457 0028 2B46     		mov	r3, r5
+ 458 002a 02AA     		add	r2, sp, #8
+ 459 002c 3146     		mov	r1, r6
+ 460 002e FFF7FEFF 		bl	xTaskNotifyWait
+ 461 0032 0128     		cmp	r0, #1
+ 462 0034 05D0     		beq	.L54
+ 463 0036 0DB9     		cbnz	r5, .L55
+ 464 0038 0195     		str	r5, [sp, #4]
+ 465 003a EDE7     		b	.L53
+ 466              	.L55:
+ 467 003c 4023     		movs	r3, #64
+ 468 003e 0193     		str	r3, [sp, #4]
+ 469 0040 EAE7     		b	.L53
+ 470              	.L54:
+ 471 0042 029B     		ldr	r3, [sp, #8]
+ 472 0044 002B     		cmp	r3, #0
+ 473 0046 02DB     		blt	.L58
+ 474 0048 0823     		movs	r3, #8
+ 475 004a 0193     		str	r3, [sp, #4]
+ 476 004c E4E7     		b	.L53
+ 477              	.L58:
+ 478 004e 8623     		movs	r3, #134
+ 479 0050 0193     		str	r3, [sp, #4]
+ 480 0052 E1E7     		b	.L53
+ 482              		.section	.text.osMutexCreate,"ax",%progbits
+ 483              		.align	1
+ 484              		.global	osMutexCreate
+ 485              		.syntax unified
+ 486              		.thumb
+ 487              		.thumb_func
+ 489              	osMutexCreate:
+ 490              		@ args = 0, pretend = 0, frame = 0
+ 491              		@ frame_needed = 0, uses_anonymous_args = 0
+ 492 0000 08B5     		push	{r3, lr}
+ 493 0002 4168     		ldr	r1, [r0, #4]
+ 494 0004 19B1     		cbz	r1, .L60
+ 495 0006 0120     		movs	r0, #1
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 9
+
+
+ 496 0008 FFF7FEFF 		bl	xQueueCreateMutexStatic
+ 497              	.L59:
+ 498 000c 08BD     		pop	{r3, pc}
+ 499              	.L60:
+ 500 000e 0120     		movs	r0, #1
+ 501 0010 FFF7FEFF 		bl	xQueueCreateMutex
+ 502 0014 FAE7     		b	.L59
+ 504              		.section	.text.osMutexWait,"ax",%progbits
+ 505              		.align	1
+ 506              		.global	osMutexWait
+ 507              		.syntax unified
+ 508              		.thumb
+ 509              		.thumb_func
+ 511              	osMutexWait:
+ 512              		@ args = 0, pretend = 0, frame = 8
+ 513              		@ frame_needed = 0, uses_anonymous_args = 0
+ 514 0000 30B5     		push	{r4, r5, lr}
+ 515 0002 83B0     		sub	sp, sp, #12
+ 516 0004 0023     		movs	r3, #0
+ 517 0006 0193     		str	r3, [sp, #4]
+ 518 0008 10B3     		cbz	r0, .L66
+ 519 000a 0D46     		mov	r5, r1
+ 520 000c 0446     		mov	r4, r0
+ 521 000e FFF7FEFF 		bl	inHandlerMode
+ 522 0012 A0B1     		cbz	r0, .L65
+ 523 0014 01AA     		add	r2, sp, #4
+ 524 0016 0021     		movs	r1, #0
+ 525 0018 2046     		mov	r0, r4
+ 526 001a FFF7FEFF 		bl	xQueueReceiveFromISR
+ 527 001e 0128     		cmp	r0, #1
+ 528 0020 18D1     		bne	.L67
+ 529 0022 019B     		ldr	r3, [sp, #4]
+ 530 0024 C3B1     		cbz	r3, .L68
+ 531 0026 4FF0E023 		mov	r3, #-536813568
+ 532 002a 4FF08052 		mov	r2, #268435456
+ 533 002e C3F8042D 		str	r2, [r3, #3332]
+ 534              		.syntax unified
+ 535              	@ 651 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c" 1
+ 536 0032 BFF34F8F 		dsb
+ 537              	@ 0 "" 2
+ 538              	@ 651 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c" 1
+ 539 0036 BFF36F8F 		isb
+ 540              	@ 0 "" 2
+ 541              		.thumb
+ 542              		.syntax unified
+ 543 003a 0020     		movs	r0, #0
+ 544 003c 06E0     		b	.L63
+ 545              	.L65:
+ 546 003e 2946     		mov	r1, r5
+ 547 0040 2046     		mov	r0, r4
+ 548 0042 FFF7FEFF 		bl	xQueueSemaphoreTake
+ 549 0046 0128     		cmp	r0, #1
+ 550 0048 08D1     		bne	.L69
+ 551 004a 0020     		movs	r0, #0
+ 552              	.L63:
+ 553 004c 03B0     		add	sp, sp, #12
+ 554              		@ sp needed
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 10
+
+
+ 555 004e 30BD     		pop	{r4, r5, pc}
+ 556              	.L66:
+ 557 0050 8020     		movs	r0, #128
+ 558 0052 FBE7     		b	.L63
+ 559              	.L67:
+ 560 0054 FF20     		movs	r0, #255
+ 561 0056 F9E7     		b	.L63
+ 562              	.L68:
+ 563 0058 1846     		mov	r0, r3
+ 564 005a F7E7     		b	.L63
+ 565              	.L69:
+ 566 005c FF20     		movs	r0, #255
+ 567 005e F5E7     		b	.L63
+ 569              		.section	.text.osMutexRelease,"ax",%progbits
+ 570              		.align	1
+ 571              		.global	osMutexRelease
+ 572              		.syntax unified
+ 573              		.thumb
+ 574              		.thumb_func
+ 576              	osMutexRelease:
+ 577              		@ args = 0, pretend = 0, frame = 8
+ 578              		@ frame_needed = 0, uses_anonymous_args = 0
+ 579 0000 10B5     		push	{r4, lr}
+ 580 0002 82B0     		sub	sp, sp, #8
+ 581 0004 0446     		mov	r4, r0
+ 582 0006 0023     		movs	r3, #0
+ 583 0008 0193     		str	r3, [sp, #4]
+ 584 000a FFF7FEFF 		bl	inHandlerMode
+ 585 000e 98B1     		cbz	r0, .L72
+ 586 0010 01A9     		add	r1, sp, #4
+ 587 0012 2046     		mov	r0, r4
+ 588 0014 FFF7FEFF 		bl	xQueueGiveFromISR
+ 589 0018 0128     		cmp	r0, #1
+ 590 001a 1AD1     		bne	.L74
+ 591 001c 019B     		ldr	r3, [sp, #4]
+ 592 001e D3B1     		cbz	r3, .L75
+ 593 0020 4FF0E023 		mov	r3, #-536813568
+ 594 0024 4FF08052 		mov	r2, #268435456
+ 595 0028 C3F8042D 		str	r2, [r3, #3332]
+ 596              		.syntax unified
+ 597              	@ 675 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c" 1
+ 598 002c BFF34F8F 		dsb
+ 599              	@ 0 "" 2
+ 600              	@ 675 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c" 1
+ 601 0030 BFF36F8F 		isb
+ 602              	@ 0 "" 2
+ 603              		.thumb
+ 604              		.syntax unified
+ 605 0034 0020     		movs	r0, #0
+ 606 0036 08E0     		b	.L71
+ 607              	.L72:
+ 608 0038 0346     		mov	r3, r0
+ 609 003a 0246     		mov	r2, r0
+ 610 003c 0146     		mov	r1, r0
+ 611 003e 2046     		mov	r0, r4
+ 612 0040 FFF7FEFF 		bl	xQueueGenericSend
+ 613 0044 0128     		cmp	r0, #1
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 11
+
+
+ 614 0046 02D0     		beq	.L78
+ 615 0048 FF20     		movs	r0, #255
+ 616              	.L71:
+ 617 004a 02B0     		add	sp, sp, #8
+ 618              		@ sp needed
+ 619 004c 10BD     		pop	{r4, pc}
+ 620              	.L78:
+ 621 004e 0020     		movs	r0, #0
+ 622 0050 FBE7     		b	.L71
+ 623              	.L74:
+ 624 0052 FF20     		movs	r0, #255
+ 625 0054 F9E7     		b	.L71
+ 626              	.L75:
+ 627 0056 1846     		mov	r0, r3
+ 628 0058 F7E7     		b	.L71
+ 630              		.section	.text.osMutexDelete,"ax",%progbits
+ 631              		.align	1
+ 632              		.global	osMutexDelete
+ 633              		.syntax unified
+ 634              		.thumb
+ 635              		.thumb_func
+ 637              	osMutexDelete:
+ 638              		@ args = 0, pretend = 0, frame = 0
+ 639              		@ frame_needed = 0, uses_anonymous_args = 0
+ 640 0000 10B5     		push	{r4, lr}
+ 641 0002 0446     		mov	r4, r0
+ 642 0004 FFF7FEFF 		bl	inHandlerMode
+ 643 0008 20B9     		cbnz	r0, .L81
+ 644 000a 2046     		mov	r0, r4
+ 645 000c FFF7FEFF 		bl	vQueueDelete
+ 646 0010 0020     		movs	r0, #0
+ 647              	.L79:
+ 648 0012 10BD     		pop	{r4, pc}
+ 649              	.L81:
+ 650 0014 8220     		movs	r0, #130
+ 651 0016 FCE7     		b	.L79
+ 653              		.section	.text.osSemaphoreCreate,"ax",%progbits
+ 654              		.align	1
+ 655              		.global	osSemaphoreCreate
+ 656              		.syntax unified
+ 657              		.thumb
+ 658              		.thumb_func
+ 660              	osSemaphoreCreate:
+ 661              		@ args = 0, pretend = 0, frame = 0
+ 662              		@ frame_needed = 0, uses_anonymous_args = 0
+ 663 0000 10B5     		push	{r4, lr}
+ 664 0002 82B0     		sub	sp, sp, #8
+ 665 0004 4468     		ldr	r4, [r0, #4]
+ 666 0006 7CB1     		cbz	r4, .L84
+ 667 0008 0129     		cmp	r1, #1
+ 668 000a 03D0     		beq	.L89
+ 669 000c 0024     		movs	r4, #0
+ 670              	.L83:
+ 671 000e 2046     		mov	r0, r4
+ 672 0010 02B0     		add	sp, sp, #8
+ 673              		@ sp needed
+ 674 0012 10BD     		pop	{r4, pc}
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 12
+
+
+ 675              	.L89:
+ 676 0014 0323     		movs	r3, #3
+ 677 0016 0093     		str	r3, [sp]
+ 678 0018 2346     		mov	r3, r4
+ 679 001a 0022     		movs	r2, #0
+ 680 001c 1146     		mov	r1, r2
+ 681 001e 0120     		movs	r0, #1
+ 682 0020 FFF7FEFF 		bl	xQueueGenericCreateStatic
+ 683 0024 0446     		mov	r4, r0
+ 684 0026 F2E7     		b	.L83
+ 685              	.L84:
+ 686 0028 0129     		cmp	r1, #1
+ 687 002a F0D1     		bne	.L83
+ 688 002c 0322     		movs	r2, #3
+ 689 002e 2146     		mov	r1, r4
+ 690 0030 0120     		movs	r0, #1
+ 691 0032 FFF7FEFF 		bl	xQueueGenericCreate
+ 692 0036 0446     		mov	r4, r0
+ 693 0038 0028     		cmp	r0, #0
+ 694 003a E8D0     		beq	.L83
+ 695 003c 0023     		movs	r3, #0
+ 696 003e 1A46     		mov	r2, r3
+ 697 0040 1946     		mov	r1, r3
+ 698 0042 FFF7FEFF 		bl	xQueueGenericSend
+ 699 0046 E2E7     		b	.L83
+ 701              		.section	.text.osSemaphoreWait,"ax",%progbits
+ 702              		.align	1
+ 703              		.global	osSemaphoreWait
+ 704              		.syntax unified
+ 705              		.thumb
+ 706              		.thumb_func
+ 708              	osSemaphoreWait:
+ 709              		@ args = 0, pretend = 0, frame = 8
+ 710              		@ frame_needed = 0, uses_anonymous_args = 0
+ 711 0000 70B5     		push	{r4, r5, r6, lr}
+ 712 0002 82B0     		sub	sp, sp, #8
+ 713 0004 0023     		movs	r3, #0
+ 714 0006 0193     		str	r3, [sp, #4]
+ 715 0008 28B3     		cbz	r0, .L93
+ 716 000a 0E46     		mov	r6, r1
+ 717 000c 0446     		mov	r4, r0
+ 718 000e FFF7FEFF 		bl	inHandlerMode
+ 719 0012 0546     		mov	r5, r0
+ 720 0014 B0B1     		cbz	r0, .L92
+ 721 0016 01AA     		add	r2, sp, #4
+ 722 0018 0021     		movs	r1, #0
+ 723 001a 2046     		mov	r0, r4
+ 724 001c FFF7FEFF 		bl	xQueueReceiveFromISR
+ 725 0020 0128     		cmp	r0, #1
+ 726 0022 1BD1     		bne	.L94
+ 727 0024 019B     		ldr	r3, [sp, #4]
+ 728 0026 1D46     		mov	r5, r3
+ 729 0028 93B1     		cbz	r3, .L90
+ 730 002a 4FF0E023 		mov	r3, #-536813568
+ 731 002e 4FF08052 		mov	r2, #268435456
+ 732 0032 C3F8042D 		str	r2, [r3, #3332]
+ 733              		.syntax unified
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 13
+
+
+ 734              	@ 804 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c" 1
+ 735 0036 BFF34F8F 		dsb
+ 736              	@ 0 "" 2
+ 737              	@ 804 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c" 1
+ 738 003a BFF36F8F 		isb
+ 739              	@ 0 "" 2
+ 740              		.thumb
+ 741              		.syntax unified
+ 742 003e 0023     		movs	r3, #0
+ 743 0040 1D46     		mov	r5, r3
+ 744 0042 05E0     		b	.L90
+ 745              	.L92:
+ 746 0044 3146     		mov	r1, r6
+ 747 0046 2046     		mov	r0, r4
+ 748 0048 FFF7FEFF 		bl	xQueueSemaphoreTake
+ 749 004c 0128     		cmp	r0, #1
+ 750 004e 08D1     		bne	.L97
+ 751              	.L90:
+ 752 0050 2846     		mov	r0, r5
+ 753 0052 02B0     		add	sp, sp, #8
+ 754              		@ sp needed
+ 755 0054 70BD     		pop	{r4, r5, r6, pc}
+ 756              	.L93:
+ 757 0056 8023     		movs	r3, #128
+ 758 0058 1D46     		mov	r5, r3
+ 759 005a F9E7     		b	.L90
+ 760              	.L94:
+ 761 005c FF23     		movs	r3, #255
+ 762 005e 1D46     		mov	r5, r3
+ 763 0060 F6E7     		b	.L90
+ 764              	.L97:
+ 765 0062 FF23     		movs	r3, #255
+ 766 0064 1D46     		mov	r5, r3
+ 767 0066 F3E7     		b	.L90
+ 769              		.section	.text.osSemaphoreRelease,"ax",%progbits
+ 770              		.align	1
+ 771              		.global	osSemaphoreRelease
+ 772              		.syntax unified
+ 773              		.thumb
+ 774              		.thumb_func
+ 776              	osSemaphoreRelease:
+ 777              		@ args = 0, pretend = 0, frame = 8
+ 778              		@ frame_needed = 0, uses_anonymous_args = 0
+ 779 0000 10B5     		push	{r4, lr}
+ 780 0002 82B0     		sub	sp, sp, #8
+ 781 0004 0446     		mov	r4, r0
+ 782 0006 0023     		movs	r3, #0
+ 783 0008 0193     		str	r3, [sp, #4]
+ 784 000a FFF7FEFF 		bl	inHandlerMode
+ 785 000e 98B1     		cbz	r0, .L99
+ 786 0010 01A9     		add	r1, sp, #4
+ 787 0012 2046     		mov	r0, r4
+ 788 0014 FFF7FEFF 		bl	xQueueGiveFromISR
+ 789 0018 0128     		cmp	r0, #1
+ 790 001a 1AD1     		bne	.L101
+ 791 001c 019B     		ldr	r3, [sp, #4]
+ 792 001e D3B1     		cbz	r3, .L102
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 14
+
+
+ 793 0020 4FF0E023 		mov	r3, #-536813568
+ 794 0024 4FF08052 		mov	r2, #268435456
+ 795 0028 C3F8042D 		str	r2, [r3, #3332]
+ 796              		.syntax unified
+ 797              	@ 829 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c" 1
+ 798 002c BFF34F8F 		dsb
+ 799              	@ 0 "" 2
+ 800              	@ 829 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c" 1
+ 801 0030 BFF36F8F 		isb
+ 802              	@ 0 "" 2
+ 803              		.thumb
+ 804              		.syntax unified
+ 805 0034 0020     		movs	r0, #0
+ 806 0036 08E0     		b	.L98
+ 807              	.L99:
+ 808 0038 0346     		mov	r3, r0
+ 809 003a 0246     		mov	r2, r0
+ 810 003c 0146     		mov	r1, r0
+ 811 003e 2046     		mov	r0, r4
+ 812 0040 FFF7FEFF 		bl	xQueueGenericSend
+ 813 0044 0128     		cmp	r0, #1
+ 814 0046 02D0     		beq	.L105
+ 815 0048 FF20     		movs	r0, #255
+ 816              	.L98:
+ 817 004a 02B0     		add	sp, sp, #8
+ 818              		@ sp needed
+ 819 004c 10BD     		pop	{r4, pc}
+ 820              	.L105:
+ 821 004e 0020     		movs	r0, #0
+ 822 0050 FBE7     		b	.L98
+ 823              	.L101:
+ 824 0052 FF20     		movs	r0, #255
+ 825 0054 F9E7     		b	.L98
+ 826              	.L102:
+ 827 0056 1846     		mov	r0, r3
+ 828 0058 F7E7     		b	.L98
+ 830              		.section	.text.osSemaphoreDelete,"ax",%progbits
+ 831              		.align	1
+ 832              		.global	osSemaphoreDelete
+ 833              		.syntax unified
+ 834              		.thumb
+ 835              		.thumb_func
+ 837              	osSemaphoreDelete:
+ 838              		@ args = 0, pretend = 0, frame = 0
+ 839              		@ frame_needed = 0, uses_anonymous_args = 0
+ 840 0000 10B5     		push	{r4, lr}
+ 841 0002 0446     		mov	r4, r0
+ 842 0004 FFF7FEFF 		bl	inHandlerMode
+ 843 0008 20B9     		cbnz	r0, .L108
+ 844 000a 2046     		mov	r0, r4
+ 845 000c FFF7FEFF 		bl	vQueueDelete
+ 846 0010 0020     		movs	r0, #0
+ 847              	.L106:
+ 848 0012 10BD     		pop	{r4, pc}
+ 849              	.L108:
+ 850 0014 8220     		movs	r0, #130
+ 851 0016 FCE7     		b	.L106
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 15
+
+
+ 853              		.section	.text.osPoolCreate,"ax",%progbits
+ 854              		.align	1
+ 855              		.global	osPoolCreate
+ 856              		.syntax unified
+ 857              		.thumb
+ 858              		.thumb_func
+ 860              	osPoolCreate:
+ 861              		@ args = 0, pretend = 0, frame = 0
+ 862              		@ frame_needed = 0, uses_anonymous_args = 0
+ 863 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 864 0002 0446     		mov	r4, r0
+ 865 0004 4368     		ldr	r3, [r0, #4]
+ 866 0006 0333     		adds	r3, r3, #3
+ 867 0008 23F00306 		bic	r6, r3, #3
+ 868 000c 1420     		movs	r0, #20
+ 869 000e FFF7FEFF 		bl	pvPortMalloc
+ 870 0012 0546     		mov	r5, r0
+ 871 0014 D8B1     		cbz	r0, .L110
+ 872 0016 2368     		ldr	r3, [r4]
+ 873 0018 8360     		str	r3, [r0, #8]
+ 874 001a C660     		str	r6, [r0, #12]
+ 875 001c 0023     		movs	r3, #0
+ 876 001e 0361     		str	r3, [r0, #16]
+ 877 0020 2068     		ldr	r0, [r4]
+ 878 0022 FFF7FEFF 		bl	pvPortMalloc
+ 879 0026 0746     		mov	r7, r0
+ 880 0028 6860     		str	r0, [r5, #4]
+ 881 002a D0B1     		cbz	r0, .L112
+ 882 002c 2068     		ldr	r0, [r4]
+ 883 002e 06FB00F0 		mul	r0, r6, r0
+ 884 0032 FFF7FEFF 		bl	pvPortMalloc
+ 885 0036 0646     		mov	r6, r0
+ 886 0038 2860     		str	r0, [r5]
+ 887 003a 50B1     		cbz	r0, .L119
+ 888 003c 0023     		movs	r3, #0
+ 889 003e 03E0     		b	.L113
+ 890              	.L115:
+ 891 0040 6A68     		ldr	r2, [r5, #4]
+ 892 0042 0021     		movs	r1, #0
+ 893 0044 D154     		strb	r1, [r2, r3]
+ 894 0046 0133     		adds	r3, r3, #1
+ 895              	.L113:
+ 896 0048 2268     		ldr	r2, [r4]
+ 897 004a 9A42     		cmp	r2, r3
+ 898 004c F8D8     		bhi	.L115
+ 899              	.L110:
+ 900 004e 2846     		mov	r0, r5
+ 901 0050 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 902              	.L119:
+ 903 0052 6868     		ldr	r0, [r5, #4]
+ 904 0054 FFF7FEFF 		bl	vPortFree
+ 905 0058 2846     		mov	r0, r5
+ 906 005a FFF7FEFF 		bl	vPortFree
+ 907 005e 3546     		mov	r5, r6
+ 908 0060 F5E7     		b	.L110
+ 909              	.L112:
+ 910 0062 2846     		mov	r0, r5
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 16
+
+
+ 911 0064 FFF7FEFF 		bl	vPortFree
+ 912 0068 3D46     		mov	r5, r7
+ 913 006a F0E7     		b	.L110
+ 915              		.section	.text.osPoolAlloc,"ax",%progbits
+ 916              		.align	1
+ 917              		.global	osPoolAlloc
+ 918              		.syntax unified
+ 919              		.thumb
+ 920              		.thumb_func
+ 922              	osPoolAlloc:
+ 923              		@ args = 0, pretend = 0, frame = 0
+ 924              		@ frame_needed = 0, uses_anonymous_args = 0
+ 925 0000 70B5     		push	{r4, r5, r6, lr}
+ 926 0002 0446     		mov	r4, r0
+ 927 0004 FFF7FEFF 		bl	inHandlerMode
+ 928 0008 60B1     		cbz	r0, .L121
+ 929              		.syntax unified
+ 930              	@ 211 "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h" 1
+ 931 000a EFF31183 			mrs r3, basepri											
+ 932 000e 4FF05002 		mov r2, #80												
+ 933 0012 82F31188 		msr basepri, r2											
+ 934 0016 BFF36F8F 		isb														
+ 935 001a BFF34F8F 		dsb														
+ 936              	
+ 937              	@ 0 "" 2
+ 938              		.thumb
+ 939              		.syntax unified
+ 940 001e 1D46     		mov	r5, r3
+ 941              	.L122:
+ 942 0020 0021     		movs	r1, #0
+ 943 0022 04E0     		b	.L123
+ 944              	.L121:
+ 945 0024 0546     		mov	r5, r0
+ 946 0026 FFF7FEFF 		bl	vPortEnterCritical
+ 947 002a F9E7     		b	.L122
+ 948              	.L124:
+ 949 002c 0131     		adds	r1, r1, #1
+ 950              	.L123:
+ 951 002e A268     		ldr	r2, [r4, #8]
+ 952 0030 8A42     		cmp	r2, r1
+ 953 0032 12D9     		bls	.L130
+ 954 0034 2369     		ldr	r3, [r4, #16]
+ 955 0036 0B44     		add	r3, r3, r1
+ 956 0038 B3FBF2F0 		udiv	r0, r3, r2
+ 957 003c 02FB1033 		mls	r3, r2, r0, r3
+ 958 0040 6268     		ldr	r2, [r4, #4]
+ 959 0042 D05C     		ldrb	r0, [r2, r3]	@ zero_extendqisi2
+ 960 0044 0028     		cmp	r0, #0
+ 961 0046 F1D1     		bne	.L124
+ 962 0048 0121     		movs	r1, #1
+ 963 004a D154     		strb	r1, [r2, r3]
+ 964 004c 2268     		ldr	r2, [r4]
+ 965 004e E168     		ldr	r1, [r4, #12]
+ 966 0050 03FB0122 		mla	r2, r3, r1, r2
+ 967 0054 1646     		mov	r6, r2
+ 968 0056 2361     		str	r3, [r4, #16]
+ 969 0058 01E0     		b	.L125
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 17
+
+
+ 970              	.L130:
+ 971 005a 0023     		movs	r3, #0
+ 972 005c 1E46     		mov	r6, r3
+ 973              	.L125:
+ 974 005e FFF7FEFF 		bl	inHandlerMode
+ 975 0062 18B1     		cbz	r0, .L127
+ 976              		.syntax unified
+ 977              	@ 229 "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h" 1
+ 978 0064 85F31188 			msr basepri, r5	
+ 979              	@ 0 "" 2
+ 980              		.thumb
+ 981              		.syntax unified
+ 982              	.L120:
+ 983 0068 3046     		mov	r0, r6
+ 984 006a 70BD     		pop	{r4, r5, r6, pc}
+ 985              	.L127:
+ 986 006c FFF7FEFF 		bl	vPortExitCritical
+ 987 0070 FAE7     		b	.L120
+ 989              		.section	.text.osPoolCAlloc,"ax",%progbits
+ 990              		.align	1
+ 991              		.global	osPoolCAlloc
+ 992              		.syntax unified
+ 993              		.thumb
+ 994              		.thumb_func
+ 996              	osPoolCAlloc:
+ 997              		@ args = 0, pretend = 0, frame = 0
+ 998              		@ frame_needed = 0, uses_anonymous_args = 0
+ 999 0000 08B5     		push	{r3, lr}
+ 1000 0002 FFF7FEFF 		bl	osPoolAlloc
+ 1001 0006 08B1     		cbz	r0, .L131
+ 1002 0008 0023     		movs	r3, #0
+ 1003 000a 0360     		str	r3, [r0]	@ unaligned
+ 1004              	.L131:
+ 1005 000c 08BD     		pop	{r3, pc}
+ 1007              		.section	.text.osPoolFree,"ax",%progbits
+ 1008              		.align	1
+ 1009              		.global	osPoolFree
+ 1010              		.syntax unified
+ 1011              		.thumb
+ 1012              		.thumb_func
+ 1014              	osPoolFree:
+ 1015              		@ args = 0, pretend = 0, frame = 0
+ 1016              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1017              		@ link register save eliminated.
+ 1018 0000 0346     		mov	r3, r0
+ 1019 0002 90B1     		cbz	r0, .L136
+ 1020 0004 99B1     		cbz	r1, .L137
+ 1021 0006 0268     		ldr	r2, [r0]
+ 1022 0008 8A42     		cmp	r2, r1
+ 1023 000a 12D8     		bhi	.L138
+ 1024 000c 891A     		subs	r1, r1, r2
+ 1025 000e C268     		ldr	r2, [r0, #12]
+ 1026 0010 B1FBF2F0 		udiv	r0, r1, r2
+ 1027 0014 02FB1010 		mls	r0, r2, r0, r1
+ 1028 0018 68B9     		cbnz	r0, .L139
+ 1029 001a B1FBF2F1 		udiv	r1, r1, r2
+ 1030 001e 9A68     		ldr	r2, [r3, #8]
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 18
+
+
+ 1031 0020 8A42     		cmp	r2, r1
+ 1032 0022 0AD9     		bls	.L140
+ 1033 0024 5B68     		ldr	r3, [r3, #4]
+ 1034 0026 5854     		strb	r0, [r3, r1]
+ 1035 0028 7047     		bx	lr
+ 1036              	.L136:
+ 1037 002a 8020     		movs	r0, #128
+ 1038 002c 7047     		bx	lr
+ 1039              	.L137:
+ 1040 002e 8020     		movs	r0, #128
+ 1041 0030 7047     		bx	lr
+ 1042              	.L138:
+ 1043 0032 8020     		movs	r0, #128
+ 1044 0034 7047     		bx	lr
+ 1045              	.L139:
+ 1046 0036 8020     		movs	r0, #128
+ 1047 0038 7047     		bx	lr
+ 1048              	.L140:
+ 1049 003a 8020     		movs	r0, #128
+ 1050 003c 7047     		bx	lr
+ 1052              		.section	.text.osMessageCreate,"ax",%progbits
+ 1053              		.align	1
+ 1054              		.global	osMessageCreate
+ 1055              		.syntax unified
+ 1056              		.thumb
+ 1057              		.thumb_func
+ 1059              	osMessageCreate:
+ 1060              		@ args = 0, pretend = 0, frame = 0
+ 1061              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1062 0000 00B5     		push	{lr}
+ 1063 0002 83B0     		sub	sp, sp, #12
+ 1064 0004 8268     		ldr	r2, [r0, #8]
+ 1065 0006 42B1     		cbz	r2, .L142
+ 1066 0008 C368     		ldr	r3, [r0, #12]
+ 1067 000a 33B1     		cbz	r3, .L142
+ 1068 000c 0021     		movs	r1, #0
+ 1069 000e 0091     		str	r1, [sp]
+ 1070 0010 4168     		ldr	r1, [r0, #4]
+ 1071 0012 0068     		ldr	r0, [r0]
+ 1072 0014 FFF7FEFF 		bl	xQueueGenericCreateStatic
+ 1073 0018 04E0     		b	.L141
+ 1074              	.L142:
+ 1075 001a 0022     		movs	r2, #0
+ 1076 001c 4168     		ldr	r1, [r0, #4]
+ 1077 001e 0068     		ldr	r0, [r0]
+ 1078 0020 FFF7FEFF 		bl	xQueueGenericCreate
+ 1079              	.L141:
+ 1080 0024 03B0     		add	sp, sp, #12
+ 1081              		@ sp needed
+ 1082 0026 00BD     		pop	{pc}
+ 1084              		.section	.text.osMessagePut,"ax",%progbits
+ 1085              		.align	1
+ 1086              		.global	osMessagePut
+ 1087              		.syntax unified
+ 1088              		.thumb
+ 1089              		.thumb_func
+ 1091              	osMessagePut:
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 19
+
+
+ 1092              		@ args = 0, pretend = 0, frame = 16
+ 1093              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1094 0000 30B5     		push	{r4, r5, lr}
+ 1095 0002 85B0     		sub	sp, sp, #20
+ 1096 0004 0446     		mov	r4, r0
+ 1097 0006 0191     		str	r1, [sp, #4]
+ 1098 0008 0023     		movs	r3, #0
+ 1099 000a 0393     		str	r3, [sp, #12]
+ 1100 000c 1546     		mov	r5, r2
+ 1101 000e 0AB9     		cbnz	r2, .L146
+ 1102 0010 0123     		movs	r3, #1
+ 1103 0012 1D46     		mov	r5, r3
+ 1104              	.L146:
+ 1105 0014 FFF7FEFF 		bl	inHandlerMode
+ 1106 0018 A8B1     		cbz	r0, .L147
+ 1107 001a 0023     		movs	r3, #0
+ 1108 001c 03AA     		add	r2, sp, #12
+ 1109 001e 01A9     		add	r1, sp, #4
+ 1110 0020 2046     		mov	r0, r4
+ 1111 0022 FFF7FEFF 		bl	xQueueGenericSendFromISR
+ 1112 0026 0128     		cmp	r0, #1
+ 1113 0028 18D1     		bne	.L150
+ 1114 002a 039B     		ldr	r3, [sp, #12]
+ 1115 002c C3B1     		cbz	r3, .L151
+ 1116 002e 4FF0E023 		mov	r3, #-536813568
+ 1117 0032 4FF08052 		mov	r2, #268435456
+ 1118 0036 C3F8042D 		str	r2, [r3, #3332]
+ 1119              		.syntax unified
+ 1120              	@ 1081 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c" 1
+ 1121 003a BFF34F8F 		dsb
+ 1122              	@ 0 "" 2
+ 1123              	@ 1081 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c" 1
+ 1124 003e BFF36F8F 		isb
+ 1125              	@ 0 "" 2
+ 1126              		.thumb
+ 1127              		.syntax unified
+ 1128 0042 0020     		movs	r0, #0
+ 1129 0044 08E0     		b	.L145
+ 1130              	.L147:
+ 1131 0046 0346     		mov	r3, r0
+ 1132 0048 2A46     		mov	r2, r5
+ 1133 004a 01A9     		add	r1, sp, #4
+ 1134 004c 2046     		mov	r0, r4
+ 1135 004e FFF7FEFF 		bl	xQueueGenericSend
+ 1136 0052 0128     		cmp	r0, #1
+ 1137 0054 06D1     		bne	.L152
+ 1138 0056 0020     		movs	r0, #0
+ 1139              	.L145:
+ 1140 0058 05B0     		add	sp, sp, #20
+ 1141              		@ sp needed
+ 1142 005a 30BD     		pop	{r4, r5, pc}
+ 1143              	.L150:
+ 1144 005c FF20     		movs	r0, #255
+ 1145 005e FBE7     		b	.L145
+ 1146              	.L151:
+ 1147 0060 1846     		mov	r0, r3
+ 1148 0062 F9E7     		b	.L145
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 20
+
+
+ 1149              	.L152:
+ 1150 0064 FF20     		movs	r0, #255
+ 1151 0066 F7E7     		b	.L145
+ 1153              		.section	.text.osMessageGet,"ax",%progbits
+ 1154              		.align	1
+ 1155              		.global	osMessageGet
+ 1156              		.syntax unified
+ 1157              		.thumb
+ 1158              		.thumb_func
+ 1160              	osMessageGet:
+ 1161              		@ args = 0, pretend = 0, frame = 16
+ 1162              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1163 0000 70B5     		push	{r4, r5, r6, lr}
+ 1164 0002 84B0     		sub	sp, sp, #16
+ 1165 0004 0546     		mov	r5, r0
+ 1166 0006 0291     		str	r1, [sp, #8]
+ 1167 0008 0023     		movs	r3, #0
+ 1168 000a 0193     		str	r3, [sp, #4]
+ 1169 000c E1B1     		cbz	r1, .L165
+ 1170 000e 0C46     		mov	r4, r1
+ 1171 0010 1646     		mov	r6, r2
+ 1172 0012 0023     		movs	r3, #0
+ 1173 0014 0393     		str	r3, [sp, #12]
+ 1174 0016 FFF7FEFF 		bl	inHandlerMode
+ 1175 001a F8B1     		cbz	r0, .L157
+ 1176 001c 03AA     		add	r2, sp, #12
+ 1177 001e 01A9     		add	r1, sp, #4
+ 1178 0020 2046     		mov	r0, r4
+ 1179 0022 FFF7FEFF 		bl	xQueueReceiveFromISR
+ 1180 0026 0128     		cmp	r0, #1
+ 1181 0028 15D0     		beq	.L166
+ 1182 002a 0023     		movs	r3, #0
+ 1183 002c 0093     		str	r3, [sp]
+ 1184              	.L159:
+ 1185 002e 039B     		ldr	r3, [sp, #12]
+ 1186 0030 FBB1     		cbz	r3, .L160
+ 1187 0032 4FF0E023 		mov	r3, #-536813568
+ 1188 0036 4FF08052 		mov	r2, #268435456
+ 1189 003a C3F8042D 		str	r2, [r3, #3332]
+ 1190              		.syntax unified
+ 1191              	@ 1134 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c" 1
+ 1192 003e BFF34F8F 		dsb
+ 1193              	@ 0 "" 2
+ 1194              	@ 1134 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c" 1
+ 1195 0042 BFF36F8F 		isb
+ 1196              	@ 0 "" 2
+ 1197              		.thumb
+ 1198              		.syntax unified
+ 1199 0046 14E0     		b	.L160
+ 1200              	.L165:
+ 1201 0048 8023     		movs	r3, #128
+ 1202 004a 0093     		str	r3, [sp]
+ 1203 004c 9DE80700 		ldm	sp, {r0, r1, r2}
+ 1204 0050 85E80700 		stm	r5, {r0, r1, r2}
+ 1205 0054 11E0     		b	.L154
+ 1206              	.L166:
+ 1207 0056 1023     		movs	r3, #16
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 21
+
+
+ 1208 0058 0093     		str	r3, [sp]
+ 1209 005a E8E7     		b	.L159
+ 1210              	.L157:
+ 1211 005c 3246     		mov	r2, r6
+ 1212 005e 01A9     		add	r1, sp, #4
+ 1213 0060 2046     		mov	r0, r4
+ 1214 0062 FFF7FEFF 		bl	xQueueReceive
+ 1215 0066 0128     		cmp	r0, #1
+ 1216 0068 0AD0     		beq	.L167
+ 1217 006a 0EB1     		cbz	r6, .L162
+ 1218 006c 4023     		movs	r3, #64
+ 1219 006e 1E46     		mov	r6, r3
+ 1220              	.L162:
+ 1221 0070 0096     		str	r6, [sp]
+ 1222              	.L160:
+ 1223 0072 9DE80700 		ldm	sp, {r0, r1, r2}
+ 1224 0076 85E80700 		stm	r5, {r0, r1, r2}
+ 1225              	.L154:
+ 1226 007a 2846     		mov	r0, r5
+ 1227 007c 04B0     		add	sp, sp, #16
+ 1228              		@ sp needed
+ 1229 007e 70BD     		pop	{r4, r5, r6, pc}
+ 1230              	.L167:
+ 1231 0080 1023     		movs	r3, #16
+ 1232 0082 0093     		str	r3, [sp]
+ 1233 0084 F5E7     		b	.L160
+ 1235              		.section	.text.osMailCreate,"ax",%progbits
+ 1236              		.align	1
+ 1237              		.global	osMailCreate
+ 1238              		.syntax unified
+ 1239              		.thumb
+ 1240              		.thumb_func
+ 1242              	osMailCreate:
+ 1243              		@ args = 0, pretend = 0, frame = 16
+ 1244              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1245 0000 70B5     		push	{r4, r5, r6, lr}
+ 1246 0002 84B0     		sub	sp, sp, #16
+ 1247 0004 0446     		mov	r4, r0
+ 1248 0006 0368     		ldr	r3, [r0]
+ 1249 0008 0193     		str	r3, [sp, #4]
+ 1250 000a 4368     		ldr	r3, [r0, #4]
+ 1251 000c 0293     		str	r3, [sp, #8]
+ 1252 000e 0023     		movs	r3, #0
+ 1253 0010 0393     		str	r3, [sp, #12]
+ 1254 0012 8568     		ldr	r5, [r0, #8]
+ 1255 0014 0C20     		movs	r0, #12
+ 1256 0016 FFF7FEFF 		bl	pvPortMalloc
+ 1257 001a 2860     		str	r0, [r5]
+ 1258 001c A368     		ldr	r3, [r4, #8]
+ 1259 001e 1D68     		ldr	r5, [r3]
+ 1260 0020 A5B1     		cbz	r5, .L168
+ 1261 0022 2C60     		str	r4, [r5]
+ 1262 0024 A368     		ldr	r3, [r4, #8]
+ 1263 0026 1D68     		ldr	r5, [r3]
+ 1264 0028 0022     		movs	r2, #0
+ 1265 002a 0421     		movs	r1, #4
+ 1266 002c 2068     		ldr	r0, [r4]
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 22
+
+
+ 1267 002e FFF7FEFF 		bl	xQueueGenericCreate
+ 1268 0032 6860     		str	r0, [r5, #4]
+ 1269 0034 A368     		ldr	r3, [r4, #8]
+ 1270 0036 1E68     		ldr	r6, [r3]
+ 1271 0038 7568     		ldr	r5, [r6, #4]
+ 1272 003a 55B1     		cbz	r5, .L172
+ 1273 003c 01A8     		add	r0, sp, #4
+ 1274 003e FFF7FEFF 		bl	osPoolCreate
+ 1275 0042 B060     		str	r0, [r6, #8]
+ 1276 0044 A368     		ldr	r3, [r4, #8]
+ 1277 0046 1D68     		ldr	r5, [r3]
+ 1278 0048 AC68     		ldr	r4, [r5, #8]
+ 1279 004a 34B1     		cbz	r4, .L173
+ 1280              	.L168:
+ 1281 004c 2846     		mov	r0, r5
+ 1282 004e 04B0     		add	sp, sp, #16
+ 1283              		@ sp needed
+ 1284 0050 70BD     		pop	{r4, r5, r6, pc}
+ 1285              	.L172:
+ 1286 0052 3046     		mov	r0, r6
+ 1287 0054 FFF7FEFF 		bl	vPortFree
+ 1288 0058 F8E7     		b	.L168
+ 1289              	.L173:
+ 1290 005a 2846     		mov	r0, r5
+ 1291 005c FFF7FEFF 		bl	vPortFree
+ 1292 0060 2546     		mov	r5, r4
+ 1293 0062 F3E7     		b	.L168
+ 1295              		.section	.text.osMailAlloc,"ax",%progbits
+ 1296              		.align	1
+ 1297              		.global	osMailAlloc
+ 1298              		.syntax unified
+ 1299              		.thumb
+ 1300              		.thumb_func
+ 1302              	osMailAlloc:
+ 1303              		@ args = 0, pretend = 0, frame = 0
+ 1304              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1305 0000 08B5     		push	{r3, lr}
+ 1306 0002 10B1     		cbz	r0, .L174
+ 1307 0004 8068     		ldr	r0, [r0, #8]
+ 1308 0006 FFF7FEFF 		bl	osPoolAlloc
+ 1309              	.L174:
+ 1310 000a 08BD     		pop	{r3, pc}
+ 1312              		.section	.text.osMailCAlloc,"ax",%progbits
+ 1313              		.align	1
+ 1314              		.global	osMailCAlloc
+ 1315              		.syntax unified
+ 1316              		.thumb
+ 1317              		.thumb_func
+ 1319              	osMailCAlloc:
+ 1320              		@ args = 0, pretend = 0, frame = 0
+ 1321              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1322 0000 10B5     		push	{r4, lr}
+ 1323 0002 0446     		mov	r4, r0
+ 1324 0004 FFF7FEFF 		bl	osMailAlloc
+ 1325 0008 0146     		mov	r1, r0
+ 1326 000a 40B1     		cbz	r0, .L178
+ 1327 000c 0023     		movs	r3, #0
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 23
+
+
+ 1328 000e 02E0     		b	.L179
+ 1329              	.L181:
+ 1330 0010 0022     		movs	r2, #0
+ 1331 0012 CA54     		strb	r2, [r1, r3]
+ 1332 0014 0133     		adds	r3, r3, #1
+ 1333              	.L179:
+ 1334 0016 2268     		ldr	r2, [r4]
+ 1335 0018 5268     		ldr	r2, [r2, #4]
+ 1336 001a 9A42     		cmp	r2, r3
+ 1337 001c F8D8     		bhi	.L181
+ 1338              	.L178:
+ 1339 001e 0846     		mov	r0, r1
+ 1340 0020 10BD     		pop	{r4, pc}
+ 1342              		.section	.text.osMailPut,"ax",%progbits
+ 1343              		.align	1
+ 1344              		.global	osMailPut
+ 1345              		.syntax unified
+ 1346              		.thumb
+ 1347              		.thumb_func
+ 1349              	osMailPut:
+ 1350              		@ args = 0, pretend = 0, frame = 16
+ 1351              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1352 0000 10B5     		push	{r4, lr}
+ 1353 0002 84B0     		sub	sp, sp, #16
+ 1354 0004 0191     		str	r1, [sp, #4]
+ 1355 0006 30B3     		cbz	r0, .L187
+ 1356 0008 0446     		mov	r4, r0
+ 1357 000a 0023     		movs	r3, #0
+ 1358 000c 0393     		str	r3, [sp, #12]
+ 1359 000e FFF7FEFF 		bl	inHandlerMode
+ 1360 0012 A8B1     		cbz	r0, .L186
+ 1361 0014 0023     		movs	r3, #0
+ 1362 0016 03AA     		add	r2, sp, #12
+ 1363 0018 01A9     		add	r1, sp, #4
+ 1364 001a 6068     		ldr	r0, [r4, #4]
+ 1365 001c FFF7FEFF 		bl	xQueueGenericSendFromISR
+ 1366 0020 0128     		cmp	r0, #1
+ 1367 0022 1AD1     		bne	.L188
+ 1368 0024 039B     		ldr	r3, [sp, #12]
+ 1369 0026 D3B1     		cbz	r3, .L189
+ 1370 0028 4FF0E023 		mov	r3, #-536813568
+ 1371 002c 4FF08052 		mov	r2, #268435456
+ 1372 0030 C3F8042D 		str	r2, [r3, #3332]
+ 1373              		.syntax unified
+ 1374              	@ 1272 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c" 1
+ 1375 0034 BFF34F8F 		dsb
+ 1376              	@ 0 "" 2
+ 1377              	@ 1272 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c" 1
+ 1378 0038 BFF36F8F 		isb
+ 1379              	@ 0 "" 2
+ 1380              		.thumb
+ 1381              		.syntax unified
+ 1382 003c 0020     		movs	r0, #0
+ 1383 003e 08E0     		b	.L184
+ 1384              	.L186:
+ 1385 0040 0346     		mov	r3, r0
+ 1386 0042 0246     		mov	r2, r0
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 24
+
+
+ 1387 0044 01A9     		add	r1, sp, #4
+ 1388 0046 6068     		ldr	r0, [r4, #4]
+ 1389 0048 FFF7FEFF 		bl	xQueueGenericSend
+ 1390 004c 0128     		cmp	r0, #1
+ 1391 004e 08D1     		bne	.L190
+ 1392 0050 0020     		movs	r0, #0
+ 1393              	.L184:
+ 1394 0052 04B0     		add	sp, sp, #16
+ 1395              		@ sp needed
+ 1396 0054 10BD     		pop	{r4, pc}
+ 1397              	.L187:
+ 1398 0056 8020     		movs	r0, #128
+ 1399 0058 FBE7     		b	.L184
+ 1400              	.L188:
+ 1401 005a FF20     		movs	r0, #255
+ 1402 005c F9E7     		b	.L184
+ 1403              	.L189:
+ 1404 005e 1846     		mov	r0, r3
+ 1405 0060 F7E7     		b	.L184
+ 1406              	.L190:
+ 1407 0062 FF20     		movs	r0, #255
+ 1408 0064 F5E7     		b	.L184
+ 1410              		.section	.text.osMailGet,"ax",%progbits
+ 1411              		.align	1
+ 1412              		.global	osMailGet
+ 1413              		.syntax unified
+ 1414              		.thumb
+ 1415              		.thumb_func
+ 1417              	osMailGet:
+ 1418              		@ args = 0, pretend = 0, frame = 16
+ 1419              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1420 0000 70B5     		push	{r4, r5, r6, lr}
+ 1421 0002 84B0     		sub	sp, sp, #16
+ 1422 0004 0546     		mov	r5, r0
+ 1423 0006 0291     		str	r1, [sp, #8]
+ 1424 0008 E1B1     		cbz	r1, .L203
+ 1425 000a 0C46     		mov	r4, r1
+ 1426 000c 1646     		mov	r6, r2
+ 1427 000e 0023     		movs	r3, #0
+ 1428 0010 0393     		str	r3, [sp, #12]
+ 1429 0012 FFF7FEFF 		bl	inHandlerMode
+ 1430 0016 F8B1     		cbz	r0, .L195
+ 1431 0018 03AA     		add	r2, sp, #12
+ 1432 001a 01A9     		add	r1, sp, #4
+ 1433 001c 6068     		ldr	r0, [r4, #4]
+ 1434 001e FFF7FEFF 		bl	xQueueReceiveFromISR
+ 1435 0022 0128     		cmp	r0, #1
+ 1436 0024 15D0     		beq	.L204
+ 1437 0026 0023     		movs	r3, #0
+ 1438 0028 0093     		str	r3, [sp]
+ 1439              	.L197:
+ 1440 002a 039B     		ldr	r3, [sp, #12]
+ 1441 002c FBB1     		cbz	r3, .L198
+ 1442 002e 4FF0E023 		mov	r3, #-536813568
+ 1443 0032 4FF08052 		mov	r2, #268435456
+ 1444 0036 C3F8042D 		str	r2, [r3, #3332]
+ 1445              		.syntax unified
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 25
+
+
+ 1446              	@ 1324 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c" 1
+ 1447 003a BFF34F8F 		dsb
+ 1448              	@ 0 "" 2
+ 1449              	@ 1324 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c" 1
+ 1450 003e BFF36F8F 		isb
+ 1451              	@ 0 "" 2
+ 1452              		.thumb
+ 1453              		.syntax unified
+ 1454 0042 14E0     		b	.L198
+ 1455              	.L203:
+ 1456 0044 8023     		movs	r3, #128
+ 1457 0046 0093     		str	r3, [sp]
+ 1458 0048 9DE80700 		ldm	sp, {r0, r1, r2}
+ 1459 004c 85E80700 		stm	r5, {r0, r1, r2}
+ 1460 0050 11E0     		b	.L192
+ 1461              	.L204:
+ 1462 0052 2023     		movs	r3, #32
+ 1463 0054 0093     		str	r3, [sp]
+ 1464 0056 E8E7     		b	.L197
+ 1465              	.L195:
+ 1466 0058 3246     		mov	r2, r6
+ 1467 005a 01A9     		add	r1, sp, #4
+ 1468 005c 6068     		ldr	r0, [r4, #4]
+ 1469 005e FFF7FEFF 		bl	xQueueReceive
+ 1470 0062 0128     		cmp	r0, #1
+ 1471 0064 0AD0     		beq	.L205
+ 1472 0066 0EB1     		cbz	r6, .L200
+ 1473 0068 4023     		movs	r3, #64
+ 1474 006a 1E46     		mov	r6, r3
+ 1475              	.L200:
+ 1476 006c 0096     		str	r6, [sp]
+ 1477              	.L198:
+ 1478 006e 9DE80700 		ldm	sp, {r0, r1, r2}
+ 1479 0072 85E80700 		stm	r5, {r0, r1, r2}
+ 1480              	.L192:
+ 1481 0076 2846     		mov	r0, r5
+ 1482 0078 04B0     		add	sp, sp, #16
+ 1483              		@ sp needed
+ 1484 007a 70BD     		pop	{r4, r5, r6, pc}
+ 1485              	.L205:
+ 1486 007c 2023     		movs	r3, #32
+ 1487 007e 0093     		str	r3, [sp]
+ 1488 0080 F5E7     		b	.L198
+ 1490              		.section	.text.osMailFree,"ax",%progbits
+ 1491              		.align	1
+ 1492              		.global	osMailFree
+ 1493              		.syntax unified
+ 1494              		.thumb
+ 1495              		.thumb_func
+ 1497              	osMailFree:
+ 1498              		@ args = 0, pretend = 0, frame = 0
+ 1499              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1500 0000 20B1     		cbz	r0, .L208
+ 1501 0002 08B5     		push	{r3, lr}
+ 1502 0004 8068     		ldr	r0, [r0, #8]
+ 1503 0006 FFF7FEFF 		bl	osPoolFree
+ 1504 000a 08BD     		pop	{r3, pc}
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 26
+
+
+ 1505              	.L208:
+ 1506 000c 8020     		movs	r0, #128
+ 1507 000e 7047     		bx	lr
+ 1509              		.section	.text.osSystickHandler,"ax",%progbits
+ 1510              		.align	1
+ 1511              		.global	osSystickHandler
+ 1512              		.syntax unified
+ 1513              		.thumb
+ 1514              		.thumb_func
+ 1516              	osSystickHandler:
+ 1517              		@ args = 0, pretend = 0, frame = 0
+ 1518              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1519 0000 08B5     		push	{r3, lr}
+ 1520 0002 FFF7FEFF 		bl	xTaskGetSchedulerState
+ 1521 0006 0128     		cmp	r0, #1
+ 1522 0008 00D1     		bne	.L216
+ 1523              	.L213:
+ 1524 000a 08BD     		pop	{r3, pc}
+ 1525              	.L216:
+ 1526 000c FFF7FEFF 		bl	xPortSysTickHandler
+ 1527 0010 FBE7     		b	.L213
+ 1529              		.section	.text.osThreadSuspend,"ax",%progbits
+ 1530              		.align	1
+ 1531              		.global	osThreadSuspend
+ 1532              		.syntax unified
+ 1533              		.thumb
+ 1534              		.thumb_func
+ 1536              	osThreadSuspend:
+ 1537              		@ args = 0, pretend = 0, frame = 0
+ 1538              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1539 0000 08B5     		push	{r3, lr}
+ 1540 0002 FFF7FEFF 		bl	vTaskSuspend
+ 1541 0006 0020     		movs	r0, #0
+ 1542 0008 08BD     		pop	{r3, pc}
+ 1544              		.section	.text.osThreadResume,"ax",%progbits
+ 1545              		.align	1
+ 1546              		.global	osThreadResume
+ 1547              		.syntax unified
+ 1548              		.thumb
+ 1549              		.thumb_func
+ 1551              	osThreadResume:
+ 1552              		@ args = 0, pretend = 0, frame = 0
+ 1553              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1554 0000 10B5     		push	{r4, lr}
+ 1555 0002 0446     		mov	r4, r0
+ 1556 0004 FFF7FEFF 		bl	inHandlerMode
+ 1557 0008 78B1     		cbz	r0, .L220
+ 1558 000a 2046     		mov	r0, r4
+ 1559 000c FFF7FEFF 		bl	xTaskResumeFromISR
+ 1560 0010 0128     		cmp	r0, #1
+ 1561 0012 0DD1     		bne	.L221
+ 1562 0014 4FF0E023 		mov	r3, #-536813568
+ 1563 0018 4FF08052 		mov	r2, #268435456
+ 1564 001c C3F8042D 		str	r2, [r3, #3332]
+ 1565              		.syntax unified
+ 1566              	@ 1455 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c" 1
+ 1567 0020 BFF34F8F 		dsb
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 27
+
+
+ 1568              	@ 0 "" 2
+ 1569              	@ 1455 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c" 1
+ 1570 0024 BFF36F8F 		isb
+ 1571              	@ 0 "" 2
+ 1572              		.thumb
+ 1573              		.syntax unified
+ 1574 0028 02E0     		b	.L221
+ 1575              	.L220:
+ 1576 002a 2046     		mov	r0, r4
+ 1577 002c FFF7FEFF 		bl	vTaskResume
+ 1578              	.L221:
+ 1579 0030 0020     		movs	r0, #0
+ 1580 0032 10BD     		pop	{r4, pc}
+ 1582              		.section	.text.osThreadSuspendAll,"ax",%progbits
+ 1583              		.align	1
+ 1584              		.global	osThreadSuspendAll
+ 1585              		.syntax unified
+ 1586              		.thumb
+ 1587              		.thumb_func
+ 1589              	osThreadSuspendAll:
+ 1590              		@ args = 0, pretend = 0, frame = 0
+ 1591              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1592 0000 08B5     		push	{r3, lr}
+ 1593 0002 FFF7FEFF 		bl	vTaskSuspendAll
+ 1594 0006 0020     		movs	r0, #0
+ 1595 0008 08BD     		pop	{r3, pc}
+ 1597              		.section	.text.osThreadResumeAll,"ax",%progbits
+ 1598              		.align	1
+ 1599              		.global	osThreadResumeAll
+ 1600              		.syntax unified
+ 1601              		.thumb
+ 1602              		.thumb_func
+ 1604              	osThreadResumeAll:
+ 1605              		@ args = 0, pretend = 0, frame = 0
+ 1606              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1607 0000 08B5     		push	{r3, lr}
+ 1608 0002 FFF7FEFF 		bl	xTaskResumeAll
+ 1609 0006 0128     		cmp	r0, #1
+ 1610 0008 01D0     		beq	.L229
+ 1611 000a FF20     		movs	r0, #255
+ 1612              	.L225:
+ 1613 000c 08BD     		pop	{r3, pc}
+ 1614              	.L229:
+ 1615 000e 0020     		movs	r0, #0
+ 1616 0010 FCE7     		b	.L225
+ 1618              		.section	.text.osDelayUntil,"ax",%progbits
+ 1619              		.align	1
+ 1620              		.global	osDelayUntil
+ 1621              		.syntax unified
+ 1622              		.thumb
+ 1623              		.thumb_func
+ 1625              	osDelayUntil:
+ 1626              		@ args = 0, pretend = 0, frame = 0
+ 1627              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1628              		@ link register save eliminated.
+ 1629 0000 8120     		movs	r0, #129
+ 1630 0002 7047     		bx	lr
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 28
+
+
+ 1632              		.section	.text.osAbortDelay,"ax",%progbits
+ 1633              		.align	1
+ 1634              		.global	osAbortDelay
+ 1635              		.syntax unified
+ 1636              		.thumb
+ 1637              		.thumb_func
+ 1639              	osAbortDelay:
+ 1640              		@ args = 0, pretend = 0, frame = 0
+ 1641              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1642              		@ link register save eliminated.
+ 1643 0000 8120     		movs	r0, #129
+ 1644 0002 7047     		bx	lr
+ 1646              		.section	.text.osThreadList,"ax",%progbits
+ 1647              		.align	1
+ 1648              		.global	osThreadList
+ 1649              		.syntax unified
+ 1650              		.thumb
+ 1651              		.thumb_func
+ 1653              	osThreadList:
+ 1654              		@ args = 0, pretend = 0, frame = 0
+ 1655              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1656              		@ link register save eliminated.
+ 1657 0000 0020     		movs	r0, #0
+ 1658 0002 7047     		bx	lr
+ 1660              		.section	.text.osMessagePeek,"ax",%progbits
+ 1661              		.align	1
+ 1662              		.global	osMessagePeek
+ 1663              		.syntax unified
+ 1664              		.thumb
+ 1665              		.thumb_func
+ 1667              	osMessagePeek:
+ 1668              		@ args = 0, pretend = 0, frame = 16
+ 1669              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1670 0000 30B5     		push	{r4, r5, lr}
+ 1671 0002 85B0     		sub	sp, sp, #20
+ 1672 0004 0546     		mov	r5, r0
+ 1673 0006 0391     		str	r1, [sp, #12]
+ 1674 0008 89B1     		cbz	r1, .L241
+ 1675 000a 0846     		mov	r0, r1
+ 1676 000c 1446     		mov	r4, r2
+ 1677 000e 02A9     		add	r1, sp, #8
+ 1678 0010 FFF7FEFF 		bl	xQueuePeek
+ 1679 0014 0128     		cmp	r0, #1
+ 1680 0016 12D0     		beq	.L242
+ 1681 0018 04B1     		cbz	r4, .L238
+ 1682 001a 4024     		movs	r4, #64
+ 1683              	.L238:
+ 1684 001c 0194     		str	r4, [sp, #4]
+ 1685              	.L237:
+ 1686 001e 04AB     		add	r3, sp, #16
+ 1687 0020 13E90700 		ldmdb	r3, {r0, r1, r2}
+ 1688 0024 85E80700 		stm	r5, {r0, r1, r2}
+ 1689              	.L233:
+ 1690 0028 2846     		mov	r0, r5
+ 1691 002a 05B0     		add	sp, sp, #20
+ 1692              		@ sp needed
+ 1693 002c 30BD     		pop	{r4, r5, pc}
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 29
+
+
+ 1694              	.L241:
+ 1695 002e 8023     		movs	r3, #128
+ 1696 0030 0193     		str	r3, [sp, #4]
+ 1697 0032 04AB     		add	r3, sp, #16
+ 1698 0034 13E90700 		ldmdb	r3, {r0, r1, r2}
+ 1699 0038 85E80700 		stm	r5, {r0, r1, r2}
+ 1700 003c F4E7     		b	.L233
+ 1701              	.L242:
+ 1702 003e 1023     		movs	r3, #16
+ 1703 0040 0193     		str	r3, [sp, #4]
+ 1704 0042 ECE7     		b	.L237
+ 1706              		.section	.text.osMessageWaiting,"ax",%progbits
+ 1707              		.align	1
+ 1708              		.global	osMessageWaiting
+ 1709              		.syntax unified
+ 1710              		.thumb
+ 1711              		.thumb_func
+ 1713              	osMessageWaiting:
+ 1714              		@ args = 0, pretend = 0, frame = 0
+ 1715              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1716 0000 10B5     		push	{r4, lr}
+ 1717 0002 0446     		mov	r4, r0
+ 1718 0004 FFF7FEFF 		bl	inHandlerMode
+ 1719 0008 18B1     		cbz	r0, .L244
+ 1720 000a 2046     		mov	r0, r4
+ 1721 000c FFF7FEFF 		bl	uxQueueMessagesWaitingFromISR
+ 1722              	.L243:
+ 1723 0010 10BD     		pop	{r4, pc}
+ 1724              	.L244:
+ 1725 0012 2046     		mov	r0, r4
+ 1726 0014 FFF7FEFF 		bl	uxQueueMessagesWaiting
+ 1727 0018 FAE7     		b	.L243
+ 1729              		.section	.text.osMessageAvailableSpace,"ax",%progbits
+ 1730              		.align	1
+ 1731              		.global	osMessageAvailableSpace
+ 1732              		.syntax unified
+ 1733              		.thumb
+ 1734              		.thumb_func
+ 1736              	osMessageAvailableSpace:
+ 1737              		@ args = 0, pretend = 0, frame = 0
+ 1738              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1739 0000 08B5     		push	{r3, lr}
+ 1740 0002 FFF7FEFF 		bl	uxQueueSpacesAvailable
+ 1741 0006 08BD     		pop	{r3, pc}
+ 1743              		.section	.text.osMessageDelete,"ax",%progbits
+ 1744              		.align	1
+ 1745              		.global	osMessageDelete
+ 1746              		.syntax unified
+ 1747              		.thumb
+ 1748              		.thumb_func
+ 1750              	osMessageDelete:
+ 1751              		@ args = 0, pretend = 0, frame = 0
+ 1752              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1753 0000 10B5     		push	{r4, lr}
+ 1754 0002 0446     		mov	r4, r0
+ 1755 0004 FFF7FEFF 		bl	inHandlerMode
+ 1756 0008 20B9     		cbnz	r0, .L251
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 30
+
+
+ 1757 000a 2046     		mov	r0, r4
+ 1758 000c FFF7FEFF 		bl	vQueueDelete
+ 1759 0010 0020     		movs	r0, #0
+ 1760              	.L249:
+ 1761 0012 10BD     		pop	{r4, pc}
+ 1762              	.L251:
+ 1763 0014 8220     		movs	r0, #130
+ 1764 0016 FCE7     		b	.L249
+ 1766              		.section	.text.osRecursiveMutexCreate,"ax",%progbits
+ 1767              		.align	1
+ 1768              		.global	osRecursiveMutexCreate
+ 1769              		.syntax unified
+ 1770              		.thumb
+ 1771              		.thumb_func
+ 1773              	osRecursiveMutexCreate:
+ 1774              		@ args = 0, pretend = 0, frame = 0
+ 1775              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1776              		@ link register save eliminated.
+ 1777 0000 0020     		movs	r0, #0
+ 1778 0002 7047     		bx	lr
+ 1780              		.section	.text.osRecursiveMutexRelease,"ax",%progbits
+ 1781              		.align	1
+ 1782              		.global	osRecursiveMutexRelease
+ 1783              		.syntax unified
+ 1784              		.thumb
+ 1785              		.thumb_func
+ 1787              	osRecursiveMutexRelease:
+ 1788              		@ args = 0, pretend = 0, frame = 0
+ 1789              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1790              		@ link register save eliminated.
+ 1791 0000 8120     		movs	r0, #129
+ 1792 0002 7047     		bx	lr
+ 1794              		.section	.text.osRecursiveMutexWait,"ax",%progbits
+ 1795              		.align	1
+ 1796              		.global	osRecursiveMutexWait
+ 1797              		.syntax unified
+ 1798              		.thumb
+ 1799              		.thumb_func
+ 1801              	osRecursiveMutexWait:
+ 1802              		@ args = 0, pretend = 0, frame = 0
+ 1803              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1804              		@ link register save eliminated.
+ 1805 0000 8120     		movs	r0, #129
+ 1806 0002 7047     		bx	lr
+ 1808              		.section	.text.osSemaphoreGetCount,"ax",%progbits
+ 1809              		.align	1
+ 1810              		.global	osSemaphoreGetCount
+ 1811              		.syntax unified
+ 1812              		.thumb
+ 1813              		.thumb_func
+ 1815              	osSemaphoreGetCount:
+ 1816              		@ args = 0, pretend = 0, frame = 0
+ 1817              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1818 0000 08B5     		push	{r3, lr}
+ 1819 0002 FFF7FEFF 		bl	uxQueueMessagesWaiting
+ 1820 0006 08BD     		pop	{r3, pc}
+ 1822              		.ident	"GCC: (xPack GNU Arm Embedded GCC arm64) 15.2.1 20251203"
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 31
+
+
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 32
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 cmsis_os.c
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:18     .text.makeFreeRtosPriority:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:23     .text.makeFreeRtosPriority:00000000 makeFreeRtosPriority
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:36     .text.makeCmsisPriority:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:41     .text.makeCmsisPriority:00000000 makeCmsisPriority
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:55     .text.inHandlerMode:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:60     .text.inHandlerMode:00000000 inHandlerMode
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:76     .text.osKernelStart:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:82     .text.osKernelStart:00000000 osKernelStart
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:91     .text.osKernelRunning:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:97     .text.osKernelRunning:00000000 osKernelRunning
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:112    .text.osKernelSysTick:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:118    .text.osKernelSysTick:00000000 osKernelSysTick
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:132    .text.osThreadCreate:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:138    .text.osThreadCreate:00000000 osThreadCreate
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:190    .text.osThreadGetId:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:196    .text.osThreadGetId:00000000 osThreadGetId
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:204    .text.osThreadTerminate:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:210    .text.osThreadTerminate:00000000 osThreadTerminate
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:219    .text.osThreadYield:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:225    .text.osThreadYield:00000000 osThreadYield
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:245    .text.osThreadSetPriority:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:251    .text.osThreadSetPriority:00000000 osThreadSetPriority
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:265    .text.osThreadGetPriority:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:271    .text.osThreadGetPriority:00000000 osThreadGetPriority
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:290    .text.osDelay:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:296    .text.osDelay:00000000 osDelay
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:308    .text.osTimerCreate:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:314    .text.osTimerCreate:00000000 osTimerCreate
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:322    .text.osTimerStart:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:328    .text.osTimerStart:00000000 osTimerStart
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:336    .text.osTimerStop:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:342    .text.osTimerStop:00000000 osTimerStop
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:350    .text.osTimerDelete:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:356    .text.osTimerDelete:00000000 osTimerDelete
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:364    .text.osSignalSet:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:370    .text.osSignalSet:00000000 osSignalSet
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:428    .text.osSignalWait:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:434    .text.osSignalWait:00000000 osSignalWait
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:483    .text.osMutexCreate:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:489    .text.osMutexCreate:00000000 osMutexCreate
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:505    .text.osMutexWait:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:511    .text.osMutexWait:00000000 osMutexWait
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:570    .text.osMutexRelease:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:576    .text.osMutexRelease:00000000 osMutexRelease
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:631    .text.osMutexDelete:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:637    .text.osMutexDelete:00000000 osMutexDelete
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:654    .text.osSemaphoreCreate:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:660    .text.osSemaphoreCreate:00000000 osSemaphoreCreate
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:702    .text.osSemaphoreWait:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:708    .text.osSemaphoreWait:00000000 osSemaphoreWait
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:770    .text.osSemaphoreRelease:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:776    .text.osSemaphoreRelease:00000000 osSemaphoreRelease
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:831    .text.osSemaphoreDelete:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:837    .text.osSemaphoreDelete:00000000 osSemaphoreDelete
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:854    .text.osPoolCreate:00000000 $t
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 33
+
+
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:860    .text.osPoolCreate:00000000 osPoolCreate
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:916    .text.osPoolAlloc:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:922    .text.osPoolAlloc:00000000 osPoolAlloc
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:990    .text.osPoolCAlloc:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:996    .text.osPoolCAlloc:00000000 osPoolCAlloc
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1008   .text.osPoolFree:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1014   .text.osPoolFree:00000000 osPoolFree
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1053   .text.osMessageCreate:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1059   .text.osMessageCreate:00000000 osMessageCreate
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1085   .text.osMessagePut:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1091   .text.osMessagePut:00000000 osMessagePut
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1154   .text.osMessageGet:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1160   .text.osMessageGet:00000000 osMessageGet
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1236   .text.osMailCreate:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1242   .text.osMailCreate:00000000 osMailCreate
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1296   .text.osMailAlloc:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1302   .text.osMailAlloc:00000000 osMailAlloc
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1313   .text.osMailCAlloc:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1319   .text.osMailCAlloc:00000000 osMailCAlloc
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1343   .text.osMailPut:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1349   .text.osMailPut:00000000 osMailPut
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1411   .text.osMailGet:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1417   .text.osMailGet:00000000 osMailGet
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1491   .text.osMailFree:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1497   .text.osMailFree:00000000 osMailFree
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1510   .text.osSystickHandler:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1516   .text.osSystickHandler:00000000 osSystickHandler
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1530   .text.osThreadSuspend:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1536   .text.osThreadSuspend:00000000 osThreadSuspend
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1545   .text.osThreadResume:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1551   .text.osThreadResume:00000000 osThreadResume
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1583   .text.osThreadSuspendAll:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1589   .text.osThreadSuspendAll:00000000 osThreadSuspendAll
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1598   .text.osThreadResumeAll:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1604   .text.osThreadResumeAll:00000000 osThreadResumeAll
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1619   .text.osDelayUntil:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1625   .text.osDelayUntil:00000000 osDelayUntil
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1633   .text.osAbortDelay:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1639   .text.osAbortDelay:00000000 osAbortDelay
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1647   .text.osThreadList:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1653   .text.osThreadList:00000000 osThreadList
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1661   .text.osMessagePeek:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1667   .text.osMessagePeek:00000000 osMessagePeek
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1707   .text.osMessageWaiting:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1713   .text.osMessageWaiting:00000000 osMessageWaiting
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1730   .text.osMessageAvailableSpace:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1736   .text.osMessageAvailableSpace:00000000 osMessageAvailableSpace
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1744   .text.osMessageDelete:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1750   .text.osMessageDelete:00000000 osMessageDelete
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1767   .text.osRecursiveMutexCreate:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1773   .text.osRecursiveMutexCreate:00000000 osRecursiveMutexCreate
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1781   .text.osRecursiveMutexRelease:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1787   .text.osRecursiveMutexRelease:00000000 osRecursiveMutexRelease
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1795   .text.osRecursiveMutexWait:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1801   .text.osRecursiveMutexWait:00000000 osRecursiveMutexWait
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1809   .text.osSemaphoreGetCount:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s:1815   .text.osSemaphoreGetCount:00000000 osSemaphoreGetCount
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccR0CV2J.s 			page 34
+
+
+
+UNDEFINED SYMBOLS
+vTaskStartScheduler
+xTaskGetSchedulerState
+xTaskGetTickCountFromISR
+xTaskGetTickCount
+xTaskCreateStatic
+xTaskCreate
+xTaskGetCurrentTaskHandle
+vTaskDelete
+vTaskPrioritySet
+uxTaskPriorityGetFromISR
+uxTaskPriorityGet
+vTaskDelay
+xTaskGenericNotifyFromISR
+xTaskGenericNotify
+xTaskNotifyWait
+xQueueCreateMutexStatic
+xQueueCreateMutex
+xQueueReceiveFromISR
+xQueueSemaphoreTake
+xQueueGiveFromISR
+xQueueGenericSend
+vQueueDelete
+xQueueGenericCreateStatic
+xQueueGenericCreate
+pvPortMalloc
+vPortFree
+vPortEnterCritical
+vPortExitCritical
+xQueueGenericSendFromISR
+xQueueReceive
+xPortSysTickHandler
+vTaskSuspend
+xTaskResumeFromISR
+vTaskResume
+vTaskSuspendAll
+xTaskResumeAll
+xQueuePeek
+uxQueueMessagesWaitingFromISR
+uxQueueMessagesWaiting
+uxQueueSpacesAvailable

@@ -1,0 +1,755 @@
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"dsp_task.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "Core/Src/dsp_task.c"
+  20              		.section	.text.apply_volume,"ax",%progbits
+  21              		.align	1
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	apply_volume:
+  27              	.LVL0:
+  28              	.LFB139:
+   1:Core/Src/dsp_task.c **** #include "dsp_task.h"
+   2:Core/Src/dsp_task.c **** #include "main.h"
+   3:Core/Src/dsp_task.c **** #include <string.h>
+   4:Core/Src/dsp_task.c **** 
+   5:Core/Src/dsp_task.c **** extern I2S_HandleTypeDef hi2s3;
+   6:Core/Src/dsp_task.c **** 
+   7:Core/Src/dsp_task.c **** /* Defaults: volume at 80%, LPF bypassed, 256-sample delay, only volume on */
+   8:Core/Src/dsp_task.c **** AudioEffectParams_t g_audio_params = {
+   9:Core/Src/dsp_task.c ****     .volume        = 0.8f,
+  10:Core/Src/dsp_task.c ****     .lpf_alpha     = 1.0f,
+  11:Core/Src/dsp_task.c ****     .delay_samples = 256,
+  12:Core/Src/dsp_task.c ****     .effects_mask  = EFFECT_VOLUME,
+  13:Core/Src/dsp_task.c **** };
+  14:Core/Src/dsp_task.c **** osMutexId g_params_mutex;
+  15:Core/Src/dsp_task.c **** 
+  16:Core/Src/dsp_task.c **** /* I2S DMA buffers - 24-bit layout per stereo pair: [L_MSW, L_LSW, R_MSW, R_LSW, ...].
+  17:Core/Src/dsp_task.c ****    For I2S_DATAFORMAT_24B the HAL doubles its internal transfer count, so the buffer
+  18:Core/Src/dsp_task.c ****    must be 4x the number of stereo sample pairs (2x per channel for the 32-bit slot). */
+  19:Core/Src/dsp_task.c **** static uint16_t rx_buf[AUDIO_BLOCK_SAMPLES * 4];
+  20:Core/Src/dsp_task.c **** static uint16_t tx_buf[AUDIO_BLOCK_SAMPLES * 4];
+  21:Core/Src/dsp_task.c **** 
+  22:Core/Src/dsp_task.c **** /* Per-channel delay ring buffers */
+  23:Core/Src/dsp_task.c **** static int16_t  delay_line_L[DELAY_BUF_SAMPLES];
+  24:Core/Src/dsp_task.c **** static int16_t  delay_line_R[DELAY_BUF_SAMPLES];
+  25:Core/Src/dsp_task.c **** static uint16_t delay_wr = 0;
+  26:Core/Src/dsp_task.c **** 
+  27:Core/Src/dsp_task.c **** /* Per-channel IIR state */
+  28:Core/Src/dsp_task.c **** static float lpf_L = 0.0f;
+  29:Core/Src/dsp_task.c **** static float lpf_R = 0.0f;
+  30:Core/Src/dsp_task.c **** 
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s 			page 2
+
+
+  31:Core/Src/dsp_task.c **** /* Scale every sample by vol.
+  32:Core/Src/dsp_task.c ****    24-bit layout stride: MSW at i, LSW at i+1; step by 2 to hit every MSW. */
+  33:Core/Src/dsp_task.c **** static void apply_volume(uint16_t *buf, float vol)
+  34:Core/Src/dsp_task.c **** {
+  29              		.loc 1 34 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		@ link register save eliminated.
+  35:Core/Src/dsp_task.c ****     for (int i = 0; i < AUDIO_BLOCK_SAMPLES * 4; i += 2) {
+  34              		.loc 1 35 5 view .LVU1
+  35              	.LBB2:
+  36              		.loc 1 35 10 view .LVU2
+  37              		.loc 1 35 14 is_stmt 0 view .LVU3
+  38 0000 0023     		movs	r3, #0
+  39              		.loc 1 35 5 view .LVU4
+  40 0002 12E0     		b	.L2
+  41              	.LVL1:
+  42              	.L3:
+  43              	.LBB3:
+  36:Core/Src/dsp_task.c ****         float s    = (float)(int16_t)buf[i] * vol;
+  44              		.loc 1 36 9 is_stmt 1 view .LVU5
+  45              		.loc 1 36 29 is_stmt 0 view .LVU6
+  46 0004 30F91320 		ldrsh	r2, [r0, r3, lsl #1]
+  47 0008 07EE902A 		vmov	s15, r2	@ int
+  48              		.loc 1 36 22 view .LVU7
+  49 000c F8EEE77A 		vcvt.f32.s32	s15, s15
+  50              		.loc 1 36 15 view .LVU8
+  51 0010 67EE807A 		vmul.f32	s15, s15, s0
+  52              	.LVL2:
+  37:Core/Src/dsp_task.c ****         buf[i]     = (uint16_t)(int16_t)s;
+  53              		.loc 1 37 9 is_stmt 1 view .LVU9
+  54              		.loc 1 37 32 is_stmt 0 view .LVU10
+  55 0014 FDEEE77A 		vcvt.s32.f32	s15, s15
+  56              	.LVL3:
+  57              		.loc 1 37 20 view .LVU11
+  58 0018 17EE902A 		vmov	r2, s15	@ int
+  59              	.LVL4:
+  60              		.loc 1 37 20 view .LVU12
+  61 001c 20F81320 		strh	r2, [r0, r3, lsl #1]	@ movhi
+  62              	.LVL5:
+  38:Core/Src/dsp_task.c ****         buf[i + 1] = 0;
+  63              		.loc 1 38 9 is_stmt 1 view .LVU13
+  64              		.loc 1 38 15 is_stmt 0 view .LVU14
+  65 0020 5A1C     		adds	r2, r3, #1
+  66              		.loc 1 38 20 view .LVU15
+  67 0022 0021     		movs	r1, #0
+  68 0024 20F81210 		strh	r1, [r0, r2, lsl #1]	@ movhi
+  69              	.LBE3:
+  35:Core/Src/dsp_task.c ****         float s    = (float)(int16_t)buf[i] * vol;
+  70              		.loc 1 35 52 is_stmt 1 discriminator 3 view .LVU16
+  71 0028 0233     		adds	r3, r3, #2
+  72              	.LVL6:
+  73              	.L2:
+  35:Core/Src/dsp_task.c ****         float s    = (float)(int16_t)buf[i] * vol;
+  74              		.loc 1 35 23 discriminator 1 view .LVU17
+  75 002a 3F2B     		cmp	r3, #63
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s 			page 3
+
+
+  76 002c EADD     		ble	.L3
+  77              	.LBE2:
+  39:Core/Src/dsp_task.c ****     }
+  40:Core/Src/dsp_task.c **** }
+  78              		.loc 1 40 1 is_stmt 0 view .LVU18
+  79 002e 7047     		bx	lr
+  80              		.cfi_endproc
+  81              	.LFE139:
+  83              		.section	.text.apply_lpf,"ax",%progbits
+  84              		.align	1
+  85              		.syntax unified
+  86              		.thumb
+  87              		.thumb_func
+  89              	apply_lpf:
+  90              	.LVL7:
+  91              	.LFB140:
+  41:Core/Src/dsp_task.c **** 
+  42:Core/Src/dsp_task.c **** /* First-order IIR: y[n] = alpha*x[n] + (1-alpha)*y[n-1]
+  43:Core/Src/dsp_task.c ****    alpha=1.0 is all-pass; alpha near 0 cuts more high frequencies.
+  44:Core/Src/dsp_task.c ****    24-bit layout: L_MSW at i, L_LSW at i+1, R_MSW at i+2, R_LSW at i+3; step by 4. */
+  45:Core/Src/dsp_task.c **** static void apply_lpf(uint16_t *buf, float alpha)
+  46:Core/Src/dsp_task.c **** {
+  92              		.loc 1 46 1 is_stmt 1 view -0
+  93              		.cfi_startproc
+  94              		@ args = 0, pretend = 0, frame = 0
+  95              		@ frame_needed = 0, uses_anonymous_args = 0
+  96              		@ link register save eliminated.
+  47:Core/Src/dsp_task.c ****     float beta = 1.0f - alpha;
+  97              		.loc 1 47 5 view .LVU20
+  98              		.loc 1 47 11 is_stmt 0 view .LVU21
+  99 0000 B7EE006A 		vmov.f32	s12, #1.0e+0
+ 100 0004 36EE406A 		vsub.f32	s12, s12, s0
+ 101              	.LVL8:
+  48:Core/Src/dsp_task.c ****     for (int i = 0; i < AUDIO_BLOCK_SAMPLES * 4; i += 4) {
+ 102              		.loc 1 48 5 is_stmt 1 view .LVU22
+ 103              	.LBB4:
+ 104              		.loc 1 48 10 view .LVU23
+ 105              		.loc 1 48 14 is_stmt 0 view .LVU24
+ 106 0008 0023     		movs	r3, #0
+ 107              		.loc 1 48 5 view .LVU25
+ 108 000a 37E0     		b	.L5
+ 109              	.LVL9:
+ 110              	.L6:
+ 111              	.LBB5:
+  49:Core/Src/dsp_task.c ****         float xL = (float)(int16_t)buf[i];
+ 112              		.loc 1 49 9 is_stmt 1 view .LVU26
+ 113              		.loc 1 49 27 is_stmt 0 view .LVU27
+ 114 000c 30F91320 		ldrsh	r2, [r0, r3, lsl #1]
+ 115 0010 07EE102A 		vmov	s14, r2	@ int
+ 116              		.loc 1 49 15 view .LVU28
+ 117 0014 B8EEC77A 		vcvt.f32.s32	s14, s14
+ 118              	.LVL10:
+  50:Core/Src/dsp_task.c ****         float xR = (float)(int16_t)buf[i + 2];
+ 119              		.loc 1 50 9 is_stmt 1 view .LVU29
+ 120              		.loc 1 50 42 is_stmt 0 view .LVU30
+ 121 0018 991C     		adds	r1, r3, #2
+ 122              		.loc 1 50 27 view .LVU31
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s 			page 4
+
+
+ 123 001a 30F91120 		ldrsh	r2, [r0, r1, lsl #1]
+ 124 001e 07EE902A 		vmov	s15, r2	@ int
+ 125              		.loc 1 50 15 view .LVU32
+ 126 0022 F8EEE77A 		vcvt.f32.s32	s15, s15
+ 127              	.LVL11:
+  51:Core/Src/dsp_task.c ****         lpf_L    = alpha * xL + beta * lpf_L;
+ 128              		.loc 1 51 9 is_stmt 1 view .LVU33
+ 129              		.loc 1 51 26 is_stmt 0 view .LVU34
+ 130 0026 20EE077A 		vmul.f32	s14, s0, s14
+ 131              	.LVL12:
+ 132              		.loc 1 51 38 view .LVU35
+ 133 002a 164A     		ldr	r2, .L7
+ 134 002c D2ED006A 		vldr.32	s13, [r2]
+ 135 0030 66EE266A 		vmul.f32	s13, s12, s13
+ 136              		.loc 1 51 31 view .LVU36
+ 137 0034 37EE267A 		vadd.f32	s14, s14, s13
+ 138              		.loc 1 51 18 view .LVU37
+ 139 0038 82ED007A 		vstr.32	s14, [r2]
+  52:Core/Src/dsp_task.c ****         lpf_R    = alpha * xR + beta * lpf_R;
+ 140              		.loc 1 52 9 is_stmt 1 view .LVU38
+ 141              		.loc 1 52 26 is_stmt 0 view .LVU39
+ 142 003c 60EE277A 		vmul.f32	s15, s0, s15
+ 143              	.LVL13:
+ 144              		.loc 1 52 38 view .LVU40
+ 145 0040 114A     		ldr	r2, .L7+4
+ 146 0042 D2ED006A 		vldr.32	s13, [r2]
+ 147 0046 66EE266A 		vmul.f32	s13, s12, s13
+ 148              		.loc 1 52 31 view .LVU41
+ 149 004a 77EEA67A 		vadd.f32	s15, s15, s13
+ 150              		.loc 1 52 18 view .LVU42
+ 151 004e C2ED007A 		vstr.32	s15, [r2]
+  53:Core/Src/dsp_task.c ****         buf[i]     = (uint16_t)(int16_t)lpf_L;
+ 152              		.loc 1 53 9 is_stmt 1 view .LVU43
+ 153              		.loc 1 53 32 is_stmt 0 view .LVU44
+ 154 0052 BDEEC77A 		vcvt.s32.f32	s14, s14
+ 155              		.loc 1 53 20 view .LVU45
+ 156 0056 17EE102A 		vmov	r2, s14	@ int
+ 157 005a 20F81320 		strh	r2, [r0, r3, lsl #1]	@ movhi
+ 158              	.LVL14:
+  54:Core/Src/dsp_task.c ****         buf[i + 1] = 0;
+ 159              		.loc 1 54 9 is_stmt 1 view .LVU46
+ 160              		.loc 1 54 15 is_stmt 0 view .LVU47
+ 161 005e 03F1010C 		add	ip, r3, #1
+ 162              		.loc 1 54 20 view .LVU48
+ 163 0062 0022     		movs	r2, #0
+ 164 0064 20F81C20 		strh	r2, [r0, ip, lsl #1]	@ movhi
+  55:Core/Src/dsp_task.c ****         buf[i + 2] = (uint16_t)(int16_t)lpf_R;
+ 165              		.loc 1 55 9 is_stmt 1 view .LVU49
+ 166              		.loc 1 55 32 is_stmt 0 view .LVU50
+ 167 0068 FDEEE77A 		vcvt.s32.f32	s15, s15
+ 168              		.loc 1 55 20 view .LVU51
+ 169 006c 17EE90CA 		vmov	ip, s15	@ int
+ 170 0070 20F811C0 		strh	ip, [r0, r1, lsl #1]	@ movhi
+ 171              	.LVL15:
+  56:Core/Src/dsp_task.c ****         buf[i + 3] = 0;
+ 172              		.loc 1 56 9 is_stmt 1 view .LVU52
+ 173              		.loc 1 56 15 is_stmt 0 view .LVU53
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s 			page 5
+
+
+ 174 0074 D91C     		adds	r1, r3, #3
+ 175              		.loc 1 56 20 view .LVU54
+ 176 0076 20F81120 		strh	r2, [r0, r1, lsl #1]	@ movhi
+ 177              	.LBE5:
+  48:Core/Src/dsp_task.c ****         float xL = (float)(int16_t)buf[i];
+ 178              		.loc 1 48 52 is_stmt 1 discriminator 3 view .LVU55
+ 179 007a 0433     		adds	r3, r3, #4
+ 180              	.LVL16:
+ 181              	.L5:
+  48:Core/Src/dsp_task.c ****         float xL = (float)(int16_t)buf[i];
+ 182              		.loc 1 48 23 discriminator 1 view .LVU56
+ 183 007c 3F2B     		cmp	r3, #63
+ 184 007e C5DD     		ble	.L6
+ 185              	.LBE4:
+  57:Core/Src/dsp_task.c ****     }
+  58:Core/Src/dsp_task.c **** }
+ 186              		.loc 1 58 1 is_stmt 0 view .LVU57
+ 187 0080 7047     		bx	lr
+ 188              	.L8:
+ 189 0082 00BF     		.align	2
+ 190              	.L7:
+ 191 0084 00000000 		.word	lpf_L
+ 192 0088 00000000 		.word	lpf_R
+ 193              		.cfi_endproc
+ 194              	.LFE140:
+ 196              		.section	.text.apply_delay,"ax",%progbits
+ 197              		.align	1
+ 198              		.syntax unified
+ 199              		.thumb
+ 200              		.thumb_func
+ 202              	apply_delay:
+ 203              	.LVL17:
+ 204              	.LFB141:
+  59:Core/Src/dsp_task.c **** 
+  60:Core/Src/dsp_task.c **** /* 70% dry + 30% wet feedback delay using a ring buffer.
+  61:Core/Src/dsp_task.c ****    24-bit layout: L_MSW at i, L_LSW at i+1, R_MSW at i+2, R_LSW at i+3; step by 4. */
+  62:Core/Src/dsp_task.c **** static void apply_delay(uint16_t *buf, uint16_t len)
+  63:Core/Src/dsp_task.c **** {
+ 205              		.loc 1 63 1 is_stmt 1 view -0
+ 206              		.cfi_startproc
+ 207              		@ args = 0, pretend = 0, frame = 0
+ 208              		@ frame_needed = 0, uses_anonymous_args = 0
+ 209              		.loc 1 63 1 is_stmt 0 view .LVU59
+ 210 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 211              		.cfi_def_cfa_offset 24
+ 212              		.cfi_offset 4, -24
+ 213              		.cfi_offset 5, -20
+ 214              		.cfi_offset 6, -16
+ 215              		.cfi_offset 7, -12
+ 216              		.cfi_offset 8, -8
+ 217              		.cfi_offset 14, -4
+  64:Core/Src/dsp_task.c ****     if (len == 0) len = 1;
+ 218              		.loc 1 64 5 is_stmt 1 view .LVU60
+ 219              		.loc 1 64 8 is_stmt 0 view .LVU61
+ 220 0004 0C46     		mov	r4, r1
+ 221 0006 01B9     		cbnz	r1, .L10
+ 222              		.loc 1 64 23 discriminator 1 view .LVU62
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s 			page 6
+
+
+ 223 0008 0124     		movs	r4, #1
+ 224              	.L10:
+ 225              	.LVL18:
+  65:Core/Src/dsp_task.c **** 
+  66:Core/Src/dsp_task.c ****     for (int i = 0; i < AUDIO_BLOCK_SAMPLES * 4; i += 4) {
+ 226              		.loc 1 66 5 is_stmt 1 view .LVU63
+ 227              	.LBB6:
+ 228              		.loc 1 66 10 view .LVU64
+ 229              		.loc 1 66 14 is_stmt 0 view .LVU65
+ 230 000a 4FF0000E 		mov	lr, #0
+ 231              		.loc 1 66 5 view .LVU66
+ 232 000e 5DE0     		b	.L11
+ 233              	.LVL19:
+ 234              	.L12:
+ 235              	.LBB7:
+  67:Core/Src/dsp_task.c ****         uint16_t rd    = (delay_wr + DELAY_BUF_SAMPLES - len) % DELAY_BUF_SAMPLES;
+ 236              		.loc 1 67 9 is_stmt 1 view .LVU67
+ 237              		.loc 1 67 36 is_stmt 0 view .LVU68
+ 238 0010 314E     		ldr	r6, .L15
+ 239 0012 3388     		ldrh	r3, [r6]
+ 240 0014 03F50072 		add	r2, r3, #512
+ 241              		.loc 1 67 56 view .LVU69
+ 242 0018 121B     		subs	r2, r2, r4
+ 243              		.loc 1 67 63 view .LVU70
+ 244 001a 5142     		rsbs	r1, r2, #0
+ 245 001c C2F30802 		ubfx	r2, r2, #0, #9
+ 246 0020 C1F30801 		ubfx	r1, r1, #0, #9
+ 247 0024 58BF     		it	pl
+ 248 0026 4A42     		rsbpl	r2, r1, #0
+ 249              	.LVL20:
+  68:Core/Src/dsp_task.c ****         int16_t  dryL  = (int16_t)buf[i];
+ 250              		.loc 1 68 9 is_stmt 1 view .LVU71
+ 251              		.loc 1 68 18 is_stmt 0 view .LVU72
+ 252 0028 30F91EC0 		ldrsh	ip, [r0, lr, lsl #1]
+ 253              	.LVL21:
+  69:Core/Src/dsp_task.c ****         int16_t  dryR  = (int16_t)buf[i + 2];
+ 254              		.loc 1 69 9 is_stmt 1 view .LVU73
+ 255              		.loc 1 69 41 is_stmt 0 view .LVU74
+ 256 002c 0EF10205 		add	r5, lr, #2
+ 257              		.loc 1 69 18 view .LVU75
+ 258 0030 30F91510 		ldrsh	r1, [r0, r5, lsl #1]
+ 259              	.LVL22:
+  70:Core/Src/dsp_task.c ****         int16_t  wetL  = delay_line_L[rd];
+ 260              		.loc 1 70 9 is_stmt 1 view .LVU76
+ 261 0034 92B2     		uxth	r2, r2
+ 262              		.loc 1 70 18 is_stmt 0 view .LVU77
+ 263 0036 DFF8B080 		ldr	r8, .L15+16
+ 264 003a 38F91270 		ldrsh	r7, [r8, r2, lsl #1]
+ 265 003e 06EE907A 		vmov	s13, r7	@ int
+ 266              	.LVL23:
+  71:Core/Src/dsp_task.c ****         int16_t  wetR  = delay_line_R[rd];
+ 267              		.loc 1 71 9 is_stmt 1 view .LVU78
+ 268              		.loc 1 71 18 is_stmt 0 view .LVU79
+ 269 0042 264F     		ldr	r7, .L15+4
+ 270 0044 37F91220 		ldrsh	r2, [r7, r2, lsl #1]
+ 271              	.LVL24:
+ 272              		.loc 1 71 18 view .LVU80
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s 			page 7
+
+
+ 273 0048 07EE102A 		vmov	s14, r2	@ int
+ 274              	.LVL25:
+  72:Core/Src/dsp_task.c **** 
+  73:Core/Src/dsp_task.c ****         delay_line_L[delay_wr] = dryL;
+ 275              		.loc 1 73 9 is_stmt 1 view .LVU81
+ 276              		.loc 1 73 32 is_stmt 0 view .LVU82
+ 277 004c 28F813C0 		strh	ip, [r8, r3, lsl #1]	@ movhi
+ 278              	.LVL26:
+  74:Core/Src/dsp_task.c ****         delay_line_R[delay_wr] = dryR;
+ 279              		.loc 1 74 9 is_stmt 1 view .LVU83
+ 280              		.loc 1 74 32 is_stmt 0 view .LVU84
+ 281 0050 27F81310 		strh	r1, [r7, r3, lsl #1]	@ movhi
+ 282              	.LVL27:
+  75:Core/Src/dsp_task.c ****         delay_wr = (delay_wr + 1) % DELAY_BUF_SAMPLES;
+ 283              		.loc 1 75 9 is_stmt 1 view .LVU85
+ 284              		.loc 1 75 30 is_stmt 0 view .LVU86
+ 285 0054 0133     		adds	r3, r3, #1
+ 286              	.LVL28:
+ 287              		.loc 1 75 35 view .LVU87
+ 288 0056 5A42     		rsbs	r2, r3, #0
+ 289              	.LVL29:
+ 290              		.loc 1 75 35 view .LVU88
+ 291 0058 C3F30803 		ubfx	r3, r3, #0, #9
+ 292              	.LVL30:
+ 293              		.loc 1 75 35 view .LVU89
+ 294 005c C2F30802 		ubfx	r2, r2, #0, #9
+ 295 0060 58BF     		it	pl
+ 296 0062 5342     		rsbpl	r3, r2, #0
+ 297              		.loc 1 75 18 view .LVU90
+ 298 0064 3380     		strh	r3, [r6]	@ movhi
+ 299              	.LVL31:
+  76:Core/Src/dsp_task.c **** 
+  77:Core/Src/dsp_task.c ****         buf[i]     = (uint16_t)(int16_t)(dryL * 0.7f + wetL * 0.3f);
+ 300              		.loc 1 77 9 is_stmt 1 view .LVU91
+ 301              		.loc 1 77 47 is_stmt 0 view .LVU92
+ 302 0066 07EE90CA 		vmov	s15, ip	@ int
+ 303 006a F8EEE77A 		vcvt.f32.s32	s15, s15
+ 304 006e DFED1C5A 		vldr.32	s11, .L15+8
+ 305 0072 67EEA57A 		vmul.f32	s15, s15, s11
+ 306              		.loc 1 77 61 view .LVU93
+ 307 0076 F8EEE66A 		vcvt.f32.s32	s13, s13
+ 308              	.LVL32:
+ 309              		.loc 1 77 61 view .LVU94
+ 310 007a 9FED1A6A 		vldr.32	s12, .L15+12
+ 311 007e 66EE866A 		vmul.f32	s13, s13, s12
+ 312              		.loc 1 77 54 view .LVU95
+ 313 0082 77EEA67A 		vadd.f32	s15, s15, s13
+ 314              		.loc 1 77 32 view .LVU96
+ 315 0086 FDEEE77A 		vcvt.s32.f32	s15, s15
+ 316              		.loc 1 77 20 view .LVU97
+ 317 008a 17EE903A 		vmov	r3, s15	@ int
+ 318 008e 20F81E30 		strh	r3, [r0, lr, lsl #1]	@ movhi
+  78:Core/Src/dsp_task.c ****         buf[i + 1] = 0;
+ 319              		.loc 1 78 9 is_stmt 1 view .LVU98
+ 320              		.loc 1 78 15 is_stmt 0 view .LVU99
+ 321 0092 0EF10102 		add	r2, lr, #1
+ 322              		.loc 1 78 20 view .LVU100
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s 			page 8
+
+
+ 323 0096 0023     		movs	r3, #0
+ 324 0098 20F81230 		strh	r3, [r0, r2, lsl #1]	@ movhi
+  79:Core/Src/dsp_task.c ****         buf[i + 2] = (uint16_t)(int16_t)(dryR * 0.7f + wetR * 0.3f);
+ 325              		.loc 1 79 9 is_stmt 1 view .LVU101
+ 326              		.loc 1 79 47 is_stmt 0 view .LVU102
+ 327 009c 07EE901A 		vmov	s15, r1	@ int
+ 328 00a0 F8EEE77A 		vcvt.f32.s32	s15, s15
+ 329 00a4 67EEA57A 		vmul.f32	s15, s15, s11
+ 330              		.loc 1 79 61 view .LVU103
+ 331 00a8 B8EEC77A 		vcvt.f32.s32	s14, s14
+ 332 00ac 27EE067A 		vmul.f32	s14, s14, s12
+ 333              		.loc 1 79 54 view .LVU104
+ 334 00b0 77EE877A 		vadd.f32	s15, s15, s14
+ 335              		.loc 1 79 32 view .LVU105
+ 336 00b4 FDEEE77A 		vcvt.s32.f32	s15, s15
+ 337              		.loc 1 79 20 view .LVU106
+ 338 00b8 17EE902A 		vmov	r2, s15	@ int
+ 339 00bc 20F81520 		strh	r2, [r0, r5, lsl #1]	@ movhi
+  80:Core/Src/dsp_task.c ****         buf[i + 3] = 0;
+ 340              		.loc 1 80 9 is_stmt 1 view .LVU107
+ 341              		.loc 1 80 15 is_stmt 0 view .LVU108
+ 342 00c0 0EF10302 		add	r2, lr, #3
+ 343              		.loc 1 80 20 view .LVU109
+ 344 00c4 20F81230 		strh	r3, [r0, r2, lsl #1]	@ movhi
+ 345              	.LBE7:
+  66:Core/Src/dsp_task.c ****         uint16_t rd    = (delay_wr + DELAY_BUF_SAMPLES - len) % DELAY_BUF_SAMPLES;
+ 346              		.loc 1 66 52 is_stmt 1 discriminator 3 view .LVU110
+ 347 00c8 0EF1040E 		add	lr, lr, #4
+ 348              	.LVL33:
+ 349              	.L11:
+  66:Core/Src/dsp_task.c ****         uint16_t rd    = (delay_wr + DELAY_BUF_SAMPLES - len) % DELAY_BUF_SAMPLES;
+ 350              		.loc 1 66 23 discriminator 1 view .LVU111
+ 351 00cc BEF13F0F 		cmp	lr, #63
+ 352 00d0 9EDD     		ble	.L12
+ 353              	.LBE6:
+  81:Core/Src/dsp_task.c ****     }
+  82:Core/Src/dsp_task.c **** }
+ 354              		.loc 1 82 1 is_stmt 0 view .LVU112
+ 355 00d2 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 356              	.LVL34:
+ 357              	.L16:
+ 358              		.loc 1 82 1 view .LVU113
+ 359 00d6 00BF     		.align	2
+ 360              	.L15:
+ 361 00d8 00000000 		.word	delay_wr
+ 362 00dc 00000000 		.word	delay_line_R
+ 363 00e0 3333333F 		.word	1060320051
+ 364 00e4 9A99993E 		.word	1050253722
+ 365 00e8 00000000 		.word	delay_line_L
+ 366              		.cfi_endproc
+ 367              	.LFE141:
+ 369              		.section	.text.StartDSPTask,"ax",%progbits
+ 370              		.align	1
+ 371              		.global	StartDSPTask
+ 372              		.syntax unified
+ 373              		.thumb
+ 374              		.thumb_func
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s 			page 9
+
+
+ 376              	StartDSPTask:
+ 377              	.LVL35:
+ 378              	.LFB142:
+  83:Core/Src/dsp_task.c **** 
+  84:Core/Src/dsp_task.c **** /* DSP task: highest priority.
+  85:Core/Src/dsp_task.c ****    Receives audio from PCM1808 ADC (I2S RX) and sends processed audio
+  86:Core/Src/dsp_task.c ****    to PCM5102A DAC (I2S TX) using full-duplex I2S3. One block of latency. */
+  87:Core/Src/dsp_task.c **** void StartDSPTask(void const *argument)
+  88:Core/Src/dsp_task.c **** {
+ 379              		.loc 1 88 1 is_stmt 1 view -0
+ 380              		.cfi_startproc
+ 381              		@ Volatile: function does not return.
+ 382              		@ args = 0, pretend = 0, frame = 16
+ 383              		@ frame_needed = 0, uses_anonymous_args = 0
+ 384              		.loc 1 88 1 is_stmt 0 view .LVU115
+ 385 0000 00B5     		push	{lr}
+ 386              		.cfi_def_cfa_offset 4
+ 387              		.cfi_offset 14, -4
+ 388 0002 87B0     		sub	sp, sp, #28
+ 389              		.cfi_def_cfa_offset 32
+  89:Core/Src/dsp_task.c ****     AudioEffectParams_t params;
+ 390              		.loc 1 89 5 is_stmt 1 view .LVU116
+  90:Core/Src/dsp_task.c **** 
+  91:Core/Src/dsp_task.c ****     memset(tx_buf, 0, sizeof(tx_buf));
+ 391              		.loc 1 91 5 view .LVU117
+ 392 0004 8022     		movs	r2, #128
+ 393 0006 0021     		movs	r1, #0
+ 394 0008 1F48     		ldr	r0, .L25
+ 395              	.LVL36:
+ 396              		.loc 1 91 5 is_stmt 0 view .LVU118
+ 397 000a FFF7FEFF 		bl	memset
+ 398              	.LVL37:
+ 399 000e 05E0     		b	.L20
+ 400              	.L18:
+  92:Core/Src/dsp_task.c **** 
+  93:Core/Src/dsp_task.c ****     for (;;) {
+  94:Core/Src/dsp_task.c ****         /* Transmit last processed block to DAC while receiving next block from ADC */
+  95:Core/Src/dsp_task.c ****         HAL_I2SEx_TransmitReceive(&hi2s3, tx_buf, rx_buf,
+  96:Core/Src/dsp_task.c ****                                   AUDIO_BLOCK_SAMPLES * 2, HAL_MAX_DELAY);
+  97:Core/Src/dsp_task.c **** 
+  98:Core/Src/dsp_task.c ****         /* Move raw ADC samples into the processing buffer */
+  99:Core/Src/dsp_task.c ****         memcpy(tx_buf, rx_buf, sizeof(rx_buf));
+ 100:Core/Src/dsp_task.c **** 
+ 101:Core/Src/dsp_task.c ****         /* Snapshot shared params so we hold the mutex as briefly as possible */
+ 102:Core/Src/dsp_task.c ****         osMutexWait(g_params_mutex, osWaitForever);
+ 103:Core/Src/dsp_task.c ****         params = g_audio_params;
+ 104:Core/Src/dsp_task.c ****         osMutexRelease(g_params_mutex);
+ 105:Core/Src/dsp_task.c **** 
+ 106:Core/Src/dsp_task.c ****         if (params.effects_mask & EFFECT_VOLUME)
+ 107:Core/Src/dsp_task.c ****             apply_volume(tx_buf, params.volume);
+ 108:Core/Src/dsp_task.c **** 
+ 109:Core/Src/dsp_task.c ****         if (params.effects_mask & EFFECT_LPF)
+ 401              		.loc 1 109 9 is_stmt 1 view .LVU119
+ 402              		.loc 1 109 12 is_stmt 0 view .LVU120
+ 403 0010 14F0020F 		tst	r4, #2
+ 404 0014 2BD1     		bne	.L23
+ 405              	.L19:
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s 			page 10
+
+
+ 110:Core/Src/dsp_task.c ****             apply_lpf(tx_buf, params.lpf_alpha);
+ 111:Core/Src/dsp_task.c **** 
+ 112:Core/Src/dsp_task.c ****         if (params.effects_mask & EFFECT_DELAY)
+ 406              		.loc 1 112 9 is_stmt 1 view .LVU121
+ 407              		.loc 1 112 12 is_stmt 0 view .LVU122
+ 408 0016 14F0040F 		tst	r4, #4
+ 409 001a 2ED1     		bne	.L24
+ 410              	.L20:
+  93:Core/Src/dsp_task.c ****         /* Transmit last processed block to DAC while receiving next block from ADC */
+ 411              		.loc 1 93 5 is_stmt 1 view .LVU123
+  95:Core/Src/dsp_task.c ****                                   AUDIO_BLOCK_SAMPLES * 2, HAL_MAX_DELAY);
+ 412              		.loc 1 95 9 view .LVU124
+ 413 001c 1B4E     		ldr	r6, .L25+4
+ 414 001e 1A4C     		ldr	r4, .L25
+ 415 0020 4FF0FF35 		mov	r5, #-1
+ 416 0024 0095     		str	r5, [sp]
+ 417 0026 2023     		movs	r3, #32
+ 418 0028 3246     		mov	r2, r6
+ 419 002a 2146     		mov	r1, r4
+ 420 002c 1848     		ldr	r0, .L25+8
+ 421 002e FFF7FEFF 		bl	HAL_I2SEx_TransmitReceive
+ 422              	.LVL38:
+  99:Core/Src/dsp_task.c **** 
+ 423              		.loc 1 99 9 view .LVU125
+ 424 0032 8022     		movs	r2, #128
+ 425 0034 3146     		mov	r1, r6
+ 426 0036 2046     		mov	r0, r4
+ 427 0038 FFF7FEFF 		bl	memcpy
+ 428              	.LVL39:
+ 102:Core/Src/dsp_task.c ****         params = g_audio_params;
+ 429              		.loc 1 102 9 view .LVU126
+ 430 003c 154C     		ldr	r4, .L25+12
+ 431 003e 2946     		mov	r1, r5
+ 432 0040 2068     		ldr	r0, [r4]
+ 433 0042 FFF7FEFF 		bl	osMutexWait
+ 434              	.LVL40:
+ 103:Core/Src/dsp_task.c ****         osMutexRelease(g_params_mutex);
+ 435              		.loc 1 103 9 view .LVU127
+ 103:Core/Src/dsp_task.c ****         osMutexRelease(g_params_mutex);
+ 436              		.loc 1 103 16 is_stmt 0 view .LVU128
+ 437 0046 144B     		ldr	r3, .L25+16
+ 438 0048 93E80700 		ldm	r3, {r0, r1, r2}
+ 439 004c 06AB     		add	r3, sp, #24
+ 440 004e 03E90700 		stmdb	r3, {r0, r1, r2}
+ 104:Core/Src/dsp_task.c **** 
+ 441              		.loc 1 104 9 is_stmt 1 view .LVU129
+ 442 0052 2068     		ldr	r0, [r4]
+ 443 0054 FFF7FEFF 		bl	osMutexRelease
+ 444              	.LVL41:
+ 106:Core/Src/dsp_task.c ****             apply_volume(tx_buf, params.volume);
+ 445              		.loc 1 106 9 view .LVU130
+ 106:Core/Src/dsp_task.c ****             apply_volume(tx_buf, params.volume);
+ 446              		.loc 1 106 19 is_stmt 0 view .LVU131
+ 447 0058 9DF81640 		ldrb	r4, [sp, #22]	@ zero_extendqisi2
+ 106:Core/Src/dsp_task.c ****             apply_volume(tx_buf, params.volume);
+ 448              		.loc 1 106 12 view .LVU132
+ 449 005c 14F0010F 		tst	r4, #1
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s 			page 11
+
+
+ 450 0060 D6D0     		beq	.L18
+ 107:Core/Src/dsp_task.c **** 
+ 451              		.loc 1 107 13 is_stmt 1 view .LVU133
+ 452 0062 9DED030A 		vldr.32	s0, [sp, #12]
+ 453 0066 0848     		ldr	r0, .L25
+ 454 0068 FFF7FEFF 		bl	apply_volume
+ 455              	.LVL42:
+ 456 006c D0E7     		b	.L18
+ 457              	.L23:
+ 110:Core/Src/dsp_task.c **** 
+ 458              		.loc 1 110 13 view .LVU134
+ 459 006e 9DED040A 		vldr.32	s0, [sp, #16]
+ 460 0072 0548     		ldr	r0, .L25
+ 461 0074 FFF7FEFF 		bl	apply_lpf
+ 462              	.LVL43:
+ 463 0078 CDE7     		b	.L19
+ 464              	.L24:
+ 113:Core/Src/dsp_task.c ****             apply_delay(tx_buf, params.delay_samples);
+ 465              		.loc 1 113 13 view .LVU135
+ 466 007a BDF81410 		ldrh	r1, [sp, #20]
+ 467 007e 0248     		ldr	r0, .L25
+ 468 0080 FFF7FEFF 		bl	apply_delay
+ 469              	.LVL44:
+ 470 0084 CAE7     		b	.L20
+ 471              	.L26:
+ 472 0086 00BF     		.align	2
+ 473              	.L25:
+ 474 0088 00000000 		.word	tx_buf
+ 475 008c 00000000 		.word	rx_buf
+ 476 0090 00000000 		.word	hi2s3
+ 477 0094 00000000 		.word	g_params_mutex
+ 478 0098 00000000 		.word	g_audio_params
+ 479              		.cfi_endproc
+ 480              	.LFE142:
+ 482              		.section	.bss.lpf_R,"aw",%nobits
+ 483              		.align	2
+ 486              	lpf_R:
+ 487 0000 00000000 		.space	4
+ 488              		.section	.bss.lpf_L,"aw",%nobits
+ 489              		.align	2
+ 492              	lpf_L:
+ 493 0000 00000000 		.space	4
+ 494              		.section	.bss.delay_wr,"aw",%nobits
+ 495              		.align	1
+ 498              	delay_wr:
+ 499 0000 0000     		.space	2
+ 500              		.section	.bss.delay_line_R,"aw",%nobits
+ 501              		.align	2
+ 504              	delay_line_R:
+ 505 0000 00000000 		.space	1024
+ 505      00000000 
+ 505      00000000 
+ 505      00000000 
+ 505      00000000 
+ 506              		.section	.bss.delay_line_L,"aw",%nobits
+ 507              		.align	2
+ 510              	delay_line_L:
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s 			page 12
+
+
+ 511 0000 00000000 		.space	1024
+ 511      00000000 
+ 511      00000000 
+ 511      00000000 
+ 511      00000000 
+ 512              		.section	.bss.tx_buf,"aw",%nobits
+ 513              		.align	2
+ 516              	tx_buf:
+ 517 0000 00000000 		.space	128
+ 517      00000000 
+ 517      00000000 
+ 517      00000000 
+ 517      00000000 
+ 518              		.section	.bss.rx_buf,"aw",%nobits
+ 519              		.align	2
+ 522              	rx_buf:
+ 523 0000 00000000 		.space	128
+ 523      00000000 
+ 523      00000000 
+ 523      00000000 
+ 523      00000000 
+ 524              		.global	g_params_mutex
+ 525              		.section	.bss.g_params_mutex,"aw",%nobits
+ 526              		.align	2
+ 529              	g_params_mutex:
+ 530 0000 00000000 		.space	4
+ 531              		.global	g_audio_params
+ 532              		.section	.data.g_audio_params,"aw"
+ 533              		.align	2
+ 536              	g_audio_params:
+ 537 0000 CDCC4C3F 		.word	1061997773
+ 538 0004 0000803F 		.word	1065353216
+ 539 0008 0001     		.short	256
+ 540 000a 01       		.byte	1
+ 541 000b 00       		.space	1
+ 542              		.text
+ 543              	.Letext0:
+ 544              		.file 2 "/Users/vibhasathishkumar/Library/Application Support/Code/User/globalStorage/bmd.stm32-fo
+ 545              		.file 3 "/Users/vibhasathishkumar/Library/Application Support/Code/User/globalStorage/bmd.stm32-fo
+ 546              		.file 4 "Middlewares/Third_Party/FreeRTOS/Source/include/queue.h"
+ 547              		.file 5 "Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h"
+ 548              		.file 6 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h"
+ 549              		.file 7 "Core/Inc/dsp_task.h"
+ 550              		.file 8 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
+ 551              		.file 9 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 552              		.file 10 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
+ 553              		.file 11 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2s.h"
+ 554              		.file 12 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2s_ex.h"
+ 555              		.file 13 "/Users/vibhasathishkumar/Library/Application Support/Code/User/globalStorage/bmd.stm32-f
+ 556              		.file 14 "<built-in>"
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s 			page 13
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 dsp_task.c
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:21     .text.apply_volume:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:26     .text.apply_volume:00000000 apply_volume
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:84     .text.apply_lpf:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:89     .text.apply_lpf:00000000 apply_lpf
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:191    .text.apply_lpf:00000084 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:492    .bss.lpf_L:00000000 lpf_L
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:486    .bss.lpf_R:00000000 lpf_R
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:197    .text.apply_delay:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:202    .text.apply_delay:00000000 apply_delay
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:361    .text.apply_delay:000000d8 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:498    .bss.delay_wr:00000000 delay_wr
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:504    .bss.delay_line_R:00000000 delay_line_R
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:510    .bss.delay_line_L:00000000 delay_line_L
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:370    .text.StartDSPTask:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:376    .text.StartDSPTask:00000000 StartDSPTask
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:474    .text.StartDSPTask:00000088 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:516    .bss.tx_buf:00000000 tx_buf
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:522    .bss.rx_buf:00000000 rx_buf
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:529    .bss.g_params_mutex:00000000 g_params_mutex
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:536    .data.g_audio_params:00000000 g_audio_params
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:483    .bss.lpf_R:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:489    .bss.lpf_L:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:495    .bss.delay_wr:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:501    .bss.delay_line_R:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:507    .bss.delay_line_L:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:513    .bss.tx_buf:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:519    .bss.rx_buf:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:526    .bss.g_params_mutex:00000000 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccW1Q8q4.s:533    .data.g_audio_params:00000000 $d
+
+UNDEFINED SYMBOLS
+memset
+HAL_I2SEx_TransmitReceive
+memcpy
+osMutexWait
+osMutexRelease
+hi2s3

@@ -1,0 +1,53 @@
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc9DBkyB.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"usbh_platform.c"
+  16              		.text
+  17              		.section	.text.MX_DriverVbusFS,"ax",%progbits
+  18              		.align	1
+  19              		.global	MX_DriverVbusFS
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  24              	MX_DriverVbusFS:
+  25              		@ args = 0, pretend = 0, frame = 0
+  26              		@ frame_needed = 0, uses_anonymous_args = 0
+  27 0000 08B5     		push	{r3, lr}
+  28 0002 0246     		mov	r2, r0
+  29 0004 00B1     		cbz	r0, .L2
+  30 0006 0122     		movs	r2, #1
+  31              	.L2:
+  32 0008 0121     		movs	r1, #1
+  33 000a 0248     		ldr	r0, .L5
+  34 000c FFF7FEFF 		bl	HAL_GPIO_WritePin
+  35 0010 08BD     		pop	{r3, pc}
+  36              	.L6:
+  37 0012 00BF     		.align	2
+  38              	.L5:
+  39 0014 00080240 		.word	1073874944
+  41              		.ident	"GCC: (xPack GNU Arm Embedded GCC arm64) 15.2.1 20251203"
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc9DBkyB.s 			page 2
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 usbh_platform.c
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc9DBkyB.s:18     .text.MX_DriverVbusFS:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc9DBkyB.s:24     .text.MX_DriverVbusFS:00000000 MX_DriverVbusFS
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//cc9DBkyB.s:39     .text.MX_DriverVbusFS:00000014 $d
+
+UNDEFINED SYMBOLS
+HAL_GPIO_WritePin

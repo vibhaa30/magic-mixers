@@ -1,0 +1,667 @@
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"usbh_conf.c"
+  16              		.text
+  17              		.section	.text.HAL_HCD_MspInit,"ax",%progbits
+  18              		.align	1
+  19              		.global	HAL_HCD_MspInit
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  24              	HAL_HCD_MspInit:
+  25              		@ args = 0, pretend = 0, frame = 32
+  26              		@ frame_needed = 0, uses_anonymous_args = 0
+  27 0000 30B5     		push	{r4, r5, lr}
+  28 0002 89B0     		sub	sp, sp, #36
+  29 0004 0023     		movs	r3, #0
+  30 0006 0393     		str	r3, [sp, #12]
+  31 0008 0493     		str	r3, [sp, #16]
+  32 000a 0593     		str	r3, [sp, #20]
+  33 000c 0693     		str	r3, [sp, #24]
+  34 000e 0793     		str	r3, [sp, #28]
+  35 0010 0368     		ldr	r3, [r0]
+  36 0012 B3F1A04F 		cmp	r3, #1342177280
+  37 0016 01D0     		beq	.L4
+  38              	.L1:
+  39 0018 09B0     		add	sp, sp, #36
+  40              		@ sp needed
+  41 001a 30BD     		pop	{r4, r5, pc}
+  42              	.L4:
+  43 001c 03AA     		add	r2, sp, #12
+  44 001e 0025     		movs	r5, #0
+  45 0020 0195     		str	r5, [sp, #4]
+  46 0022 1A4C     		ldr	r4, .L5
+  47 0024 236B     		ldr	r3, [r4, #48]
+  48 0026 43F00103 		orr	r3, r3, #1
+  49 002a 2363     		str	r3, [r4, #48]
+  50 002c 236B     		ldr	r3, [r4, #48]
+  51 002e 03F00103 		and	r3, r3, #1
+  52 0032 0193     		str	r3, [sp, #4]
+  53 0034 019B     		ldr	r3, [sp, #4]
+  54 0036 4FF40073 		mov	r3, #512
+  55 003a 0393     		str	r3, [sp, #12]
+  56 003c 1146     		mov	r1, r2
+  57 003e 1448     		ldr	r0, .L5+4
+  58 0040 FFF7FEFF 		bl	HAL_GPIO_Init
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s 			page 2
+
+
+  59 0044 4FF4E053 		mov	r3, #7168
+  60 0048 0393     		str	r3, [sp, #12]
+  61 004a 0223     		movs	r3, #2
+  62 004c 0493     		str	r3, [sp, #16]
+  63 004e 0595     		str	r5, [sp, #20]
+  64 0050 0695     		str	r5, [sp, #24]
+  65 0052 0A23     		movs	r3, #10
+  66 0054 0793     		str	r3, [sp, #28]
+  67 0056 03A9     		add	r1, sp, #12
+  68 0058 0D48     		ldr	r0, .L5+4
+  69 005a FFF7FEFF 		bl	HAL_GPIO_Init
+  70 005e 636B     		ldr	r3, [r4, #52]
+  71 0060 43F08003 		orr	r3, r3, #128
+  72 0064 6363     		str	r3, [r4, #52]
+  73 0066 0295     		str	r5, [sp, #8]
+  74 0068 636C     		ldr	r3, [r4, #68]
+  75 006a 43F48043 		orr	r3, r3, #16384
+  76 006e 6364     		str	r3, [r4, #68]
+  77 0070 636C     		ldr	r3, [r4, #68]
+  78 0072 03F48043 		and	r3, r3, #16384
+  79 0076 0293     		str	r3, [sp, #8]
+  80 0078 029B     		ldr	r3, [sp, #8]
+  81 007a 2A46     		mov	r2, r5
+  82 007c 0521     		movs	r1, #5
+  83 007e 4320     		movs	r0, #67
+  84 0080 FFF7FEFF 		bl	HAL_NVIC_SetPriority
+  85 0084 4320     		movs	r0, #67
+  86 0086 FFF7FEFF 		bl	HAL_NVIC_EnableIRQ
+  87 008a C5E7     		b	.L1
+  88              	.L6:
+  89              		.align	2
+  90              	.L5:
+  91 008c 00380240 		.word	1073887232
+  92 0090 00000240 		.word	1073872896
+  94              		.section	.text.HAL_HCD_MspDeInit,"ax",%progbits
+  95              		.align	1
+  96              		.global	HAL_HCD_MspDeInit
+  97              		.syntax unified
+  98              		.thumb
+  99              		.thumb_func
+ 101              	HAL_HCD_MspDeInit:
+ 102              		@ args = 0, pretend = 0, frame = 0
+ 103              		@ frame_needed = 0, uses_anonymous_args = 0
+ 104 0000 08B5     		push	{r3, lr}
+ 105 0002 0368     		ldr	r3, [r0]
+ 106 0004 B3F1A04F 		cmp	r3, #1342177280
+ 107 0008 00D0     		beq	.L10
+ 108              	.L7:
+ 109 000a 08BD     		pop	{r3, pc}
+ 110              	.L10:
+ 111 000c 064A     		ldr	r2, .L11
+ 112 000e 536B     		ldr	r3, [r2, #52]
+ 113 0010 23F08003 		bic	r3, r3, #128
+ 114 0014 5363     		str	r3, [r2, #52]
+ 115 0016 4FF4F051 		mov	r1, #7680
+ 116 001a 0448     		ldr	r0, .L11+4
+ 117 001c FFF7FEFF 		bl	HAL_GPIO_DeInit
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s 			page 3
+
+
+ 118 0020 4320     		movs	r0, #67
+ 119 0022 FFF7FEFF 		bl	HAL_NVIC_DisableIRQ
+ 120 0026 F0E7     		b	.L7
+ 121              	.L12:
+ 122              		.align	2
+ 123              	.L11:
+ 124 0028 00380240 		.word	1073887232
+ 125 002c 00000240 		.word	1073872896
+ 127              		.section	.text.HAL_HCD_SOF_Callback,"ax",%progbits
+ 128              		.align	1
+ 129              		.global	HAL_HCD_SOF_Callback
+ 130              		.syntax unified
+ 131              		.thumb
+ 132              		.thumb_func
+ 134              	HAL_HCD_SOF_Callback:
+ 135              		@ args = 0, pretend = 0, frame = 0
+ 136              		@ frame_needed = 0, uses_anonymous_args = 0
+ 137 0000 08B5     		push	{r3, lr}
+ 138 0002 D0F8DC03 		ldr	r0, [r0, #988]
+ 139 0006 FFF7FEFF 		bl	USBH_LL_IncTimer
+ 140 000a 08BD     		pop	{r3, pc}
+ 142              		.section	.text.HAL_HCD_Connect_Callback,"ax",%progbits
+ 143              		.align	1
+ 144              		.global	HAL_HCD_Connect_Callback
+ 145              		.syntax unified
+ 146              		.thumb
+ 147              		.thumb_func
+ 149              	HAL_HCD_Connect_Callback:
+ 150              		@ args = 0, pretend = 0, frame = 0
+ 151              		@ frame_needed = 0, uses_anonymous_args = 0
+ 152 0000 08B5     		push	{r3, lr}
+ 153 0002 D0F8DC03 		ldr	r0, [r0, #988]
+ 154 0006 FFF7FEFF 		bl	USBH_LL_Connect
+ 155 000a 08BD     		pop	{r3, pc}
+ 157              		.section	.text.HAL_HCD_Disconnect_Callback,"ax",%progbits
+ 158              		.align	1
+ 159              		.global	HAL_HCD_Disconnect_Callback
+ 160              		.syntax unified
+ 161              		.thumb
+ 162              		.thumb_func
+ 164              	HAL_HCD_Disconnect_Callback:
+ 165              		@ args = 0, pretend = 0, frame = 0
+ 166              		@ frame_needed = 0, uses_anonymous_args = 0
+ 167 0000 08B5     		push	{r3, lr}
+ 168 0002 D0F8DC03 		ldr	r0, [r0, #988]
+ 169 0006 FFF7FEFF 		bl	USBH_LL_Disconnect
+ 170 000a 08BD     		pop	{r3, pc}
+ 172              		.section	.text.HAL_HCD_HC_NotifyURBChange_Callback,"ax",%progbits
+ 173              		.align	1
+ 174              		.global	HAL_HCD_HC_NotifyURBChange_Callback
+ 175              		.syntax unified
+ 176              		.thumb
+ 177              		.thumb_func
+ 179              	HAL_HCD_HC_NotifyURBChange_Callback:
+ 180              		@ args = 0, pretend = 0, frame = 0
+ 181              		@ frame_needed = 0, uses_anonymous_args = 0
+ 182 0000 08B5     		push	{r3, lr}
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s 			page 4
+
+
+ 183 0002 D0F8DC03 		ldr	r0, [r0, #988]
+ 184 0006 FFF7FEFF 		bl	USBH_LL_NotifyURBChange
+ 185 000a 08BD     		pop	{r3, pc}
+ 187              		.section	.text.HAL_HCD_PortEnabled_Callback,"ax",%progbits
+ 188              		.align	1
+ 189              		.global	HAL_HCD_PortEnabled_Callback
+ 190              		.syntax unified
+ 191              		.thumb
+ 192              		.thumb_func
+ 194              	HAL_HCD_PortEnabled_Callback:
+ 195              		@ args = 0, pretend = 0, frame = 0
+ 196              		@ frame_needed = 0, uses_anonymous_args = 0
+ 197 0000 08B5     		push	{r3, lr}
+ 198 0002 D0F8DC03 		ldr	r0, [r0, #988]
+ 199 0006 FFF7FEFF 		bl	USBH_LL_PortEnabled
+ 200 000a 08BD     		pop	{r3, pc}
+ 202              		.section	.text.HAL_HCD_PortDisabled_Callback,"ax",%progbits
+ 203              		.align	1
+ 204              		.global	HAL_HCD_PortDisabled_Callback
+ 205              		.syntax unified
+ 206              		.thumb
+ 207              		.thumb_func
+ 209              	HAL_HCD_PortDisabled_Callback:
+ 210              		@ args = 0, pretend = 0, frame = 0
+ 211              		@ frame_needed = 0, uses_anonymous_args = 0
+ 212 0000 08B5     		push	{r3, lr}
+ 213 0002 D0F8DC03 		ldr	r0, [r0, #988]
+ 214 0006 FFF7FEFF 		bl	USBH_LL_PortDisabled
+ 215 000a 08BD     		pop	{r3, pc}
+ 217              		.section	.text.USBH_LL_Init,"ax",%progbits
+ 218              		.align	1
+ 219              		.global	USBH_LL_Init
+ 220              		.syntax unified
+ 221              		.thumb
+ 222              		.thumb_func
+ 224              	USBH_LL_Init:
+ 225              		@ args = 0, pretend = 0, frame = 0
+ 226              		@ frame_needed = 0, uses_anonymous_args = 0
+ 227 0000 90F8CC33 		ldrb	r3, [r0, #972]	@ zero_extendqisi2
+ 228 0004 012B     		cmp	r3, #1
+ 229 0006 01D0     		beq	.L32
+ 230 0008 0020     		movs	r0, #0
+ 231 000a 7047     		bx	lr
+ 232              	.L32:
+ 233 000c 10B5     		push	{r4, lr}
+ 234 000e 0446     		mov	r4, r0
+ 235 0010 0F48     		ldr	r0, .L34
+ 236 0012 C0F8DC43 		str	r4, [r0, #988]
+ 237 0016 C4F8D003 		str	r0, [r4, #976]
+ 238 001a 4FF0A043 		mov	r3, #1342177280
+ 239 001e 0360     		str	r3, [r0]
+ 240 0020 0823     		movs	r3, #8
+ 241 0022 4371     		strb	r3, [r0, #5]
+ 242 0024 0123     		movs	r3, #1
+ 243 0026 C371     		strb	r3, [r0, #7]
+ 244 0028 0023     		movs	r3, #0
+ 245 002a 8371     		strb	r3, [r0, #6]
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s 			page 5
+
+
+ 246 002c 0222     		movs	r2, #2
+ 247 002e 4272     		strb	r2, [r0, #9]
+ 248 0030 8372     		strb	r3, [r0, #10]
+ 249 0032 FFF7FEFF 		bl	HAL_HCD_Init
+ 250 0036 40B9     		cbnz	r0, .L33
+ 251              	.L27:
+ 252 0038 0548     		ldr	r0, .L34
+ 253 003a FFF7FEFF 		bl	HAL_HCD_GetCurrentFrame
+ 254 003e 0146     		mov	r1, r0
+ 255 0040 2046     		mov	r0, r4
+ 256 0042 FFF7FEFF 		bl	USBH_LL_SetTimer
+ 257 0046 0020     		movs	r0, #0
+ 258 0048 10BD     		pop	{r4, pc}
+ 259              	.L33:
+ 260 004a FFF7FEFF 		bl	Error_Handler
+ 261 004e F3E7     		b	.L27
+ 262              	.L35:
+ 263              		.align	2
+ 264              	.L34:
+ 265 0050 00000000 		.word	hhcd_USB_OTG_FS
+ 267              		.section	.text.USBH_LL_GetSpeed,"ax",%progbits
+ 268              		.align	1
+ 269              		.global	USBH_LL_GetSpeed
+ 270              		.syntax unified
+ 271              		.thumb
+ 272              		.thumb_func
+ 274              	USBH_LL_GetSpeed:
+ 275              		@ args = 0, pretend = 0, frame = 0
+ 276              		@ frame_needed = 0, uses_anonymous_args = 0
+ 277 0000 08B5     		push	{r3, lr}
+ 278 0002 D0F8D003 		ldr	r0, [r0, #976]
+ 279 0006 FFF7FEFF 		bl	HAL_HCD_GetCurrentSpeed
+ 280 000a 0128     		cmp	r0, #1
+ 281 000c 04D0     		beq	.L38
+ 282 000e 0228     		cmp	r0, #2
+ 283 0010 04D0     		beq	.L39
+ 284 0012 20B1     		cbz	r0, .L37
+ 285 0014 0120     		movs	r0, #1
+ 286 0016 02E0     		b	.L37
+ 287              	.L38:
+ 288 0018 0120     		movs	r0, #1
+ 289 001a 00E0     		b	.L37
+ 290              	.L39:
+ 291 001c 0220     		movs	r0, #2
+ 292              	.L37:
+ 293 001e 08BD     		pop	{r3, pc}
+ 295              		.section	.text.USBH_LL_GetLastXferSize,"ax",%progbits
+ 296              		.align	1
+ 297              		.global	USBH_LL_GetLastXferSize
+ 298              		.syntax unified
+ 299              		.thumb
+ 300              		.thumb_func
+ 302              	USBH_LL_GetLastXferSize:
+ 303              		@ args = 0, pretend = 0, frame = 0
+ 304              		@ frame_needed = 0, uses_anonymous_args = 0
+ 305 0000 08B5     		push	{r3, lr}
+ 306 0002 D0F8D003 		ldr	r0, [r0, #976]
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s 			page 6
+
+
+ 307 0006 FFF7FEFF 		bl	HAL_HCD_HC_GetXferCount
+ 308 000a 08BD     		pop	{r3, pc}
+ 310              		.section	.text.USBH_LL_ClosePipe,"ax",%progbits
+ 311              		.align	1
+ 312              		.global	USBH_LL_ClosePipe
+ 313              		.syntax unified
+ 314              		.thumb
+ 315              		.thumb_func
+ 317              	USBH_LL_ClosePipe:
+ 318              		@ args = 0, pretend = 0, frame = 0
+ 319              		@ frame_needed = 0, uses_anonymous_args = 0
+ 320              		@ link register save eliminated.
+ 321 0000 0020     		movs	r0, #0
+ 322 0002 7047     		bx	lr
+ 324              		.section	.text.USBH_LL_ActivatePipe,"ax",%progbits
+ 325              		.align	1
+ 326              		.global	USBH_LL_ActivatePipe
+ 327              		.syntax unified
+ 328              		.thumb
+ 329              		.thumb_func
+ 331              	USBH_LL_ActivatePipe:
+ 332              		@ args = 0, pretend = 0, frame = 0
+ 333              		@ frame_needed = 0, uses_anonymous_args = 0
+ 334              		@ link register save eliminated.
+ 335 0000 0020     		movs	r0, #0
+ 336 0002 7047     		bx	lr
+ 338              		.section	.text.USBH_LL_GetURBState,"ax",%progbits
+ 339              		.align	1
+ 340              		.global	USBH_LL_GetURBState
+ 341              		.syntax unified
+ 342              		.thumb
+ 343              		.thumb_func
+ 345              	USBH_LL_GetURBState:
+ 346              		@ args = 0, pretend = 0, frame = 0
+ 347              		@ frame_needed = 0, uses_anonymous_args = 0
+ 348 0000 08B5     		push	{r3, lr}
+ 349 0002 D0F8D003 		ldr	r0, [r0, #976]
+ 350 0006 FFF7FEFF 		bl	HAL_HCD_HC_GetURBState
+ 351 000a 08BD     		pop	{r3, pc}
+ 353              		.section	.text.USBH_LL_DriverVBUS,"ax",%progbits
+ 354              		.align	1
+ 355              		.global	USBH_LL_DriverVBUS
+ 356              		.syntax unified
+ 357              		.thumb
+ 358              		.thumb_func
+ 360              	USBH_LL_DriverVBUS:
+ 361              		@ args = 0, pretend = 0, frame = 0
+ 362              		@ frame_needed = 0, uses_anonymous_args = 0
+ 363 0000 08B5     		push	{r3, lr}
+ 364 0002 90F8CC33 		ldrb	r3, [r0, #972]	@ zero_extendqisi2
+ 365 0006 012B     		cmp	r3, #1
+ 366 0008 04D0     		beq	.L51
+ 367              	.L49:
+ 368 000a C820     		movs	r0, #200
+ 369 000c FFF7FEFF 		bl	HAL_Delay
+ 370 0010 0020     		movs	r0, #0
+ 371 0012 08BD     		pop	{r3, pc}
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s 			page 7
+
+
+ 372              	.L51:
+ 373 0014 0846     		mov	r0, r1
+ 374 0016 FFF7FEFF 		bl	MX_DriverVbusFS
+ 375 001a F6E7     		b	.L49
+ 377              		.section	.text.USBH_LL_SetToggle,"ax",%progbits
+ 378              		.align	1
+ 379              		.global	USBH_LL_SetToggle
+ 380              		.syntax unified
+ 381              		.thumb
+ 382              		.thumb_func
+ 384              	USBH_LL_SetToggle:
+ 385              		@ args = 0, pretend = 0, frame = 0
+ 386              		@ frame_needed = 0, uses_anonymous_args = 0
+ 387              		@ link register save eliminated.
+ 388 0000 D0F8D033 		ldr	r3, [r0, #976]
+ 389 0004 C1EB0110 		rsb	r0, r1, r1, lsl #4
+ 390 0008 03EB8000 		add	r0, r3, r0, lsl #2
+ 391 000c C07D     		ldrb	r0, [r0, #23]	@ zero_extendqisi2
+ 392 000e 38B1     		cbz	r0, .L53
+ 393 0010 C1EB0111 		rsb	r1, r1, r1, lsl #4
+ 394 0014 03EB8103 		add	r3, r3, r1, lsl #2
+ 395 0018 83F83C20 		strb	r2, [r3, #60]
+ 396              	.L54:
+ 397 001c 0020     		movs	r0, #0
+ 398 001e 7047     		bx	lr
+ 399              	.L53:
+ 400 0020 C1EB0111 		rsb	r1, r1, r1, lsl #4
+ 401 0024 03EB8103 		add	r3, r3, r1, lsl #2
+ 402 0028 83F83D20 		strb	r2, [r3, #61]
+ 403 002c F6E7     		b	.L54
+ 405              		.section	.text.USBH_LL_GetToggle,"ax",%progbits
+ 406              		.align	1
+ 407              		.global	USBH_LL_GetToggle
+ 408              		.syntax unified
+ 409              		.thumb
+ 410              		.thumb_func
+ 412              	USBH_LL_GetToggle:
+ 413              		@ args = 0, pretend = 0, frame = 0
+ 414              		@ frame_needed = 0, uses_anonymous_args = 0
+ 415              		@ link register save eliminated.
+ 416 0000 D0F8D033 		ldr	r3, [r0, #976]
+ 417 0004 C1EB0112 		rsb	r2, r1, r1, lsl #4
+ 418 0008 03EB8202 		add	r2, r3, r2, lsl #2
+ 419 000c D27D     		ldrb	r2, [r2, #23]	@ zero_extendqisi2
+ 420 000e 32B1     		cbz	r2, .L56
+ 421 0010 C1EB0111 		rsb	r1, r1, r1, lsl #4
+ 422 0014 03EB8103 		add	r3, r3, r1, lsl #2
+ 423 0018 93F83C00 		ldrb	r0, [r3, #60]	@ zero_extendqisi2
+ 424 001c 7047     		bx	lr
+ 425              	.L56:
+ 426 001e C1EB0111 		rsb	r1, r1, r1, lsl #4
+ 427 0022 03EB8103 		add	r3, r3, r1, lsl #2
+ 428 0026 93F83D00 		ldrb	r0, [r3, #61]	@ zero_extendqisi2
+ 429 002a 7047     		bx	lr
+ 431              		.section	.text.USBH_Delay,"ax",%progbits
+ 432              		.align	1
+ 433              		.global	USBH_Delay
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s 			page 8
+
+
+ 434              		.syntax unified
+ 435              		.thumb
+ 436              		.thumb_func
+ 438              	USBH_Delay:
+ 439              		@ args = 0, pretend = 0, frame = 0
+ 440              		@ frame_needed = 0, uses_anonymous_args = 0
+ 441 0000 08B5     		push	{r3, lr}
+ 442 0002 FFF7FEFF 		bl	HAL_Delay
+ 443 0006 08BD     		pop	{r3, pc}
+ 445              		.section	.text.USBH_Get_USB_Status,"ax",%progbits
+ 446              		.align	1
+ 447              		.global	USBH_Get_USB_Status
+ 448              		.syntax unified
+ 449              		.thumb
+ 450              		.thumb_func
+ 452              	USBH_Get_USB_Status:
+ 453              		@ args = 0, pretend = 0, frame = 0
+ 454              		@ frame_needed = 0, uses_anonymous_args = 0
+ 455              		@ link register save eliminated.
+ 456 0000 0228     		cmp	r0, #2
+ 457 0002 04D0     		beq	.L62
+ 458 0004 05D8     		bhi	.L63
+ 459 0006 08B1     		cbz	r0, .L65
+ 460 0008 0220     		movs	r0, #2
+ 461 000a 7047     		bx	lr
+ 462              	.L65:
+ 463 000c 7047     		bx	lr
+ 464              	.L62:
+ 465 000e 0120     		movs	r0, #1
+ 466 0010 7047     		bx	lr
+ 467              	.L63:
+ 468 0012 0220     		movs	r0, #2
+ 469 0014 7047     		bx	lr
+ 471              		.section	.text.USBH_LL_DeInit,"ax",%progbits
+ 472              		.align	1
+ 473              		.global	USBH_LL_DeInit
+ 474              		.syntax unified
+ 475              		.thumb
+ 476              		.thumb_func
+ 478              	USBH_LL_DeInit:
+ 479              		@ args = 0, pretend = 0, frame = 0
+ 480              		@ frame_needed = 0, uses_anonymous_args = 0
+ 481 0000 08B5     		push	{r3, lr}
+ 482 0002 D0F8D003 		ldr	r0, [r0, #976]
+ 483 0006 FFF7FEFF 		bl	HAL_HCD_DeInit
+ 484 000a FFF7FEFF 		bl	USBH_Get_USB_Status
+ 485 000e 08BD     		pop	{r3, pc}
+ 487              		.section	.text.USBH_LL_Start,"ax",%progbits
+ 488              		.align	1
+ 489              		.global	USBH_LL_Start
+ 490              		.syntax unified
+ 491              		.thumb
+ 492              		.thumb_func
+ 494              	USBH_LL_Start:
+ 495              		@ args = 0, pretend = 0, frame = 0
+ 496              		@ frame_needed = 0, uses_anonymous_args = 0
+ 497 0000 08B5     		push	{r3, lr}
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s 			page 9
+
+
+ 498 0002 D0F8D003 		ldr	r0, [r0, #976]
+ 499 0006 FFF7FEFF 		bl	HAL_HCD_Start
+ 500 000a FFF7FEFF 		bl	USBH_Get_USB_Status
+ 501 000e 08BD     		pop	{r3, pc}
+ 503              		.section	.text.USBH_LL_Stop,"ax",%progbits
+ 504              		.align	1
+ 505              		.global	USBH_LL_Stop
+ 506              		.syntax unified
+ 507              		.thumb
+ 508              		.thumb_func
+ 510              	USBH_LL_Stop:
+ 511              		@ args = 0, pretend = 0, frame = 0
+ 512              		@ frame_needed = 0, uses_anonymous_args = 0
+ 513 0000 08B5     		push	{r3, lr}
+ 514 0002 D0F8D003 		ldr	r0, [r0, #976]
+ 515 0006 FFF7FEFF 		bl	HAL_HCD_Stop
+ 516 000a FFF7FEFF 		bl	USBH_Get_USB_Status
+ 517 000e 08BD     		pop	{r3, pc}
+ 519              		.section	.text.USBH_LL_ResetPort,"ax",%progbits
+ 520              		.align	1
+ 521              		.global	USBH_LL_ResetPort
+ 522              		.syntax unified
+ 523              		.thumb
+ 524              		.thumb_func
+ 526              	USBH_LL_ResetPort:
+ 527              		@ args = 0, pretend = 0, frame = 0
+ 528              		@ frame_needed = 0, uses_anonymous_args = 0
+ 529 0000 08B5     		push	{r3, lr}
+ 530 0002 D0F8D003 		ldr	r0, [r0, #976]
+ 531 0006 FFF7FEFF 		bl	HAL_HCD_ResetPort
+ 532 000a FFF7FEFF 		bl	USBH_Get_USB_Status
+ 533 000e 08BD     		pop	{r3, pc}
+ 535              		.section	.text.USBH_LL_OpenPipe,"ax",%progbits
+ 536              		.align	1
+ 537              		.global	USBH_LL_OpenPipe
+ 538              		.syntax unified
+ 539              		.thumb
+ 540              		.thumb_func
+ 542              	USBH_LL_OpenPipe:
+ 543              		@ args = 12, pretend = 0, frame = 0
+ 544              		@ frame_needed = 0, uses_anonymous_args = 0
+ 545 0000 00B5     		push	{lr}
+ 546 0002 85B0     		sub	sp, sp, #20
+ 547 0004 D0F8D003 		ldr	r0, [r0, #976]
+ 548 0008 BDF820C0 		ldrh	ip, [sp, #32]
+ 549 000c CDF808C0 		str	ip, [sp, #8]
+ 550 0010 9DF81CC0 		ldrb	ip, [sp, #28]	@ zero_extendqisi2
+ 551 0014 CDF804C0 		str	ip, [sp, #4]
+ 552 0018 9DF818C0 		ldrb	ip, [sp, #24]	@ zero_extendqisi2
+ 553 001c CDF800C0 		str	ip, [sp]
+ 554 0020 FFF7FEFF 		bl	HAL_HCD_HC_Init
+ 555 0024 FFF7FEFF 		bl	USBH_Get_USB_Status
+ 556 0028 05B0     		add	sp, sp, #20
+ 557              		@ sp needed
+ 558 002a 00BD     		pop	{pc}
+ 560              		.section	.text.USBH_LL_SubmitURB,"ax",%progbits
+ 561              		.align	1
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s 			page 10
+
+
+ 562              		.global	USBH_LL_SubmitURB
+ 563              		.syntax unified
+ 564              		.thumb
+ 565              		.thumb_func
+ 567              	USBH_LL_SubmitURB:
+ 568              		@ args = 16, pretend = 0, frame = 0
+ 569              		@ frame_needed = 0, uses_anonymous_args = 0
+ 570 0000 10B5     		push	{r4, lr}
+ 571 0002 84B0     		sub	sp, sp, #16
+ 572 0004 D0F8D003 		ldr	r0, [r0, #976]
+ 573 0008 9DF824C0 		ldrb	ip, [sp, #36]	@ zero_extendqisi2
+ 574 000c CDF80CC0 		str	ip, [sp, #12]
+ 575 0010 BDF820C0 		ldrh	ip, [sp, #32]
+ 576 0014 CDF808C0 		str	ip, [sp, #8]
+ 577 0018 079C     		ldr	r4, [sp, #28]
+ 578 001a 0194     		str	r4, [sp, #4]
+ 579 001c 9DF818C0 		ldrb	ip, [sp, #24]	@ zero_extendqisi2
+ 580 0020 CDF800C0 		str	ip, [sp]
+ 581 0024 FFF7FEFF 		bl	HAL_HCD_HC_SubmitRequest
+ 582 0028 FFF7FEFF 		bl	USBH_Get_USB_Status
+ 583 002c 04B0     		add	sp, sp, #16
+ 584              		@ sp needed
+ 585 002e 10BD     		pop	{r4, pc}
+ 587              		.global	hhcd_USB_OTG_FS
+ 588              		.section	.bss.hhcd_USB_OTG_FS,"aw",%nobits
+ 589              		.align	2
+ 592              	hhcd_USB_OTG_FS:
+ 593 0000 00000000 		.space	992
+ 593      00000000 
+ 593      00000000 
+ 593      00000000 
+ 593      00000000 
+ 594              		.ident	"GCC: (xPack GNU Arm Embedded GCC arm64) 15.2.1 20251203"
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s 			page 11
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 usbh_conf.c
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:18     .text.HAL_HCD_MspInit:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:24     .text.HAL_HCD_MspInit:00000000 HAL_HCD_MspInit
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:91     .text.HAL_HCD_MspInit:0000008c $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:95     .text.HAL_HCD_MspDeInit:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:101    .text.HAL_HCD_MspDeInit:00000000 HAL_HCD_MspDeInit
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:124    .text.HAL_HCD_MspDeInit:00000028 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:128    .text.HAL_HCD_SOF_Callback:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:134    .text.HAL_HCD_SOF_Callback:00000000 HAL_HCD_SOF_Callback
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:143    .text.HAL_HCD_Connect_Callback:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:149    .text.HAL_HCD_Connect_Callback:00000000 HAL_HCD_Connect_Callback
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:158    .text.HAL_HCD_Disconnect_Callback:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:164    .text.HAL_HCD_Disconnect_Callback:00000000 HAL_HCD_Disconnect_Callback
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:173    .text.HAL_HCD_HC_NotifyURBChange_Callback:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:179    .text.HAL_HCD_HC_NotifyURBChange_Callback:00000000 HAL_HCD_HC_NotifyURBChange_Callback
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:188    .text.HAL_HCD_PortEnabled_Callback:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:194    .text.HAL_HCD_PortEnabled_Callback:00000000 HAL_HCD_PortEnabled_Callback
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:203    .text.HAL_HCD_PortDisabled_Callback:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:209    .text.HAL_HCD_PortDisabled_Callback:00000000 HAL_HCD_PortDisabled_Callback
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:218    .text.USBH_LL_Init:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:224    .text.USBH_LL_Init:00000000 USBH_LL_Init
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:265    .text.USBH_LL_Init:00000050 $d
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:592    .bss.hhcd_USB_OTG_FS:00000000 hhcd_USB_OTG_FS
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:268    .text.USBH_LL_GetSpeed:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:274    .text.USBH_LL_GetSpeed:00000000 USBH_LL_GetSpeed
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:296    .text.USBH_LL_GetLastXferSize:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:302    .text.USBH_LL_GetLastXferSize:00000000 USBH_LL_GetLastXferSize
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:311    .text.USBH_LL_ClosePipe:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:317    .text.USBH_LL_ClosePipe:00000000 USBH_LL_ClosePipe
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:325    .text.USBH_LL_ActivatePipe:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:331    .text.USBH_LL_ActivatePipe:00000000 USBH_LL_ActivatePipe
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:339    .text.USBH_LL_GetURBState:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:345    .text.USBH_LL_GetURBState:00000000 USBH_LL_GetURBState
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:354    .text.USBH_LL_DriverVBUS:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:360    .text.USBH_LL_DriverVBUS:00000000 USBH_LL_DriverVBUS
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:378    .text.USBH_LL_SetToggle:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:384    .text.USBH_LL_SetToggle:00000000 USBH_LL_SetToggle
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:406    .text.USBH_LL_GetToggle:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:412    .text.USBH_LL_GetToggle:00000000 USBH_LL_GetToggle
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:432    .text.USBH_Delay:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:438    .text.USBH_Delay:00000000 USBH_Delay
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:446    .text.USBH_Get_USB_Status:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:452    .text.USBH_Get_USB_Status:00000000 USBH_Get_USB_Status
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:472    .text.USBH_LL_DeInit:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:478    .text.USBH_LL_DeInit:00000000 USBH_LL_DeInit
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:488    .text.USBH_LL_Start:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:494    .text.USBH_LL_Start:00000000 USBH_LL_Start
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:504    .text.USBH_LL_Stop:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:510    .text.USBH_LL_Stop:00000000 USBH_LL_Stop
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:520    .text.USBH_LL_ResetPort:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:526    .text.USBH_LL_ResetPort:00000000 USBH_LL_ResetPort
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:536    .text.USBH_LL_OpenPipe:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:542    .text.USBH_LL_OpenPipe:00000000 USBH_LL_OpenPipe
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:561    .text.USBH_LL_SubmitURB:00000000 $t
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:567    .text.USBH_LL_SubmitURB:00000000 USBH_LL_SubmitURB
+/var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s:589    .bss.hhcd_USB_OTG_FS:00000000 $d
+ARM GAS  /var/folders/kf/d797ysj14bb1pb7szkr3jbx80000gn/T//ccaqgLa5.s 			page 12
+
+
+
+UNDEFINED SYMBOLS
+HAL_GPIO_Init
+HAL_NVIC_SetPriority
+HAL_NVIC_EnableIRQ
+HAL_GPIO_DeInit
+HAL_NVIC_DisableIRQ
+USBH_LL_IncTimer
+USBH_LL_Connect
+USBH_LL_Disconnect
+USBH_LL_NotifyURBChange
+USBH_LL_PortEnabled
+USBH_LL_PortDisabled
+HAL_HCD_Init
+HAL_HCD_GetCurrentFrame
+USBH_LL_SetTimer
+Error_Handler
+HAL_HCD_GetCurrentSpeed
+HAL_HCD_HC_GetXferCount
+HAL_HCD_HC_GetURBState
+HAL_Delay
+MX_DriverVbusFS
+HAL_HCD_DeInit
+HAL_HCD_Start
+HAL_HCD_Stop
+HAL_HCD_ResetPort
+HAL_HCD_HC_Init
+HAL_HCD_HC_SubmitRequest
