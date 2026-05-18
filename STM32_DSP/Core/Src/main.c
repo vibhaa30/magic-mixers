@@ -50,11 +50,24 @@ DMA_HandleTypeDef hdma_spi3_tx;
 
 SPI_HandleTypeDef hspi1;
 SPI_HandleTypeDef hspi2;
+DMA_HandleTypeDef hdma_spi2_rx;
 
 osThreadId defaultTaskHandle;
 /* USER CODE BEGIN PV */
 osThreadId dspTaskHandle;
 osThreadId spiTaskHandle;
+osSemaphoreId spiSemHandle;
+DMA_HandleTypeDef hdma_i2s3_ext_rx;
+DMA_HandleTypeDef hdma_spi3_tx;
+
+uint8_t spi_rx_buf[2];
+// uint8_t test_buf[2];
+// volatile uint8_t spi_done = 0;
+volatile uint8_t gesture = 0;
+volatile uint8_t intensity = 0;
+// volatile uint8_t store[100];
+// volatile uint8_t store_idx = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -116,15 +129,20 @@ int main(void)
   MX_SPI1_Init();
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_SPI_Receive_DMA(&hspi2, spi_rx_buf, 2);
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
-  /* add mutexes, ... */
+  osMutexDef(paramsMutex);
+  g_params_mutex = osMutexCreate(osMutex(paramsMutex));
   /* USER CODE END RTOS_MUTEX */
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
+    osSemaphoreDef(spiSem);
+    spiSemHandle = osSemaphoreCreate(osSemaphore(spiSem), 1);
+    // osSemaphoreWait(spiSemHandle, 0); // start locked
+
   /* USER CODE END RTOS_SEMAPHORES */
 
   /* USER CODE BEGIN RTOS_TIMERS */
@@ -144,8 +162,11 @@ int main(void)
   osThreadDef(dspTask, StartDSPTask, osPriorityRealtime, 0, 512);
   dspTaskHandle = osThreadCreate(osThread(dspTask), NULL);
 
-  osThreadDef(spiTask, StartSPITask, osPriorityAboveNormal, 0, 256);
+  osThreadDef(spiTask, StartSPITask, osPriorityAboveNormal, 0, 512);
   spiTaskHandle = osThreadCreate(osThread(spiTask), NULL);
+
+
+
   /* USER CODE END RTOS_THREADS */
 
   /* Start scheduler */
@@ -337,7 +358,7 @@ static void MX_SPI2_Init(void)
   hspi2.Init.DataSize = SPI_DATASIZE_8BIT;
   hspi2.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi2.Init.CLKPhase = SPI_PHASE_1EDGE;
-  hspi2.Init.NSS = SPI_NSS_SOFT;
+  hspi2.Init.NSS = SPI_NSS_HARD_INPUT;
   hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -365,6 +386,9 @@ static void MX_DMA_Init(void)
   /* DMA1_Stream0_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
+  /* DMA1_Stream3_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream3_IRQn);
   /* DMA1_Stream5_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn);
@@ -484,7 +508,21 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
+{
+    if (hspi->Instance == SPI2)
+    {
+        gesture = spi_rx_buf[0];
+        // gesture =1;
+        intensity = spi_rx_buf[1];
 
+        HAL_GPIO_TogglePin(GPIOD, LD6_Pin);
+
+        osSemaphoreRelease(spiSemHandle);
+
+        HAL_SPI_Receive_DMA(&hspi2, spi_rx_buf, 2);
+    }
+}
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -500,7 +538,8 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
+    osDelay(500);
   }
   /* USER CODE END 5 */
 }

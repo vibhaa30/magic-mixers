@@ -2,6 +2,14 @@
 #define SPI_TASK_H
 
 #include "cmsis_os.h"
+#include "main.h"
+
+extern osSemaphoreId spiSemHandle;
+
+extern uint8_t spi_rx_buf[2];
+
+extern volatile uint8_t gesture;
+extern volatile uint8_t intensity;
 
 /* 3-byte packet format from Raspberry Pi: [CMD] [VAL_HI] [VAL_LO] */
 #define SPI_PKT_SIZE        3

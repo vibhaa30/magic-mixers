@@ -150,5 +150,7 @@ void StartDSPTask(void const *argument)
 
         if (params.effects_mask & EFFECT_DELAY)
             apply_delay(tx_half, params.delay_samples);
+        
+        osDelay(1);
     }
 }

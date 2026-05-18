@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 1
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 1
   28:Core/Src/dsp_task.c **** 
   29:Core/Src/dsp_task.c **** /* Per-channel IIR state */
   30:Core/Src/dsp_task.c **** static float lpf_L = 0.0f;
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 2
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s 			page 2
 
 
   31:Core/Src/dsp_task.c **** static float lpf_R = 0.0f;
@@ -118,7 +118,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 1
   54              		.loc 1 59 32 is_stmt 0 view .LVU10
   55 0014 FDEEE77A 		vcvt.s32.f32	s15, s15
   56              	.LVL3:
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 3
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s 			page 3
 
 
   57              		.loc 1 59 20 view .LVU11
@@ -178,7 +178,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 1
  101              	.LVL8:
   70:Core/Src/dsp_task.c ****     for (int i = 0; i < HALF_BUF_LEN; i += 4) {
  102              		.loc 1 70 5 is_stmt 1 view .LVU22
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 4
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s 			page 4
 
 
  103              	.LBB4:
@@ -238,7 +238,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 1
  152              		.loc 1 75 9 is_stmt 1 view .LVU43
  153              		.loc 1 75 32 is_stmt 0 view .LVU44
  154 0052 BDEEC77A 		vcvt.s32.f32	s14, s14
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 5
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s 			page 5
 
 
  155              		.loc 1 75 20 view .LVU45
@@ -298,7 +298,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 1
  204              	.LFB143:
   81:Core/Src/dsp_task.c **** 
   82:Core/Src/dsp_task.c **** /* 70% dry + 30% wet feedback delay using a ring buffer.
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 6
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s 			page 6
 
 
   83:Core/Src/dsp_task.c ****    24-bit layout: L_MSW at i, L_LSW at i+1, R_MSW at i+2, R_LSW at i+3; step by 4. */
@@ -358,7 +358,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 1
  251              		.loc 1 90 18 is_stmt 0 view .LVU72
  252 0028 30F91EC0 		ldrsh	ip, [r0, lr, lsl #1]
  253              	.LVL21:
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 7
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s 			page 7
 
 
   91:Core/Src/dsp_task.c ****         int16_t  dryR  = (int16_t)buf[i + 2];
@@ -418,7 +418,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 1
   99:Core/Src/dsp_task.c ****         buf[i]     = (uint16_t)(int16_t)(dryL * 0.7f + wetL * 0.3f);
  300              		.loc 1 99 9 is_stmt 1 view .LVU91
  301              		.loc 1 99 47 is_stmt 0 view .LVU92
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 8
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s 			page 8
 
 
  302 0066 07EE90CA 		vmov	s15, ip	@ int
@@ -478,7 +478,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 1
  351 00cc BEF13F0F 		cmp	lr, #63
  352 00d0 9EDD     		ble	.L12
  353              	.LBE6:
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 9
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s 			page 9
 
 
  103:Core/Src/dsp_task.c ****     }
@@ -538,7 +538,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 1
  401              		.loc 1 45 1 view .LVU120
  402 0012 08BD     		pop	{r3, pc}
  403              	.L20:
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 10
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s 			page 10
 
 
  404              		.align	2
@@ -598,7 +598,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 1
  454              		.global	StartDSPTask
  455              		.syntax unified
  456              		.thumb
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 11
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s 			page 11
 
 
  457              		.thumb_func
@@ -638,12 +638,12 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 1
  477 0004 FFF7FEFF 		bl	osThreadGetId
  478              	.LVL42:
  479              		.loc 1 119 17 discriminator 1 view .LVU133
- 480 0008 244B     		ldr	r3, .L31
+ 480 0008 254B     		ldr	r3, .L30
  481 000a 1860     		str	r0, [r3]
  120:Core/Src/dsp_task.c **** 
  121:Core/Src/dsp_task.c ****     memset(tx_dma_buf, 0, sizeof(tx_dma_buf));
  482              		.loc 1 121 5 is_stmt 1 view .LVU134
- 483 000c 244C     		ldr	r4, .L31+4
+ 483 000c 254C     		ldr	r4, .L30+4
  484 000e 4FF48072 		mov	r2, #256
  485 0012 0021     		movs	r1, #0
  486 0014 2046     		mov	r0, r4
@@ -657,15 +657,15 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 1
  127:Core/Src/dsp_task.c ****     HAL_I2SEx_TransmitReceive_DMA(&hi2s3, tx_dma_buf, rx_dma_buf,
  489              		.loc 1 127 5 view .LVU135
  490 001a 8023     		movs	r3, #128
- 491 001c 214A     		ldr	r2, .L31+8
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 12
+ 491 001c 224A     		ldr	r2, .L30+8
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s 			page 12
 
 
  492 001e 2146     		mov	r1, r4
- 493 0020 2148     		ldr	r0, .L31+12
+ 493 0020 2248     		ldr	r0, .L30+12
  494 0022 FFF7FEFF 		bl	HAL_I2SEx_TransmitReceive_DMA
  495              	.LVL44:
- 496 0026 02E0     		b	.L27
+ 496 0026 0AE0     		b	.L28
  497              	.LVL45:
  498              	.L26:
  499              	.LBB8:
@@ -696,253 +696,262 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 1
  500              		.loc 1 151 9 view .LVU136
  501              		.loc 1 151 12 is_stmt 0 view .LVU137
  502 0028 15F0040F 		tst	r5, #4
- 503 002c 30D1     		bne	.L30
- 504              	.LVL46:
- 505              	.L27:
- 506              		.loc 1 151 12 view .LVU138
- 507              	.LBE8:
- 130:Core/Src/dsp_task.c ****         osSignalWait(SIG_DMA_RDY, osWaitForever);
- 508              		.loc 1 130 5 is_stmt 1 view .LVU139
- 509              	.LBB9:
- 131:Core/Src/dsp_task.c **** 
- 510              		.loc 1 131 9 view .LVU140
- 511 002e 4FF0FF32 		mov	r2, #-1
- 512 0032 0121     		movs	r1, #1
- 513 0034 6846     		mov	r0, sp
- 514 0036 FFF7FEFF 		bl	osSignalWait
- 515              	.LVL47:
- 134:Core/Src/dsp_task.c ****         uint16_t *rx_half = &rx_dma_buf[half * HALF_BUF_LEN];
- 516              		.loc 1 134 9 view .LVU141
- 134:Core/Src/dsp_task.c ****         uint16_t *rx_half = &rx_dma_buf[half * HALF_BUF_LEN];
- 517              		.loc 1 134 19 is_stmt 0 view .LVU142
- 518 003a 1C4B     		ldr	r3, .L31+16
- 519 003c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
- 520              	.LVL48:
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 13
-
-
- 135:Core/Src/dsp_task.c ****         uint16_t *tx_half = &tx_dma_buf[half * HALF_BUF_LEN];
- 521              		.loc 1 135 9 is_stmt 1 view .LVU143
- 136:Core/Src/dsp_task.c **** 
- 522              		.loc 1 136 9 view .LVU144
- 136:Core/Src/dsp_task.c **** 
- 523              		.loc 1 136 19 is_stmt 0 view .LVU145
- 524 003e 184C     		ldr	r4, .L31+4
- 525 0040 04EBC314 		add	r4, r4, r3, lsl #7
- 526              	.LVL49:
- 139:Core/Src/dsp_task.c **** 
- 527              		.loc 1 139 9 is_stmt 1 view .LVU146
- 528 0044 8022     		movs	r2, #128
- 529 0046 1749     		ldr	r1, .L31+8
- 530 0048 01EBC311 		add	r1, r1, r3, lsl #7
- 531              	.LVL50:
- 139:Core/Src/dsp_task.c **** 
- 532              		.loc 1 139 9 is_stmt 0 view .LVU147
- 533 004c 2046     		mov	r0, r4
- 534 004e FFF7FEFF 		bl	memcpy
- 535              	.LVL51:
- 141:Core/Src/dsp_task.c ****         params = g_audio_params;
- 536              		.loc 1 141 9 is_stmt 1 view .LVU148
- 537 0052 174D     		ldr	r5, .L31+20
- 538 0054 4FF0FF31 		mov	r1, #-1
- 539 0058 2868     		ldr	r0, [r5]
- 540 005a FFF7FEFF 		bl	osMutexWait
- 541              	.LVL52:
- 142:Core/Src/dsp_task.c ****         osMutexRelease(g_params_mutex);
- 542              		.loc 1 142 9 view .LVU149
- 142:Core/Src/dsp_task.c ****         osMutexRelease(g_params_mutex);
- 543              		.loc 1 142 16 is_stmt 0 view .LVU150
- 544 005e 154B     		ldr	r3, .L31+24
- 545 0060 93E80700 		ldm	r3, {r0, r1, r2}
- 546 0064 08AB     		add	r3, sp, #32
- 547 0066 03E90700 		stmdb	r3, {r0, r1, r2}
- 143:Core/Src/dsp_task.c ****         // params.effects_mask & EFFECT_VOLUME
- 548              		.loc 1 143 9 is_stmt 1 view .LVU151
- 549 006a 2868     		ldr	r0, [r5]
- 550 006c FFF7FEFF 		bl	osMutexRelease
- 551              	.LVL53:
- 145:Core/Src/dsp_task.c ****             apply_volume(tx_half, params.volume);
- 552              		.loc 1 145 9 view .LVU152
- 146:Core/Src/dsp_task.c ****             
- 553              		.loc 1 146 13 view .LVU153
- 554 0070 9DED050A 		vldr.32	s0, [sp, #20]
- 555 0074 2046     		mov	r0, r4
- 556 0076 FFF7FEFF 		bl	apply_volume
- 557              	.LVL54:
- 148:Core/Src/dsp_task.c ****             apply_lpf(tx_half, params.lpf_alpha);
- 558              		.loc 1 148 9 view .LVU154
- 148:Core/Src/dsp_task.c ****             apply_lpf(tx_half, params.lpf_alpha);
- 559              		.loc 1 148 19 is_stmt 0 view .LVU155
- 560 007a 9DF81E50 		ldrb	r5, [sp, #30]	@ zero_extendqisi2
- 148:Core/Src/dsp_task.c ****             apply_lpf(tx_half, params.lpf_alpha);
- 561              		.loc 1 148 12 view .LVU156
- 562 007e 15F0020F 		tst	r5, #2
- 563 0082 D1D0     		beq	.L26
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 14
-
-
- 149:Core/Src/dsp_task.c **** 
- 564              		.loc 1 149 13 is_stmt 1 view .LVU157
- 565 0084 9DED060A 		vldr.32	s0, [sp, #24]
- 566 0088 2046     		mov	r0, r4
- 567 008a FFF7FEFF 		bl	apply_lpf
- 568              	.LVL55:
- 569 008e CBE7     		b	.L26
- 570              	.L30:
+ 503 002c 04D0     		beq	.L27
  152:Core/Src/dsp_task.c ****             apply_delay(tx_half, params.delay_samples);
- 571              		.loc 1 152 13 view .LVU158
- 572 0090 BDF81C10 		ldrh	r1, [sp, #28]
- 573 0094 2046     		mov	r0, r4
- 574 0096 FFF7FEFF 		bl	apply_delay
- 575              	.LVL56:
- 576 009a C8E7     		b	.L27
- 577              	.L32:
- 578              		.align	2
+ 504              		.loc 1 152 13 is_stmt 1 view .LVU138
+ 505 002e BDF81C10 		ldrh	r1, [sp, #28]
+ 506 0032 2046     		mov	r0, r4
+ 507 0034 FFF7FEFF 		bl	apply_delay
+ 508              	.LVL46:
+ 509              	.L27:
+ 153:Core/Src/dsp_task.c ****         
+ 154:Core/Src/dsp_task.c ****         osDelay(1);
+ 510              		.loc 1 154 9 view .LVU139
+ 511 0038 0120     		movs	r0, #1
+ 512 003a FFF7FEFF 		bl	osDelay
+ 513              	.LVL47:
+ 514              	.LBE8:
+ 130:Core/Src/dsp_task.c ****         osSignalWait(SIG_DMA_RDY, osWaitForever);
+ 515              		.loc 1 130 5 view .LVU140
+ 516              	.L28:
+ 130:Core/Src/dsp_task.c ****         osSignalWait(SIG_DMA_RDY, osWaitForever);
+ 517              		.loc 1 130 5 view .LVU141
+ 518              	.LBB9:
+ 131:Core/Src/dsp_task.c **** 
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s 			page 13
+
+
+ 519              		.loc 1 131 9 view .LVU142
+ 520 003e 4FF0FF32 		mov	r2, #-1
+ 521 0042 0121     		movs	r1, #1
+ 522 0044 6846     		mov	r0, sp
+ 523 0046 FFF7FEFF 		bl	osSignalWait
+ 524              	.LVL48:
+ 134:Core/Src/dsp_task.c ****         uint16_t *rx_half = &rx_dma_buf[half * HALF_BUF_LEN];
+ 525              		.loc 1 134 9 view .LVU143
+ 134:Core/Src/dsp_task.c ****         uint16_t *rx_half = &rx_dma_buf[half * HALF_BUF_LEN];
+ 526              		.loc 1 134 19 is_stmt 0 view .LVU144
+ 527 004a 194B     		ldr	r3, .L30+16
+ 528 004c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 529              	.LVL49:
+ 135:Core/Src/dsp_task.c ****         uint16_t *tx_half = &tx_dma_buf[half * HALF_BUF_LEN];
+ 530              		.loc 1 135 9 is_stmt 1 view .LVU145
+ 136:Core/Src/dsp_task.c **** 
+ 531              		.loc 1 136 9 view .LVU146
+ 136:Core/Src/dsp_task.c **** 
+ 532              		.loc 1 136 19 is_stmt 0 view .LVU147
+ 533 004e 154C     		ldr	r4, .L30+4
+ 534 0050 04EBC314 		add	r4, r4, r3, lsl #7
+ 535              	.LVL50:
+ 139:Core/Src/dsp_task.c **** 
+ 536              		.loc 1 139 9 is_stmt 1 view .LVU148
+ 537 0054 8022     		movs	r2, #128
+ 538 0056 1449     		ldr	r1, .L30+8
+ 539 0058 01EBC311 		add	r1, r1, r3, lsl #7
+ 540              	.LVL51:
+ 139:Core/Src/dsp_task.c **** 
+ 541              		.loc 1 139 9 is_stmt 0 view .LVU149
+ 542 005c 2046     		mov	r0, r4
+ 543 005e FFF7FEFF 		bl	memcpy
+ 544              	.LVL52:
+ 141:Core/Src/dsp_task.c ****         params = g_audio_params;
+ 545              		.loc 1 141 9 is_stmt 1 view .LVU150
+ 546 0062 144D     		ldr	r5, .L30+20
+ 547 0064 4FF0FF31 		mov	r1, #-1
+ 548 0068 2868     		ldr	r0, [r5]
+ 549 006a FFF7FEFF 		bl	osMutexWait
+ 550              	.LVL53:
+ 142:Core/Src/dsp_task.c ****         osMutexRelease(g_params_mutex);
+ 551              		.loc 1 142 9 view .LVU151
+ 142:Core/Src/dsp_task.c ****         osMutexRelease(g_params_mutex);
+ 552              		.loc 1 142 16 is_stmt 0 view .LVU152
+ 553 006e 124B     		ldr	r3, .L30+24
+ 554 0070 93E80700 		ldm	r3, {r0, r1, r2}
+ 555 0074 08AB     		add	r3, sp, #32
+ 556 0076 03E90700 		stmdb	r3, {r0, r1, r2}
+ 143:Core/Src/dsp_task.c ****         // params.effects_mask & EFFECT_VOLUME
+ 557              		.loc 1 143 9 is_stmt 1 view .LVU153
+ 558 007a 2868     		ldr	r0, [r5]
+ 559 007c FFF7FEFF 		bl	osMutexRelease
+ 560              	.LVL54:
+ 145:Core/Src/dsp_task.c ****             apply_volume(tx_half, params.volume);
+ 561              		.loc 1 145 9 view .LVU154
+ 146:Core/Src/dsp_task.c ****             
+ 562              		.loc 1 146 13 view .LVU155
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s 			page 14
+
+
+ 563 0080 9DED050A 		vldr.32	s0, [sp, #20]
+ 564 0084 2046     		mov	r0, r4
+ 565 0086 FFF7FEFF 		bl	apply_volume
+ 566              	.LVL55:
+ 148:Core/Src/dsp_task.c ****             apply_lpf(tx_half, params.lpf_alpha);
+ 567              		.loc 1 148 9 view .LVU156
+ 148:Core/Src/dsp_task.c ****             apply_lpf(tx_half, params.lpf_alpha);
+ 568              		.loc 1 148 19 is_stmt 0 view .LVU157
+ 569 008a 9DF81E50 		ldrb	r5, [sp, #30]	@ zero_extendqisi2
+ 148:Core/Src/dsp_task.c ****             apply_lpf(tx_half, params.lpf_alpha);
+ 570              		.loc 1 148 12 view .LVU158
+ 571 008e 15F0020F 		tst	r5, #2
+ 572 0092 C9D0     		beq	.L26
+ 149:Core/Src/dsp_task.c **** 
+ 573              		.loc 1 149 13 is_stmt 1 view .LVU159
+ 574 0094 9DED060A 		vldr.32	s0, [sp, #24]
+ 575 0098 2046     		mov	r0, r4
+ 576 009a FFF7FEFF 		bl	apply_lpf
+ 577              	.LVL56:
+ 578 009e C3E7     		b	.L26
  579              	.L31:
- 580 009c 00000000 		.word	dsp_task_id
- 581 00a0 00000000 		.word	tx_dma_buf
- 582 00a4 00000000 		.word	rx_dma_buf
- 583 00a8 00000000 		.word	hi2s3
- 584 00ac 00000000 		.word	active_half
- 585 00b0 00000000 		.word	g_params_mutex
- 586 00b4 00000000 		.word	g_audio_params
- 587              	.LBE9:
- 588              		.cfi_endproc
- 589              	.LFE144:
- 591              		.section	.bss.dsp_task_id,"aw",%nobits
- 592              		.align	2
- 595              	dsp_task_id:
- 596 0000 00000000 		.space	4
- 597              		.section	.bss.active_half,"aw",%nobits
- 600              	active_half:
- 601 0000 00       		.space	1
- 602              		.section	.bss.lpf_R,"aw",%nobits
- 603              		.align	2
- 606              	lpf_R:
- 607 0000 00000000 		.space	4
- 608              		.section	.bss.lpf_L,"aw",%nobits
- 609              		.align	2
- 612              	lpf_L:
- 613 0000 00000000 		.space	4
- 614              		.section	.bss.delay_wr,"aw",%nobits
- 615              		.align	1
- 618              	delay_wr:
- 619 0000 0000     		.space	2
- 620              		.section	.bss.delay_line_R,"aw",%nobits
- 621              		.align	2
- 624              	delay_line_R:
- 625 0000 00000000 		.space	1024
- 625      00000000 
- 625      00000000 
- 625      00000000 
- 625      00000000 
- 626              		.section	.bss.delay_line_L,"aw",%nobits
- 627              		.align	2
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 15
+ 580              		.align	2
+ 581              	.L30:
+ 582 00a0 00000000 		.word	dsp_task_id
+ 583 00a4 00000000 		.word	tx_dma_buf
+ 584 00a8 00000000 		.word	rx_dma_buf
+ 585 00ac 00000000 		.word	hi2s3
+ 586 00b0 00000000 		.word	active_half
+ 587 00b4 00000000 		.word	g_params_mutex
+ 588 00b8 00000000 		.word	g_audio_params
+ 589              	.LBE9:
+ 590              		.cfi_endproc
+ 591              	.LFE144:
+ 593              		.section	.bss.dsp_task_id,"aw",%nobits
+ 594              		.align	2
+ 597              	dsp_task_id:
+ 598 0000 00000000 		.space	4
+ 599              		.section	.bss.active_half,"aw",%nobits
+ 602              	active_half:
+ 603 0000 00       		.space	1
+ 604              		.section	.bss.lpf_R,"aw",%nobits
+ 605              		.align	2
+ 608              	lpf_R:
+ 609 0000 00000000 		.space	4
+ 610              		.section	.bss.lpf_L,"aw",%nobits
+ 611              		.align	2
+ 614              	lpf_L:
+ 615 0000 00000000 		.space	4
+ 616              		.section	.bss.delay_wr,"aw",%nobits
+ 617              		.align	1
+ 620              	delay_wr:
+ 621 0000 0000     		.space	2
+ 622              		.section	.bss.delay_line_R,"aw",%nobits
+ 623              		.align	2
+ 626              	delay_line_R:
+ 627 0000 00000000 		.space	1024
+ 627      00000000 
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s 			page 15
 
 
- 630              	delay_line_L:
- 631 0000 00000000 		.space	1024
- 631      00000000 
- 631      00000000 
- 631      00000000 
- 631      00000000 
- 632              		.section	.bss.tx_dma_buf,"aw",%nobits
- 633              		.align	2
- 636              	tx_dma_buf:
- 637 0000 00000000 		.space	256
- 637      00000000 
- 637      00000000 
- 637      00000000 
- 637      00000000 
- 638              		.section	.bss.rx_dma_buf,"aw",%nobits
- 639              		.align	2
- 642              	rx_dma_buf:
- 643 0000 00000000 		.space	256
- 643      00000000 
- 643      00000000 
- 643      00000000 
- 643      00000000 
- 644              		.global	g_params_mutex
- 645              		.section	.bss.g_params_mutex,"aw",%nobits
- 646              		.align	2
- 649              	g_params_mutex:
- 650 0000 00000000 		.space	4
- 651              		.global	g_audio_params
- 652              		.section	.data.g_audio_params,"aw"
- 653              		.align	2
- 656              	g_audio_params:
- 657 0000 CDCC4C3F 		.word	1061997773
- 658 0004 0000803F 		.word	1065353216
- 659 0008 0001     		.short	256
- 660 000a 01       		.byte	1
- 661 000b 00       		.space	1
- 662              		.text
- 663              	.Letext0:
- 664              		.file 2 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
- 665              		.file 3 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
- 666              		.file 4 "Middlewares/Third_Party/FreeRTOS/Source/include/task.h"
- 667              		.file 5 "Middlewares/Third_Party/FreeRTOS/Source/include/queue.h"
- 668              		.file 6 "Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h"
- 669              		.file 7 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h"
- 670              		.file 8 "Core/Inc/dsp_task.h"
- 671              		.file 9 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
- 672              		.file 10 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
- 673              		.file 11 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
- 674              		.file 12 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2s.h"
- 675              		.file 13 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-t
- 676              		.file 14 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2s_ex.h"
- 677              		.file 15 "<built-in>"
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s 			page 16
+ 627      00000000 
+ 627      00000000 
+ 627      00000000 
+ 628              		.section	.bss.delay_line_L,"aw",%nobits
+ 629              		.align	2
+ 632              	delay_line_L:
+ 633 0000 00000000 		.space	1024
+ 633      00000000 
+ 633      00000000 
+ 633      00000000 
+ 633      00000000 
+ 634              		.section	.bss.tx_dma_buf,"aw",%nobits
+ 635              		.align	2
+ 638              	tx_dma_buf:
+ 639 0000 00000000 		.space	256
+ 639      00000000 
+ 639      00000000 
+ 639      00000000 
+ 639      00000000 
+ 640              		.section	.bss.rx_dma_buf,"aw",%nobits
+ 641              		.align	2
+ 644              	rx_dma_buf:
+ 645 0000 00000000 		.space	256
+ 645      00000000 
+ 645      00000000 
+ 645      00000000 
+ 645      00000000 
+ 646              		.global	g_params_mutex
+ 647              		.section	.bss.g_params_mutex,"aw",%nobits
+ 648              		.align	2
+ 651              	g_params_mutex:
+ 652 0000 00000000 		.space	4
+ 653              		.global	g_audio_params
+ 654              		.section	.data.g_audio_params,"aw"
+ 655              		.align	2
+ 658              	g_audio_params:
+ 659 0000 CDCC4C3F 		.word	1061997773
+ 660 0004 0000803F 		.word	1065353216
+ 661 0008 0001     		.short	256
+ 662 000a 01       		.byte	1
+ 663 000b 00       		.space	1
+ 664              		.text
+ 665              	.Letext0:
+ 666              		.file 2 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
+ 667              		.file 3 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
+ 668              		.file 4 "Middlewares/Third_Party/FreeRTOS/Source/include/task.h"
+ 669              		.file 5 "Middlewares/Third_Party/FreeRTOS/Source/include/queue.h"
+ 670              		.file 6 "Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h"
+ 671              		.file 7 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h"
+ 672              		.file 8 "Core/Inc/dsp_task.h"
+ 673              		.file 9 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
+ 674              		.file 10 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 675              		.file 11 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
+ 676              		.file 12 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2s.h"
+ 677              		.file 13 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-t
+ 678              		.file 14 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2s_ex.h"
+ 679              		.file 15 "<built-in>"
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s 			page 16
+
+
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s 			page 17
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 dsp_task.c
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:21     .text.apply_volume:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:26     .text.apply_volume:00000000 apply_volume
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:84     .text.apply_lpf:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:89     .text.apply_lpf:00000000 apply_lpf
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:191    .text.apply_lpf:00000084 $d
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:612    .bss.lpf_L:00000000 lpf_L
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:606    .bss.lpf_R:00000000 lpf_R
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:197    .text.apply_delay:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:202    .text.apply_delay:00000000 apply_delay
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:361    .text.apply_delay:000000d8 $d
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:618    .bss.delay_wr:00000000 delay_wr
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:624    .bss.delay_line_R:00000000 delay_line_R
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:630    .bss.delay_line_L:00000000 delay_line_L
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:370    .text.HAL_I2SEx_TxRxHalfCpltCallback:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:376    .text.HAL_I2SEx_TxRxHalfCpltCallback:00000000 HAL_I2SEx_TxRxHalfCpltCallback
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:406    .text.HAL_I2SEx_TxRxHalfCpltCallback:00000014 $d
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:600    .bss.active_half:00000000 active_half
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:595    .bss.dsp_task_id:00000000 dsp_task_id
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:412    .text.HAL_I2SEx_TxRxCpltCallback:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:418    .text.HAL_I2SEx_TxRxCpltCallback:00000000 HAL_I2SEx_TxRxCpltCallback
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:447    .text.HAL_I2SEx_TxRxCpltCallback:00000014 $d
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:453    .text.StartDSPTask:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:459    .text.StartDSPTask:00000000 StartDSPTask
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:580    .text.StartDSPTask:0000009c $d
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:636    .bss.tx_dma_buf:00000000 tx_dma_buf
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:642    .bss.rx_dma_buf:00000000 rx_dma_buf
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:649    .bss.g_params_mutex:00000000 g_params_mutex
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:656    .data.g_audio_params:00000000 g_audio_params
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:592    .bss.dsp_task_id:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:601    .bss.active_half:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:603    .bss.lpf_R:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:609    .bss.lpf_L:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:615    .bss.delay_wr:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:621    .bss.delay_line_R:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:627    .bss.delay_line_L:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:633    .bss.tx_dma_buf:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:639    .bss.rx_dma_buf:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:646    .bss.g_params_mutex:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccmCW3Xc.s:653    .data.g_audio_params:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:21     .text.apply_volume:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:26     .text.apply_volume:00000000 apply_volume
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:84     .text.apply_lpf:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:89     .text.apply_lpf:00000000 apply_lpf
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:191    .text.apply_lpf:00000084 $d
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:614    .bss.lpf_L:00000000 lpf_L
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:608    .bss.lpf_R:00000000 lpf_R
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:197    .text.apply_delay:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:202    .text.apply_delay:00000000 apply_delay
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:361    .text.apply_delay:000000d8 $d
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:620    .bss.delay_wr:00000000 delay_wr
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:626    .bss.delay_line_R:00000000 delay_line_R
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:632    .bss.delay_line_L:00000000 delay_line_L
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:370    .text.HAL_I2SEx_TxRxHalfCpltCallback:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:376    .text.HAL_I2SEx_TxRxHalfCpltCallback:00000000 HAL_I2SEx_TxRxHalfCpltCallback
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:406    .text.HAL_I2SEx_TxRxHalfCpltCallback:00000014 $d
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:602    .bss.active_half:00000000 active_half
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:597    .bss.dsp_task_id:00000000 dsp_task_id
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:412    .text.HAL_I2SEx_TxRxCpltCallback:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:418    .text.HAL_I2SEx_TxRxCpltCallback:00000000 HAL_I2SEx_TxRxCpltCallback
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:447    .text.HAL_I2SEx_TxRxCpltCallback:00000014 $d
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:453    .text.StartDSPTask:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:459    .text.StartDSPTask:00000000 StartDSPTask
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:582    .text.StartDSPTask:000000a0 $d
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:638    .bss.tx_dma_buf:00000000 tx_dma_buf
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:644    .bss.rx_dma_buf:00000000 rx_dma_buf
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:651    .bss.g_params_mutex:00000000 g_params_mutex
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:658    .data.g_audio_params:00000000 g_audio_params
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:594    .bss.dsp_task_id:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:603    .bss.active_half:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:605    .bss.lpf_R:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:611    .bss.lpf_L:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:617    .bss.delay_wr:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:623    .bss.delay_line_R:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:629    .bss.delay_line_L:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:635    .bss.tx_dma_buf:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:641    .bss.rx_dma_buf:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:648    .bss.g_params_mutex:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccKEO0Kj.s:655    .data.g_audio_params:00000000 $d
 
 UNDEFINED SYMBOLS
 osSignalSet
 osThreadGetId
 memset
 HAL_I2SEx_TransmitReceive_DMA
+osDelay
 osSignalWait
 memcpy
 osMutexWait
