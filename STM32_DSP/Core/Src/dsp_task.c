@@ -13,11 +13,13 @@ AudioEffectParams_t g_audio_params = {
 };
 osMutexId g_params_mutex;
 
-/* I2S DMA buffers - 24-bit layout per stereo pair: [L_MSW, L_LSW, R_MSW, R_LSW, ...].
-   For I2S_DATAFORMAT_24B the HAL doubles its internal transfer count, so the buffer
-   must be 4x the number of stereo sample pairs (2x per channel for the 32-bit slot). */
-static uint16_t rx_buf[AUDIO_BLOCK_SAMPLES * 4];
-static uint16_t tx_buf[AUDIO_BLOCK_SAMPLES * 4];
+/* Ping-pong DMA buffers: two blocks back-to-back.
+   DMA (circular) writes into one half while DSP reads the other.
+   24-bit I2S layout per stereo pair: [L_MSW, L_LSW, R_MSW, R_LSW],
+   so each block is AUDIO_BLOCK_SAMPLES * 4 uint16_t words. */
+#define HALF_BUF_LEN  (AUDIO_BLOCK_SAMPLES * 4)
+static uint16_t rx_dma_buf[HALF_BUF_LEN * 2];
+static uint16_t tx_dma_buf[HALF_BUF_LEN * 2];
 
 /* Per-channel delay ring buffers */
 static int16_t  delay_line_L[DELAY_BUF_SAMPLES];
@@ -28,11 +30,31 @@ static uint16_t delay_wr = 0;
 static float lpf_L = 0.0f;
 static float lpf_R = 0.0f;
 
+/* Ping-pong signaling: set by ISR callbacks, consumed by task */
+#define SIG_DMA_RDY   0x0001
+static volatile uint8_t active_half = 0;
+static osThreadId       dsp_task_id;
+
+/* HAL weak-symbol overrides — called from DMA ISR context.
+   HalfCplt: first block is ready (DMA now filling second).
+   TxRxCplt:  second block is ready (DMA wraps to first). */
+void HAL_I2SEx_TxRxHalfCpltCallback(I2S_HandleTypeDef *hi2s)
+{
+    active_half = 0;
+    osSignalSet(dsp_task_id, SIG_DMA_RDY);
+}
+
+void HAL_I2SEx_TxRxCpltCallback(I2S_HandleTypeDef *hi2s)
+{
+    active_half = 1;
+    osSignalSet(dsp_task_id, SIG_DMA_RDY);
+}
+
 /* Scale every sample by vol.
    24-bit layout stride: MSW at i, LSW at i+1; step by 2 to hit every MSW. */
 static void apply_volume(uint16_t *buf, float vol)
 {
-    for (int i = 0; i < AUDIO_BLOCK_SAMPLES * 4; i += 2) {
+    for (int i = 0; i < HALF_BUF_LEN; i += 2) {
         float s    = (float)(int16_t)buf[i] * vol;
         buf[i]     = (uint16_t)(int16_t)s;
         buf[i + 1] = 0;
@@ -45,7 +67,7 @@ static void apply_volume(uint16_t *buf, float vol)
 static void apply_lpf(uint16_t *buf, float alpha)
 {
     float beta = 1.0f - alpha;
-    for (int i = 0; i < AUDIO_BLOCK_SAMPLES * 4; i += 4) {
+    for (int i = 0; i < HALF_BUF_LEN; i += 4) {
         float xL = (float)(int16_t)buf[i];
         float xR = (float)(int16_t)buf[i + 2];
         lpf_L    = alpha * xL + beta * lpf_L;
@@ -63,7 +85,7 @@ static void apply_delay(uint16_t *buf, uint16_t len)
 {
     if (len == 0) len = 1;
 
-    for (int i = 0; i < AUDIO_BLOCK_SAMPLES * 4; i += 4) {
+    for (int i = 0; i < HALF_BUF_LEN; i += 4) {
         uint16_t rd    = (delay_wr + DELAY_BUF_SAMPLES - len) % DELAY_BUF_SAMPLES;
         int16_t  dryL  = (int16_t)buf[i];
         int16_t  dryR  = (int16_t)buf[i + 2];
@@ -83,33 +105,50 @@ static void apply_delay(uint16_t *buf, uint16_t len)
 
 /* DSP task: highest priority.
    Receives audio from PCM1808 ADC (I2S RX) and sends processed audio
-   to PCM5102A DAC (I2S TX) using full-duplex I2S3. One block of latency. */
+   to PCM5102A DAC (I2S TX) using full-duplex I2S3.
+
+   Ping-pong: DMA (circular) continuously streams into rx_dma_buf and out
+   of tx_dma_buf.  HalfCplt signals that the first HALF_BUF_LEN words are
+   ready; TxRxCplt signals that the second half is ready.  The task wakes,
+   copies the fresh RX half into the corresponding TX half, applies effects,
+   and goes back to sleep — all before DMA wraps around to that half again. */
 void StartDSPTask(void const *argument)
 {
     AudioEffectParams_t params;
 
-    memset(tx_buf, 0, sizeof(tx_buf));
+    dsp_task_id = osThreadGetId();
+
+    memset(tx_dma_buf, 0, sizeof(tx_dma_buf));
+
+    /* Size = number of 32-bit DMA words in the full double buffer.
+       Each uint16_t pair in the buffer maps to one 32-bit DMA word,
+       so Size = HALF_BUF_LEN (uint16_t per half) / 2 * 2 halves
+               = HALF_BUF_LEN = AUDIO_BLOCK_SAMPLES * 4.            */
+    HAL_I2SEx_TransmitReceive_DMA(&hi2s3, tx_dma_buf, rx_dma_buf,
+                                  HALF_BUF_LEN * 2);
 
     for (;;) {
-        /* Transmit last processed block to DAC while receiving next block from ADC */
-        HAL_I2SEx_TransmitReceive(&hi2s3, tx_buf, rx_buf,
-                                  AUDIO_BLOCK_SAMPLES * 2, HAL_MAX_DELAY);
+        osSignalWait(SIG_DMA_RDY, osWaitForever);
 
-        /* Move raw ADC samples into the processing buffer */
-        memcpy(tx_buf, rx_buf, sizeof(rx_buf));
+        /* Snapshot which half the ISR marked ready, then derive pointers */
+        uint8_t   half    = active_half;
+        uint16_t *rx_half = &rx_dma_buf[half * HALF_BUF_LEN];
+        uint16_t *tx_half = &tx_dma_buf[half * HALF_BUF_LEN];
 
-        /* Snapshot shared params so we hold the mutex as briefly as possible */
+        /* Copy fresh ADC samples into the output half, then process in-place */
+        memcpy(tx_half, rx_half, HALF_BUF_LEN * sizeof(uint16_t));
+
         osMutexWait(g_params_mutex, osWaitForever);
         params = g_audio_params;
         osMutexRelease(g_params_mutex);
-
-        if (params.effects_mask & EFFECT_VOLUME)
-            apply_volume(tx_buf, params.volume);
-
+        // params.effects_mask & EFFECT_VOLUME
+        if (1)
+            apply_volume(tx_half, params.volume);
+            
         if (params.effects_mask & EFFECT_LPF)
-            apply_lpf(tx_buf, params.lpf_alpha);
+            apply_lpf(tx_half, params.lpf_alpha);
 
         if (params.effects_mask & EFFECT_DELAY)
-            apply_delay(tx_buf, params.delay_samples);
+            apply_delay(tx_half, params.delay_samples);
     }
 }
