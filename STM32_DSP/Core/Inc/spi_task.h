@@ -6,7 +6,7 @@
 
 extern osSemaphoreId spiSemHandle;
 
-extern uint8_t spi_rx_buf[2];
+extern volatile uint8_t spi_rx_buf[2];
 
 extern volatile uint8_t gesture;
 extern volatile uint8_t intensity;

@@ -4,16 +4,14 @@
 
 extern SPI_HandleTypeDef hspi2;
 
-/* SPI task: receives 3-byte command packets from the Raspberry Pi 4 (SPI master)
+/* SPI task: receives 2-byte packets from the Raspberry Pi 4 (SPI master)
    and updates the shared audio effect parameters.
 
-   Packet format: [CMD] [VAL_HI] [VAL_LO]
+   Packet format: [GESTURE] [INTENSITY]
    The RPi must be configured as SPI master (SPI_MODE_0, MSB first, 8-bit)
    to match the STM32 SPI2 slave configuration.
-
-   NOTE: SPI2 is configured with software NSS. If you use a hardware CS line from
-   the RPi, change hspi2.Init.NSS to SPI_NSS_HARD_INPUT in main.c for reliable
-   transaction framing. */
+   SPI2 uses hardware NSS (SPI_NSS_HARD_INPUT) — the RPi CS line directly
+   controls transaction framing. */
 
 
 void StartSPITask(void const * argument)
@@ -26,7 +24,9 @@ void StartSPITask(void const * argument)
             {
                 HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_SET);
 
+                osMutexWait(g_params_mutex, osWaitForever);
                 g_audio_params.volume = intensity / 10.0f;
+                osMutexRelease(g_params_mutex);
 
                 osDelay(100);
 
@@ -36,7 +36,9 @@ void StartSPITask(void const * argument)
             {
                 HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_SET);
 
+                osMutexWait(g_params_mutex, osWaitForever);
                 g_audio_params.delay_samples = intensity * 48;
+                osMutexRelease(g_params_mutex);
 
                 osDelay(100);
 
@@ -49,8 +51,6 @@ void StartSPITask(void const * argument)
                 osDelay(100);
                 HAL_GPIO_TogglePin(GPIOD, LD5_Pin);
                 HAL_GPIO_TogglePin(GPIOD, LD3_Pin);
-
-
             }
         }
     }

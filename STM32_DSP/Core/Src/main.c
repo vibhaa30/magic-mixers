@@ -57,10 +57,8 @@ osThreadId defaultTaskHandle;
 osThreadId dspTaskHandle;
 osThreadId spiTaskHandle;
 osSemaphoreId spiSemHandle;
-DMA_HandleTypeDef hdma_i2s3_ext_rx;
-DMA_HandleTypeDef hdma_spi3_tx;
 
-uint8_t spi_rx_buf[2];
+volatile uint8_t spi_rx_buf[2];
 // uint8_t test_buf[2];
 // volatile uint8_t spi_done = 0;
 volatile uint8_t gesture = 0;
@@ -106,12 +104,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-  GPIO_InitStruct.Pin = GPIO_PIN_12;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP; // Push-Pull
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -141,7 +134,7 @@ int main(void)
   /* add semaphores, ... */
     osSemaphoreDef(spiSem);
     spiSemHandle = osSemaphoreCreate(osSemaphore(spiSem), 1);
-    // osSemaphoreWait(spiSemHandle, 0); // start locked
+    osSemaphoreWait(spiSemHandle, 0); // drain initial count so task waits for real SPI data
 
   /* USER CODE END RTOS_SEMAPHORES */
 
@@ -441,10 +434,8 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : PDM_OUT_Pin */
   GPIO_InitStruct.Pin = PDM_OUT_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.Alternate = GPIO_AF5_SPI2;
   HAL_GPIO_Init(PDM_OUT_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : B1_Pin */
@@ -461,10 +452,8 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : CLK_IN_Pin */
   GPIO_InitStruct.Pin = CLK_IN_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.Alternate = GPIO_AF5_SPI2;
   HAL_GPIO_Init(CLK_IN_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : LD4_Pin LD3_Pin LD5_Pin LD6_Pin
@@ -512,14 +501,27 @@ void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
 {
     if (hspi->Instance == SPI2)
     {
-        gesture = spi_rx_buf[0];
-        // gesture =1;
+        gesture   = spi_rx_buf[0];
         intensity = spi_rx_buf[1];
 
         HAL_GPIO_TogglePin(GPIOD, LD6_Pin);
 
         osSemaphoreRelease(spiSemHandle);
 
+        /* Clear any OVR caused by bytes arriving between transfers,
+           then re-arm for the next packet. */
+        __HAL_SPI_CLEAR_OVRFLAG(hspi);
+        HAL_SPI_Receive_DMA(&hspi2, spi_rx_buf, 2);
+    }
+}
+
+void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi)
+{
+    if (hspi->Instance == SPI2)
+    {
+        /* OVR is the most common slave-mode error: clear it and re-arm so
+           reception continues rather than silently dying. */
+        __HAL_SPI_CLEAR_OVRFLAG(hspi);
         HAL_SPI_Receive_DMA(&hspi2, spi_rx_buf, 2);
     }
 }
