@@ -79,26 +79,40 @@ static void apply_lpf(uint16_t *buf, float alpha)
     }
 }
 
-/* 70% dry + 30% wet feedback delay using a ring buffer.
+/* Echo delay with feedback.
+   Each echo repeats at DELAY_FEEDBACK level (natural decay), mixed at DELAY_WET into output.
    24-bit layout: L_MSW at i, L_LSW at i+1, R_MSW at i+2, R_LSW at i+3; step by 4. */
+#define DELAY_FEEDBACK  0.45f
+#define DELAY_WET       0.50f
+
 static void apply_delay(uint16_t *buf, uint16_t len)
 {
     if (len == 0) len = 1;
+    if (len > DELAY_BUF_SAMPLES) len = DELAY_BUF_SAMPLES;
 
     for (int i = 0; i < HALF_BUF_LEN; i += 4) {
-        uint16_t rd    = (delay_wr + DELAY_BUF_SAMPLES - len) % DELAY_BUF_SAMPLES;
-        int16_t  dryL  = (int16_t)buf[i];
-        int16_t  dryR  = (int16_t)buf[i + 2];
-        int16_t  wetL  = delay_line_L[rd];
-        int16_t  wetR  = delay_line_R[rd];
+        uint16_t rd   = (delay_wr + DELAY_BUF_SAMPLES - len) % DELAY_BUF_SAMPLES;
+        float    dryL = (float)(int16_t)buf[i];
+        float    dryR = (float)(int16_t)buf[i + 2];
+        float    echL = (float)delay_line_L[rd];
+        float    echR = (float)delay_line_R[rd];
 
-        delay_line_L[delay_wr] = dryL;
-        delay_line_R[delay_wr] = dryR;
+        /* Write dry + decayed echo back into delay line → repeating echoes */
+        delay_line_L[delay_wr] = (int16_t)(dryL + echL * DELAY_FEEDBACK);
+        delay_line_R[delay_wr] = (int16_t)(dryR + echR * DELAY_FEEDBACK);
         delay_wr = (delay_wr + 1) % DELAY_BUF_SAMPLES;
 
-        buf[i]     = (uint16_t)(int16_t)(dryL * 0.7f + wetL * 0.3f);
+        float outL = dryL + echL * DELAY_WET;
+        float outR = dryR + echR * DELAY_WET;
+
+        if (outL >  32767.0f) outL =  32767.0f;
+        if (outL < -32768.0f) outL = -32768.0f;
+        if (outR >  32767.0f) outR =  32767.0f;
+        if (outR < -32768.0f) outR = -32768.0f;
+
+        buf[i]     = (uint16_t)(int16_t)outL;
         buf[i + 1] = 0;
-        buf[i + 2] = (uint16_t)(int16_t)(dryR * 0.7f + wetR * 0.3f);
+        buf[i + 2] = (uint16_t)(int16_t)outR;
         buf[i + 3] = 0;
     }
 }
@@ -120,12 +134,12 @@ void StartDSPTask(void const *argument)
 
     memset(tx_dma_buf, 0, sizeof(tx_dma_buf));
 
-    /* Size = number of 32-bit DMA words in the full double buffer.
-       Each uint16_t pair in the buffer maps to one 32-bit DMA word,
-       so Size = HALF_BUF_LEN (uint16_t per half) / 2 * 2 halves
-               = HALF_BUF_LEN = AUDIO_BLOCK_SAMPLES * 4.            */
+    /* HAL doubles Size internally for 24-bit format (TxXferSize = Size << 1).
+       Buffer holds HALF_BUF_LEN uint16_t per half = HALF_BUF_LEN/2 32-bit words per half.
+       Full double-buffer = HALF_BUF_LEN/2 * 2 halves = HALF_BUF_LEN/2 WORD transfers pre-doubling.
+       After HAL doubles: HALF_BUF_LEN WORD transfers = 256 bytes = exact buffer size. */
     HAL_I2SEx_TransmitReceive_DMA(&hi2s3, tx_dma_buf, rx_dma_buf,
-                                  HALF_BUF_LEN * 2);
+                                  HALF_BUF_LEN / 2);
 
     for (;;) {
         osSignalWait(SIG_DMA_RDY, osWaitForever);
@@ -141,8 +155,7 @@ void StartDSPTask(void const *argument)
         osMutexWait(g_params_mutex, osWaitForever);
         params = g_audio_params;
         osMutexRelease(g_params_mutex);
-        // params.effects_mask & EFFECT_VOLUME
-        if (1)
+        if (params.effects_mask & EFFECT_VOLUME)
             apply_volume(tx_half, params.volume);
             
         if (params.effects_mask & EFFECT_LPF)
@@ -150,7 +163,5 @@ void StartDSPTask(void const *argument)
 
         if (params.effects_mask & EFFECT_DELAY)
             apply_delay(tx_half, params.delay_samples);
-        
-        osDelay(1);
     }
 }

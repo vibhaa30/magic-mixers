@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
   28:Core/Src/stm32f4xx_hal_msp.c **** 
   29:Core/Src/stm32f4xx_hal_msp.c **** extern DMA_HandleTypeDef hdma_spi2_rx;
   30:Core/Src/stm32f4xx_hal_msp.c **** 
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 2
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 2
 
 
   31:Core/Src/stm32f4xx_hal_msp.c **** /* Private typedef -----------------------------------------------------------*/
@@ -118,7 +118,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
   39              	.LBB2:
   40              		.loc 1 74 3 view .LVU2
   41 0004 0022     		movs	r2, #0
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 3
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 3
 
 
   42 0006 0092     		str	r2, [sp]
@@ -178,7 +178,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
   86              		.cfi_endproc
   87              	.LFE134:
   89              		.section	.text.HAL_I2C_MspInit,"ax",%progbits
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 4
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 4
 
 
   90              		.align	1
@@ -238,7 +238,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  102:Core/Src/stm32f4xx_hal_msp.c ****     /**I2C1 GPIO Configuration
  103:Core/Src/stm32f4xx_hal_msp.c ****     PB6     ------> I2C1_SCL
  104:Core/Src/stm32f4xx_hal_msp.c ****     PB9     ------> I2C1_SDA
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 5
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 5
 
 
  105:Core/Src/stm32f4xx_hal_msp.c ****     */
@@ -298,7 +298,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  157 0034 4FF41073 		mov	r3, #576
  158 0038 0393     		str	r3, [sp, #12]
  107:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Pull = GPIO_PULLUP;
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 6
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 6
 
 
  159              		.loc 1 107 5 is_stmt 1 view .LVU31
@@ -358,7 +358,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  199              	.L9:
  200 0064 00540040 		.word	1073763328
  201 0068 00380240 		.word	1073887232
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 7
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 7
 
 
  202 006c 00040240 		.word	1073873920
@@ -418,7 +418,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  146:Core/Src/stm32f4xx_hal_msp.c **** 
  147:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE BEGIN I2C1_MspDeInit 1 */
  148:Core/Src/stm32f4xx_hal_msp.c **** 
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 8
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 8
 
 
  149:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE END I2C1_MspDeInit 1 */
@@ -478,7 +478,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  159:Core/Src/stm32f4xx_hal_msp.c ****   */
  160:Core/Src/stm32f4xx_hal_msp.c **** void HAL_I2S_MspInit(I2S_HandleTypeDef* hi2s)
  161:Core/Src/stm32f4xx_hal_msp.c **** {
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 9
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 9
 
 
  276              		.loc 1 161 1 is_stmt 1 view -0
@@ -538,7 +538,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  179:Core/Src/stm32f4xx_hal_msp.c **** 
  180:Core/Src/stm32f4xx_hal_msp.c ****     /* Peripheral clock enable */
  181:Core/Src/stm32f4xx_hal_msp.c ****     __HAL_RCC_SPI3_CLK_ENABLE();
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 10
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 10
 
 
  182:Core/Src/stm32f4xx_hal_msp.c **** 
@@ -598,7 +598,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  236:Core/Src/stm32f4xx_hal_msp.c ****     hdma_spi3_tx.Init.PeriphInc = DMA_PINC_DISABLE;
  237:Core/Src/stm32f4xx_hal_msp.c ****     hdma_spi3_tx.Init.MemInc = DMA_MINC_ENABLE;
  238:Core/Src/stm32f4xx_hal_msp.c ****     hdma_spi3_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 11
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 11
 
 
  239:Core/Src/stm32f4xx_hal_msp.c ****     hdma_spi3_tx.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
@@ -658,7 +658,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  340              		.loc 1 175 9 view .LVU77
  341 0034 FFF7FEFF 		bl	HAL_RCCEx_PeriphCLKConfig
  342              	.LVL16:
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 12
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 12
 
 
  175:Core/Src/stm32f4xx_hal_msp.c ****     {
@@ -718,7 +718,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  184:Core/Src/stm32f4xx_hal_msp.c ****     /**I2S3 GPIO Configuration
  383              		.loc 1 184 5 view .LVU92
  384 0068 0295     		str	r5, [sp, #8]
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 13
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 13
 
 
  184:Core/Src/stm32f4xx_hal_msp.c ****     /**I2S3 GPIO Configuration
@@ -778,7 +778,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  422 0094 4FF4A453 		mov	r3, #5248
  423 0098 0793     		str	r3, [sp, #28]
  200:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Pull = GPIO_NOPULL;
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 14
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 14
 
 
  424              		.loc 1 200 5 is_stmt 1 view .LVU110
@@ -838,7 +838,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  459 00ba 07A9     		add	r1, sp, #28
  460 00bc 2748     		ldr	r0, .L27+12
  461 00be FFF7FEFF 		bl	HAL_GPIO_Init
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 15
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 15
 
 
  462              	.LVL19:
@@ -898,7 +898,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  224:Core/Src/stm32f4xx_hal_msp.c ****     if (HAL_DMA_Init(&hdma_i2s3_ext_rx) != HAL_OK)
  498              		.loc 1 224 5 is_stmt 1 view .LVU148
  224:Core/Src/stm32f4xx_hal_msp.c ****     if (HAL_DMA_Init(&hdma_i2s3_ext_rx) != HAL_OK)
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 16
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 16
 
 
  499              		.loc 1 224 36 is_stmt 0 view .LVU149
@@ -958,7 +958,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  535              		.loc 1 238 5 is_stmt 1 view .LVU167
  238:Core/Src/stm32f4xx_hal_msp.c ****     hdma_spi3_tx.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
  536              		.loc 1 238 43 is_stmt 0 view .LVU168
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 17
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 17
 
 
  537 0114 4FF48052 		mov	r2, #4096
@@ -1018,7 +1018,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  575              	.L25:
  227:Core/Src/stm32f4xx_hal_msp.c ****     }
  576              		.loc 1 227 7 view .LVU186
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 18
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 18
 
 
  577 0142 FFF7FEFF 		bl	Error_Handler
@@ -1078,7 +1078,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  265:Core/Src/stm32f4xx_hal_msp.c ****   if(hi2s->Instance==SPI3)
  622              		.loc 1 265 1 view .LVU192
  623 000a 10B5     		push	{r4, lr}
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 19
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 19
 
 
  624              		.cfi_def_cfa_offset 8
@@ -1138,7 +1138,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  292:Core/Src/stm32f4xx_hal_msp.c **** 
  293:Core/Src/stm32f4xx_hal_msp.c **** }
  653              		.loc 1 293 1 is_stmt 0 view .LVU199
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 20
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 20
 
 
  654 0036 10BD     		pop	{r4, pc}
@@ -1198,12 +1198,12 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  304:Core/Src/stm32f4xx_hal_msp.c ****   if(hspi->Instance==SPI1)
  700              		.loc 1 304 3 is_stmt 1 view .LVU205
  701              		.loc 1 304 10 is_stmt 0 view .LVU206
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 21
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 21
 
 
  702 0012 0368     		ldr	r3, [r0]
  703              		.loc 1 304 5 view .LVU207
- 704 0014 414A     		ldr	r2, .L46
+ 704 0014 424A     		ldr	r2, .L46
  705 0016 9342     		cmp	r3, r2
  706 0018 06D0     		beq	.L43
  707 001a 8046     		mov	r8, r0
@@ -1234,7 +1234,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  329:Core/Src/stm32f4xx_hal_msp.c ****   else if(hspi->Instance==SPI2)
  708              		.loc 1 329 8 is_stmt 1 view .LVU208
  709              		.loc 1 329 10 is_stmt 0 view .LVU209
- 710 001c 404A     		ldr	r2, .L46+4
+ 710 001c 414A     		ldr	r2, .L46+4
  711 001e 9342     		cmp	r3, r2
  712 0020 23D0     		beq	.L44
  713              	.LVL33:
@@ -1258,7 +1258,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  346:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
  347:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Pull = GPIO_NOPULL;
  348:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 22
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 22
 
 
  349:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Alternate = GPIO_AF5_SPI2;
@@ -1280,7 +1280,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  365:Core/Src/stm32f4xx_hal_msp.c ****     hdma_spi2_rx.Init.MemInc = DMA_MINC_ENABLE;
  366:Core/Src/stm32f4xx_hal_msp.c ****     hdma_spi2_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
  367:Core/Src/stm32f4xx_hal_msp.c ****     hdma_spi2_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
- 368:Core/Src/stm32f4xx_hal_msp.c ****     hdma_spi2_rx.Init.Mode = DMA_NORMAL;
+ 368:Core/Src/stm32f4xx_hal_msp.c ****     hdma_spi2_rx.Init.Mode = DMA_CIRCULAR;
  369:Core/Src/stm32f4xx_hal_msp.c ****     hdma_spi2_rx.Init.Priority = DMA_PRIORITY_LOW;
  370:Core/Src/stm32f4xx_hal_msp.c ****     hdma_spi2_rx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
  371:Core/Src/stm32f4xx_hal_msp.c ****     if (HAL_DMA_Init(&hdma_spi2_rx) != HAL_OK)
@@ -1317,8 +1317,8 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  728 002a 0091     		str	r1, [sp]
  310:Core/Src/stm32f4xx_hal_msp.c **** 
  729              		.loc 1 310 5 view .LVU213
- 730 002c 3D4B     		ldr	r3, .L46+8
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 23
+ 730 002c 3E4B     		ldr	r3, .L46+8
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 23
 
 
  731 002e 5A6C     		ldr	r2, [r3, #68]
@@ -1378,14 +1378,14 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  322:Core/Src/stm32f4xx_hal_msp.c ****     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
  769              		.loc 1 322 31 is_stmt 0 view .LVU230
  770 005c 0523     		movs	r3, #5
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 24
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 24
 
 
  771 005e 0993     		str	r3, [sp, #36]
  323:Core/Src/stm32f4xx_hal_msp.c **** 
  772              		.loc 1 323 5 is_stmt 1 view .LVU231
  773 0060 05A9     		add	r1, sp, #20
- 774 0062 3148     		ldr	r0, .L46+12
+ 774 0062 3248     		ldr	r0, .L46+12
  775              	.LVL35:
  323:Core/Src/stm32f4xx_hal_msp.c **** 
  776              		.loc 1 323 5 is_stmt 0 view .LVU232
@@ -1403,7 +1403,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  786 006c 0294     		str	r4, [sp, #8]
  335:Core/Src/stm32f4xx_hal_msp.c **** 
  787              		.loc 1 335 5 view .LVU235
- 788 006e 2D4B     		ldr	r3, .L46+8
+ 788 006e 2E4B     		ldr	r3, .L46+8
  789 0070 1A6C     		ldr	r2, [r3, #64]
  790 0072 42F48042 		orr	r2, r2, #16384
  791 0076 1A64     		str	r2, [r3, #64]
@@ -1438,7 +1438,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  812              		.loc 1 337 5 view .LVU243
  813 0094 039A     		ldr	r2, [sp, #12]
  814              	.LBE12:
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 25
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 25
 
 
  337:Core/Src/stm32f4xx_hal_msp.c ****     __HAL_RCC_GPIOB_CLK_ENABLE();
@@ -1494,11 +1494,11 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  350:Core/Src/stm32f4xx_hal_msp.c **** 
  849              		.loc 1 350 5 is_stmt 1 view .LVU260
  850 00ba 05A9     		add	r1, sp, #20
- 851 00bc 1B48     		ldr	r0, .L46+16
+ 851 00bc 1C48     		ldr	r0, .L46+16
  852              	.LVL38:
  350:Core/Src/stm32f4xx_hal_msp.c **** 
  853              		.loc 1 350 5 is_stmt 0 view .LVU261
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 26
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 26
 
 
  854 00be FFF7FEFF 		bl	HAL_GPIO_Init
@@ -1532,15 +1532,15 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  357:Core/Src/stm32f4xx_hal_msp.c **** 
  872              		.loc 1 357 5 is_stmt 1 view .LVU272
  873 00d0 05A9     		add	r1, sp, #20
- 874 00d2 1748     		ldr	r0, .L46+20
+ 874 00d2 1848     		ldr	r0, .L46+20
  875 00d4 FFF7FEFF 		bl	HAL_GPIO_Init
  876              	.LVL40:
  361:Core/Src/stm32f4xx_hal_msp.c ****     hdma_spi2_rx.Init.Channel = DMA_CHANNEL_0;
  877              		.loc 1 361 5 view .LVU273
  361:Core/Src/stm32f4xx_hal_msp.c ****     hdma_spi2_rx.Init.Channel = DMA_CHANNEL_0;
  878              		.loc 1 361 27 is_stmt 0 view .LVU274
- 879 00d8 1648     		ldr	r0, .L46+24
- 880 00da 174B     		ldr	r3, .L46+28
+ 879 00d8 1748     		ldr	r0, .L46+24
+ 880 00da 184B     		ldr	r3, .L46+28
  881 00dc 0360     		str	r3, [r0]
  362:Core/Src/stm32f4xx_hal_msp.c ****     hdma_spi2_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
  882              		.loc 1 362 5 is_stmt 1 view .LVU275
@@ -1558,7 +1558,7 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  889              		.loc 1 364 33 is_stmt 0 view .LVU280
  890 00e2 C460     		str	r4, [r0, #12]
  365:Core/Src/stm32f4xx_hal_msp.c ****     hdma_spi2_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 27
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 27
 
 
  891              		.loc 1 365 5 is_stmt 1 view .LVU281
@@ -1571,92 +1571,93 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  366:Core/Src/stm32f4xx_hal_msp.c ****     hdma_spi2_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
  896              		.loc 1 366 43 is_stmt 0 view .LVU284
  897 00ea 4461     		str	r4, [r0, #20]
- 367:Core/Src/stm32f4xx_hal_msp.c ****     hdma_spi2_rx.Init.Mode = DMA_NORMAL;
+ 367:Core/Src/stm32f4xx_hal_msp.c ****     hdma_spi2_rx.Init.Mode = DMA_CIRCULAR;
  898              		.loc 1 367 5 is_stmt 1 view .LVU285
- 367:Core/Src/stm32f4xx_hal_msp.c ****     hdma_spi2_rx.Init.Mode = DMA_NORMAL;
+ 367:Core/Src/stm32f4xx_hal_msp.c ****     hdma_spi2_rx.Init.Mode = DMA_CIRCULAR;
  899              		.loc 1 367 40 is_stmt 0 view .LVU286
  900 00ec 8461     		str	r4, [r0, #24]
  368:Core/Src/stm32f4xx_hal_msp.c ****     hdma_spi2_rx.Init.Priority = DMA_PRIORITY_LOW;
  901              		.loc 1 368 5 is_stmt 1 view .LVU287
  368:Core/Src/stm32f4xx_hal_msp.c ****     hdma_spi2_rx.Init.Priority = DMA_PRIORITY_LOW;
  902              		.loc 1 368 28 is_stmt 0 view .LVU288
- 903 00ee C461     		str	r4, [r0, #28]
+ 903 00ee 4FF48073 		mov	r3, #256
+ 904 00f2 C361     		str	r3, [r0, #28]
  369:Core/Src/stm32f4xx_hal_msp.c ****     hdma_spi2_rx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
- 904              		.loc 1 369 5 is_stmt 1 view .LVU289
+ 905              		.loc 1 369 5 is_stmt 1 view .LVU289
  369:Core/Src/stm32f4xx_hal_msp.c ****     hdma_spi2_rx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
- 905              		.loc 1 369 32 is_stmt 0 view .LVU290
- 906 00f0 0462     		str	r4, [r0, #32]
+ 906              		.loc 1 369 32 is_stmt 0 view .LVU290
+ 907 00f4 0462     		str	r4, [r0, #32]
  370:Core/Src/stm32f4xx_hal_msp.c ****     if (HAL_DMA_Init(&hdma_spi2_rx) != HAL_OK)
- 907              		.loc 1 370 5 is_stmt 1 view .LVU291
+ 908              		.loc 1 370 5 is_stmt 1 view .LVU291
  370:Core/Src/stm32f4xx_hal_msp.c ****     if (HAL_DMA_Init(&hdma_spi2_rx) != HAL_OK)
- 908              		.loc 1 370 32 is_stmt 0 view .LVU292
- 909 00f2 4462     		str	r4, [r0, #36]
+ 909              		.loc 1 370 32 is_stmt 0 view .LVU292
+ 910 00f6 4462     		str	r4, [r0, #36]
  371:Core/Src/stm32f4xx_hal_msp.c ****     {
- 910              		.loc 1 371 5 is_stmt 1 view .LVU293
+ 911              		.loc 1 371 5 is_stmt 1 view .LVU293
  371:Core/Src/stm32f4xx_hal_msp.c ****     {
- 911              		.loc 1 371 9 is_stmt 0 view .LVU294
- 912 00f4 FFF7FEFF 		bl	HAL_DMA_Init
- 913              	.LVL41:
+ 912              		.loc 1 371 9 is_stmt 0 view .LVU294
+ 913 00f8 FFF7FEFF 		bl	HAL_DMA_Init
+ 914              	.LVL41:
  371:Core/Src/stm32f4xx_hal_msp.c ****     {
- 914              		.loc 1 371 8 discriminator 1 view .LVU295
- 915 00f8 68B9     		cbnz	r0, .L45
- 916              	.L41:
+ 915              		.loc 1 371 8 discriminator 1 view .LVU295
+ 916 00fc 68B9     		cbnz	r0, .L45
+ 917              	.L41:
  376:Core/Src/stm32f4xx_hal_msp.c **** 
- 917              		.loc 1 376 5 is_stmt 1 view .LVU296
+ 918              		.loc 1 376 5 is_stmt 1 view .LVU296
  376:Core/Src/stm32f4xx_hal_msp.c **** 
- 918              		.loc 1 376 5 view .LVU297
- 919 00fa 0E4B     		ldr	r3, .L46+24
- 920 00fc C8F84C30 		str	r3, [r8, #76]
+ 919              		.loc 1 376 5 view .LVU297
+ 920 00fe 0E4B     		ldr	r3, .L46+24
+ 921 0100 C8F84C30 		str	r3, [r8, #76]
  376:Core/Src/stm32f4xx_hal_msp.c **** 
- 921              		.loc 1 376 5 view .LVU298
- 922 0100 C3F83880 		str	r8, [r3, #56]
+ 922              		.loc 1 376 5 view .LVU298
+ 923 0104 C3F83880 		str	r8, [r3, #56]
  376:Core/Src/stm32f4xx_hal_msp.c **** 
- 923              		.loc 1 376 5 view .LVU299
+ 924              		.loc 1 376 5 view .LVU299
  379:Core/Src/stm32f4xx_hal_msp.c ****     HAL_NVIC_EnableIRQ(SPI2_IRQn);
- 924              		.loc 1 379 5 view .LVU300
- 925 0104 0022     		movs	r2, #0
- 926 0106 0521     		movs	r1, #5
- 927 0108 2420     		movs	r0, #36
- 928 010a FFF7FEFF 		bl	HAL_NVIC_SetPriority
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 28
+ 925              		.loc 1 379 5 view .LVU300
+ 926 0108 0022     		movs	r2, #0
+ 927 010a 0521     		movs	r1, #5
+ 928 010c 2420     		movs	r0, #36
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 28
 
 
- 929              	.LVL42:
+ 929 010e FFF7FEFF 		bl	HAL_NVIC_SetPriority
+ 930              	.LVL42:
  380:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE BEGIN SPI2_MspInit 1 */
- 930              		.loc 1 380 5 view .LVU301
- 931 010e 2420     		movs	r0, #36
- 932 0110 FFF7FEFF 		bl	HAL_NVIC_EnableIRQ
- 933              	.LVL43:
- 934              		.loc 1 386 1 is_stmt 0 view .LVU302
- 935 0114 85E7     		b	.L38
- 936              	.L45:
+ 931              		.loc 1 380 5 view .LVU301
+ 932 0112 2420     		movs	r0, #36
+ 933 0114 FFF7FEFF 		bl	HAL_NVIC_EnableIRQ
+ 934              	.LVL43:
+ 935              		.loc 1 386 1 is_stmt 0 view .LVU302
+ 936 0118 83E7     		b	.L38
+ 937              	.L45:
  373:Core/Src/stm32f4xx_hal_msp.c ****     }
- 937              		.loc 1 373 7 is_stmt 1 view .LVU303
- 938 0116 FFF7FEFF 		bl	Error_Handler
- 939              	.LVL44:
- 940 011a EEE7     		b	.L41
- 941              	.L47:
- 942              		.align	2
- 943              	.L46:
- 944 011c 00300140 		.word	1073819648
- 945 0120 00380040 		.word	1073756160
- 946 0124 00380240 		.word	1073887232
- 947 0128 00000240 		.word	1073872896
- 948 012c 00080240 		.word	1073874944
- 949 0130 00040240 		.word	1073873920
- 950 0134 00000000 		.word	hdma_spi2_rx
- 951 0138 58600240 		.word	1073897560
- 952              		.cfi_endproc
- 953              	.LFE139:
- 955              		.section	.text.HAL_SPI_MspDeInit,"ax",%progbits
- 956              		.align	1
- 957              		.global	HAL_SPI_MspDeInit
- 958              		.syntax unified
- 959              		.thumb
- 960              		.thumb_func
- 962              	HAL_SPI_MspDeInit:
- 963              	.LVL45:
- 964              	.LFB140:
+ 938              		.loc 1 373 7 is_stmt 1 view .LVU303
+ 939 011a FFF7FEFF 		bl	Error_Handler
+ 940              	.LVL44:
+ 941 011e EEE7     		b	.L41
+ 942              	.L47:
+ 943              		.align	2
+ 944              	.L46:
+ 945 0120 00300140 		.word	1073819648
+ 946 0124 00380040 		.word	1073756160
+ 947 0128 00380240 		.word	1073887232
+ 948 012c 00000240 		.word	1073872896
+ 949 0130 00080240 		.word	1073874944
+ 950 0134 00040240 		.word	1073873920
+ 951 0138 00000000 		.word	hdma_spi2_rx
+ 952 013c 58600240 		.word	1073897560
+ 953              		.cfi_endproc
+ 954              	.LFE139:
+ 956              		.section	.text.HAL_SPI_MspDeInit,"ax",%progbits
+ 957              		.align	1
+ 958              		.global	HAL_SPI_MspDeInit
+ 959              		.syntax unified
+ 960              		.thumb
+ 961              		.thumb_func
+ 963              	HAL_SPI_MspDeInit:
+ 964              	.LVL45:
+ 965              	.LFB140:
  387:Core/Src/stm32f4xx_hal_msp.c **** 
  388:Core/Src/stm32f4xx_hal_msp.c **** /**
  389:Core/Src/stm32f4xx_hal_msp.c ****   * @brief SPI MSP De-Initialization
@@ -1666,27 +1667,27 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  393:Core/Src/stm32f4xx_hal_msp.c ****   */
  394:Core/Src/stm32f4xx_hal_msp.c **** void HAL_SPI_MspDeInit(SPI_HandleTypeDef* hspi)
  395:Core/Src/stm32f4xx_hal_msp.c **** {
- 965              		.loc 1 395 1 view -0
- 966              		.cfi_startproc
- 967              		@ args = 0, pretend = 0, frame = 0
- 968              		@ frame_needed = 0, uses_anonymous_args = 0
- 969              		.loc 1 395 1 is_stmt 0 view .LVU305
- 970 0000 10B5     		push	{r4, lr}
- 971              		.cfi_def_cfa_offset 8
- 972              		.cfi_offset 4, -8
- 973              		.cfi_offset 14, -4
+ 966              		.loc 1 395 1 view -0
+ 967              		.cfi_startproc
+ 968              		@ args = 0, pretend = 0, frame = 0
+ 969              		@ frame_needed = 0, uses_anonymous_args = 0
+ 970              		.loc 1 395 1 is_stmt 0 view .LVU305
+ 971 0000 10B5     		push	{r4, lr}
+ 972              		.cfi_def_cfa_offset 8
+ 973              		.cfi_offset 4, -8
+ 974              		.cfi_offset 14, -4
  396:Core/Src/stm32f4xx_hal_msp.c ****   if(hspi->Instance==SPI1)
- 974              		.loc 1 396 3 is_stmt 1 view .LVU306
- 975              		.loc 1 396 10 is_stmt 0 view .LVU307
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 29
+ 975              		.loc 1 396 3 is_stmt 1 view .LVU306
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 29
 
 
- 976 0002 0368     		ldr	r3, [r0]
- 977              		.loc 1 396 5 view .LVU308
- 978 0004 144A     		ldr	r2, .L54
- 979 0006 9342     		cmp	r3, r2
- 980 0008 04D0     		beq	.L52
- 981 000a 0446     		mov	r4, r0
+ 976              		.loc 1 396 10 is_stmt 0 view .LVU307
+ 977 0002 0368     		ldr	r3, [r0]
+ 978              		.loc 1 396 5 view .LVU308
+ 979 0004 144A     		ldr	r2, .L54
+ 980 0006 9342     		cmp	r3, r2
+ 981 0008 04D0     		beq	.L52
+ 982 000a 0446     		mov	r4, r0
  397:Core/Src/stm32f4xx_hal_msp.c ****   {
  398:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE BEGIN SPI1_MspDeInit 0 */
  399:Core/Src/stm32f4xx_hal_msp.c **** 
@@ -1706,13 +1707,13 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  413:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE END SPI1_MspDeInit 1 */
  414:Core/Src/stm32f4xx_hal_msp.c ****   }
  415:Core/Src/stm32f4xx_hal_msp.c ****   else if(hspi->Instance==SPI2)
- 982              		.loc 1 415 8 is_stmt 1 view .LVU309
- 983              		.loc 1 415 10 is_stmt 0 view .LVU310
- 984 000c 134A     		ldr	r2, .L54+4
- 985 000e 9342     		cmp	r3, r2
- 986 0010 0BD0     		beq	.L53
- 987              	.LVL46:
- 988              	.L48:
+ 983              		.loc 1 415 8 is_stmt 1 view .LVU309
+ 984              		.loc 1 415 10 is_stmt 0 view .LVU310
+ 985 000c 134A     		ldr	r2, .L54+4
+ 986 000e 9342     		cmp	r3, r2
+ 987 0010 0BD0     		beq	.L53
+ 988              	.LVL46:
+ 989              	.L48:
  416:Core/Src/stm32f4xx_hal_msp.c ****   {
  417:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE BEGIN SPI2_MspDeInit 0 */
  418:Core/Src/stm32f4xx_hal_msp.c **** 
@@ -1737,121 +1738,121 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 1
  437:Core/Src/stm32f4xx_hal_msp.c ****     HAL_NVIC_DisableIRQ(SPI2_IRQn);
  438:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE BEGIN SPI2_MspDeInit 1 */
  439:Core/Src/stm32f4xx_hal_msp.c **** 
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 30
+
+
  440:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE END SPI2_MspDeInit 1 */
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 30
-
-
  441:Core/Src/stm32f4xx_hal_msp.c ****   }
  442:Core/Src/stm32f4xx_hal_msp.c **** 
  443:Core/Src/stm32f4xx_hal_msp.c **** }
- 989              		.loc 1 443 1 view .LVU311
- 990 0012 10BD     		pop	{r4, pc}
- 991              	.LVL47:
- 992              	.L52:
+ 990              		.loc 1 443 1 view .LVU311
+ 991 0012 10BD     		pop	{r4, pc}
+ 992              	.LVL47:
+ 993              	.L52:
  402:Core/Src/stm32f4xx_hal_msp.c **** 
- 993              		.loc 1 402 5 is_stmt 1 view .LVU312
- 994 0014 02F58432 		add	r2, r2, #67584
- 995 0018 536C     		ldr	r3, [r2, #68]
- 996 001a 23F48053 		bic	r3, r3, #4096
- 997 001e 5364     		str	r3, [r2, #68]
+ 994              		.loc 1 402 5 is_stmt 1 view .LVU312
+ 995 0014 02F58432 		add	r2, r2, #67584
+ 996 0018 536C     		ldr	r3, [r2, #68]
+ 997 001a 23F48053 		bic	r3, r3, #4096
+ 998 001e 5364     		str	r3, [r2, #68]
  409:Core/Src/stm32f4xx_hal_msp.c **** 
- 998              		.loc 1 409 5 view .LVU313
- 999 0020 E021     		movs	r1, #224
- 1000 0022 0F48     		ldr	r0, .L54+8
- 1001              	.LVL48:
+ 999              		.loc 1 409 5 view .LVU313
+ 1000 0020 E021     		movs	r1, #224
+ 1001 0022 0F48     		ldr	r0, .L54+8
+ 1002              	.LVL48:
  409:Core/Src/stm32f4xx_hal_msp.c **** 
- 1002              		.loc 1 409 5 is_stmt 0 view .LVU314
- 1003 0024 FFF7FEFF 		bl	HAL_GPIO_DeInit
- 1004              	.LVL49:
- 1005 0028 F3E7     		b	.L48
- 1006              	.LVL50:
- 1007              	.L53:
+ 1003              		.loc 1 409 5 is_stmt 0 view .LVU314
+ 1004 0024 FFF7FEFF 		bl	HAL_GPIO_DeInit
+ 1005              	.LVL49:
+ 1006 0028 F3E7     		b	.L48
+ 1007              	.LVL50:
+ 1008              	.L53:
  421:Core/Src/stm32f4xx_hal_msp.c **** 
- 1008              		.loc 1 421 5 is_stmt 1 view .LVU315
- 1009 002a 02F50032 		add	r2, r2, #131072
- 1010 002e 136C     		ldr	r3, [r2, #64]
- 1011 0030 23F48043 		bic	r3, r3, #16384
- 1012 0034 1364     		str	r3, [r2, #64]
+ 1009              		.loc 1 421 5 is_stmt 1 view .LVU315
+ 1010 002a 02F50032 		add	r2, r2, #131072
+ 1011 002e 136C     		ldr	r3, [r2, #64]
+ 1012 0030 23F48043 		bic	r3, r3, #16384
+ 1013 0034 1364     		str	r3, [r2, #64]
  429:Core/Src/stm32f4xx_hal_msp.c **** 
- 1013              		.loc 1 429 5 view .LVU316
- 1014 0036 0421     		movs	r1, #4
- 1015 0038 0A48     		ldr	r0, .L54+12
- 1016              	.LVL51:
+ 1014              		.loc 1 429 5 view .LVU316
+ 1015 0036 0421     		movs	r1, #4
+ 1016 0038 0A48     		ldr	r0, .L54+12
+ 1017              	.LVL51:
  429:Core/Src/stm32f4xx_hal_msp.c **** 
- 1017              		.loc 1 429 5 is_stmt 0 view .LVU317
- 1018 003a FFF7FEFF 		bl	HAL_GPIO_DeInit
- 1019              	.LVL52:
+ 1018              		.loc 1 429 5 is_stmt 0 view .LVU317
+ 1019 003a FFF7FEFF 		bl	HAL_GPIO_DeInit
+ 1020              	.LVL52:
  431:Core/Src/stm32f4xx_hal_msp.c **** 
- 1020              		.loc 1 431 5 is_stmt 1 view .LVU318
- 1021 003e 4FF43041 		mov	r1, #45056
- 1022 0042 0948     		ldr	r0, .L54+16
- 1023 0044 FFF7FEFF 		bl	HAL_GPIO_DeInit
- 1024              	.LVL53:
+ 1021              		.loc 1 431 5 is_stmt 1 view .LVU318
+ 1022 003e 4FF43041 		mov	r1, #45056
+ 1023 0042 0948     		ldr	r0, .L54+16
+ 1024 0044 FFF7FEFF 		bl	HAL_GPIO_DeInit
+ 1025              	.LVL53:
  434:Core/Src/stm32f4xx_hal_msp.c **** 
- 1025              		.loc 1 434 5 view .LVU319
- 1026 0048 E06C     		ldr	r0, [r4, #76]
- 1027 004a FFF7FEFF 		bl	HAL_DMA_DeInit
- 1028              	.LVL54:
+ 1026              		.loc 1 434 5 view .LVU319
+ 1027 0048 E06C     		ldr	r0, [r4, #76]
+ 1028 004a FFF7FEFF 		bl	HAL_DMA_DeInit
+ 1029              	.LVL54:
  437:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE BEGIN SPI2_MspDeInit 1 */
- 1029              		.loc 1 437 5 view .LVU320
- 1030 004e 2420     		movs	r0, #36
- 1031 0050 FFF7FEFF 		bl	HAL_NVIC_DisableIRQ
- 1032              	.LVL55:
- 1033              		.loc 1 443 1 is_stmt 0 view .LVU321
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 31
+ 1030              		.loc 1 437 5 view .LVU320
+ 1031 004e 2420     		movs	r0, #36
+ 1032 0050 FFF7FEFF 		bl	HAL_NVIC_DisableIRQ
+ 1033              	.LVL55:
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 31
 
 
- 1034 0054 DDE7     		b	.L48
- 1035              	.L55:
- 1036 0056 00BF     		.align	2
- 1037              	.L54:
- 1038 0058 00300140 		.word	1073819648
- 1039 005c 00380040 		.word	1073756160
- 1040 0060 00000240 		.word	1073872896
- 1041 0064 00080240 		.word	1073874944
- 1042 0068 00040240 		.word	1073873920
- 1043              		.cfi_endproc
- 1044              	.LFE140:
- 1046              		.text
- 1047              	.Letext0:
- 1048              		.file 2 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
- 1049              		.file 3 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
- 1050              		.file 4 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
- 1051              		.file 5 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
- 1052              		.file 6 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h"
- 1053              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h"
- 1054              		.file 8 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
- 1055              		.file 9 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h"
- 1056              		.file 10 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2s.h"
- 1057              		.file 11 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h"
- 1058              		.file 12 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h"
- 1059              		.file 13 "Core/Inc/main.h"
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccKiper7.s 			page 32
+ 1034              		.loc 1 443 1 is_stmt 0 view .LVU321
+ 1035 0054 DDE7     		b	.L48
+ 1036              	.L55:
+ 1037 0056 00BF     		.align	2
+ 1038              	.L54:
+ 1039 0058 00300140 		.word	1073819648
+ 1040 005c 00380040 		.word	1073756160
+ 1041 0060 00000240 		.word	1073872896
+ 1042 0064 00080240 		.word	1073874944
+ 1043 0068 00040240 		.word	1073873920
+ 1044              		.cfi_endproc
+ 1045              	.LFE140:
+ 1047              		.text
+ 1048              	.Letext0:
+ 1049              		.file 2 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
+ 1050              		.file 3 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
+ 1051              		.file 4 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
+ 1052              		.file 5 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 1053              		.file 6 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h"
+ 1054              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h"
+ 1055              		.file 8 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
+ 1056              		.file 9 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h"
+ 1057              		.file 10 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2s.h"
+ 1058              		.file 11 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h"
+ 1059              		.file 12 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h"
+ 1060              		.file 13 "Core/Inc/main.h"
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s 			page 32
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 stm32f4xx_hal_msp.c
-C:\Users\leejo\AppData\Local\Temp\ccKiper7.s:21     .text.HAL_MspInit:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccKiper7.s:27     .text.HAL_MspInit:00000000 HAL_MspInit
-C:\Users\leejo\AppData\Local\Temp\ccKiper7.s:85     .text.HAL_MspInit:00000040 $d
-C:\Users\leejo\AppData\Local\Temp\ccKiper7.s:90     .text.HAL_I2C_MspInit:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccKiper7.s:96     .text.HAL_I2C_MspInit:00000000 HAL_I2C_MspInit
-C:\Users\leejo\AppData\Local\Temp\ccKiper7.s:200    .text.HAL_I2C_MspInit:00000064 $d
-C:\Users\leejo\AppData\Local\Temp\ccKiper7.s:207    .text.HAL_I2C_MspDeInit:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccKiper7.s:213    .text.HAL_I2C_MspDeInit:00000000 HAL_I2C_MspDeInit
-C:\Users\leejo\AppData\Local\Temp\ccKiper7.s:260    .text.HAL_I2C_MspDeInit:0000002c $d
-C:\Users\leejo\AppData\Local\Temp\ccKiper7.s:267    .text.HAL_I2S_MspInit:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccKiper7.s:273    .text.HAL_I2S_MspInit:00000000 HAL_I2S_MspInit
-C:\Users\leejo\AppData\Local\Temp\ccKiper7.s:588    .text.HAL_I2S_MspInit:00000150 $d
-C:\Users\leejo\AppData\Local\Temp\ccKiper7.s:600    .text.HAL_I2S_MspDeInit:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccKiper7.s:606    .text.HAL_I2S_MspDeInit:00000000 HAL_I2S_MspDeInit
-C:\Users\leejo\AppData\Local\Temp\ccKiper7.s:660    .text.HAL_I2S_MspDeInit:00000038 $d
-C:\Users\leejo\AppData\Local\Temp\ccKiper7.s:668    .text.HAL_SPI_MspInit:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccKiper7.s:674    .text.HAL_SPI_MspInit:00000000 HAL_SPI_MspInit
-C:\Users\leejo\AppData\Local\Temp\ccKiper7.s:944    .text.HAL_SPI_MspInit:0000011c $d
-C:\Users\leejo\AppData\Local\Temp\ccKiper7.s:956    .text.HAL_SPI_MspDeInit:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccKiper7.s:962    .text.HAL_SPI_MspDeInit:00000000 HAL_SPI_MspDeInit
-C:\Users\leejo\AppData\Local\Temp\ccKiper7.s:1038   .text.HAL_SPI_MspDeInit:00000058 $d
+C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s:21     .text.HAL_MspInit:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s:27     .text.HAL_MspInit:00000000 HAL_MspInit
+C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s:85     .text.HAL_MspInit:00000040 $d
+C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s:90     .text.HAL_I2C_MspInit:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s:96     .text.HAL_I2C_MspInit:00000000 HAL_I2C_MspInit
+C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s:200    .text.HAL_I2C_MspInit:00000064 $d
+C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s:207    .text.HAL_I2C_MspDeInit:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s:213    .text.HAL_I2C_MspDeInit:00000000 HAL_I2C_MspDeInit
+C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s:260    .text.HAL_I2C_MspDeInit:0000002c $d
+C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s:267    .text.HAL_I2S_MspInit:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s:273    .text.HAL_I2S_MspInit:00000000 HAL_I2S_MspInit
+C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s:588    .text.HAL_I2S_MspInit:00000150 $d
+C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s:600    .text.HAL_I2S_MspDeInit:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s:606    .text.HAL_I2S_MspDeInit:00000000 HAL_I2S_MspDeInit
+C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s:660    .text.HAL_I2S_MspDeInit:00000038 $d
+C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s:668    .text.HAL_SPI_MspInit:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s:674    .text.HAL_SPI_MspInit:00000000 HAL_SPI_MspInit
+C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s:945    .text.HAL_SPI_MspInit:00000120 $d
+C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s:957    .text.HAL_SPI_MspDeInit:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s:963    .text.HAL_SPI_MspDeInit:00000000 HAL_SPI_MspDeInit
+C:\Users\leejo\AppData\Local\Temp\ccHcSVji.s:1039   .text.HAL_SPI_MspDeInit:00000058 $d
 
 UNDEFINED SYMBOLS
 HAL_NVIC_SetPriority

@@ -7,8 +7,8 @@
 /* Audio block size: stereo sample pairs transferred per I2S call */
 #define AUDIO_BLOCK_SAMPLES  16
 
-/* Delay line length per channel: ~64ms at 8 kHz */
-#define DELAY_BUF_SAMPLES    512
+/* Delay line length per channel: ~250ms at 32 kHz */
+#define DELAY_BUF_SAMPLES    8000
 
 /* Effect enable bitmask flags */
 #define EFFECT_VOLUME  (1U << 0)

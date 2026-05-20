@@ -54,18 +54,11 @@ DMA_HandleTypeDef hdma_spi2_rx;
 
 osThreadId defaultTaskHandle;
 /* USER CODE BEGIN PV */
-osThreadId dspTaskHandle;
-osThreadId spiTaskHandle;
-osSemaphoreId spiSemHandle;
+osThreadId       dspTaskHandle;
+osThreadId       spiTaskHandle;
+osMessageQId     spiQueueHandle;
 
-volatile uint8_t spi_rx_buf[2];
-// uint8_t test_buf[2];
-// volatile uint8_t spi_done = 0;
-volatile uint8_t gesture = 0;
-volatile uint8_t intensity = 0;
-// volatile uint8_t store[100];
-// volatile uint8_t store_idx = 0;
-
+volatile uint8_t spi_rx_buf[SPI_PKT_SIZE];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -122,7 +115,6 @@ int main(void)
   MX_SPI1_Init();
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
-  HAL_SPI_Receive_DMA(&hspi2, spi_rx_buf, 2);
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -131,11 +123,6 @@ int main(void)
   /* USER CODE END RTOS_MUTEX */
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
-  /* add semaphores, ... */
-    osSemaphoreDef(spiSem);
-    spiSemHandle = osSemaphoreCreate(osSemaphore(spiSem), 1);
-    osSemaphoreWait(spiSemHandle, 0); // drain initial count so task waits for real SPI data
-
   /* USER CODE END RTOS_SEMAPHORES */
 
   /* USER CODE BEGIN RTOS_TIMERS */
@@ -143,7 +130,9 @@ int main(void)
   /* USER CODE END RTOS_TIMERS */
 
   /* USER CODE BEGIN RTOS_QUEUES */
-  /* add queues, ... */
+  osMessageQDef(spiQueue, 4, uint32_t);
+  spiQueueHandle = osMessageCreate(osMessageQ(spiQueue), NULL);
+
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
@@ -433,8 +422,11 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(OTG_FS_PowerSwitchOn_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PDM_OUT_Pin */
+  /* PC3 must NOT be configured as GPIO_AF5_SPI2 (SPI2_MOSI) because PB15
+     is already SPI2_MOSI for the RPi slave. Having both pads wired to the
+     same peripheral input corrupts all SPI2 reception. Leave as analog. */
   GPIO_InitStruct.Pin = PDM_OUT_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(PDM_OUT_GPIO_Port, &GPIO_InitStruct);
 
@@ -451,8 +443,9 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(BOOT1_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : CLK_IN_Pin */
+  /* PB10 is the MEMS microphone clock; leave as analog since I2S2 is unused. */
   GPIO_InitStruct.Pin = CLK_IN_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(CLK_IN_GPIO_Port, &GPIO_InitStruct);
 
@@ -501,17 +494,10 @@ void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
 {
     if (hspi->Instance == SPI2)
     {
-        gesture   = spi_rx_buf[0];
-        intensity = spi_rx_buf[1];
-
+        uint32_t msg = ((uint32_t)spi_rx_buf[0] << 8) | spi_rx_buf[1];
+        osMessagePut(spiQueueHandle, msg, 0);
         HAL_GPIO_TogglePin(GPIOD, LD6_Pin);
-
-        osSemaphoreRelease(spiSemHandle);
-
-        /* Clear any OVR caused by bytes arriving between transfers,
-           then re-arm for the next packet. */
-        __HAL_SPI_CLEAR_OVRFLAG(hspi);
-        HAL_SPI_Receive_DMA(&hspi2, spi_rx_buf, 2);
+        HAL_SPI_Receive_IT(&hspi2, (uint8_t *)spi_rx_buf, SPI_PKT_SIZE);
     }
 }
 
@@ -519,10 +505,8 @@ void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi)
 {
     if (hspi->Instance == SPI2)
     {
-        /* OVR is the most common slave-mode error: clear it and re-arm so
-           reception continues rather than silently dying. */
-        __HAL_SPI_CLEAR_OVRFLAG(hspi);
-        HAL_SPI_Receive_DMA(&hspi2, spi_rx_buf, 2);
+        /* HAL IT mode resets state before calling this; just re-arm. */
+        HAL_SPI_Receive_IT(&hspi2, (uint8_t *)spi_rx_buf, SPI_PKT_SIZE);
     }
 }
 /* USER CODE END 4 */

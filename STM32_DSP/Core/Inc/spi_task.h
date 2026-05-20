@@ -2,22 +2,14 @@
 #define SPI_TASK_H
 
 #include "cmsis_os.h"
-#include "main.h"
 
-extern osSemaphoreId spiSemHandle;
+/* Two-byte packet received from the Raspberry Pi SPI master.
+   Byte 0: gesture code (1 = volume, 2 = delay, 3 = LPF, 0/other = clear effects)
+   Byte 1: intensity (0-255 mapped to the parameter range) */
+#define SPI_PKT_SIZE  2
 
-extern volatile uint8_t spi_rx_buf[2];
-
-extern volatile uint8_t gesture;
-extern volatile uint8_t intensity;
-
-/* 3-byte packet format from Raspberry Pi: [CMD] [VAL_HI] [VAL_LO] */
-#define SPI_PKT_SIZE        3
-
-#define SPI_CMD_SET_VOLUME  0x01  /* VAL_HI = 0-100 (maps to 0.0-1.0) */
-#define SPI_CMD_SET_LPF     0x02  /* VAL_HI = 0-255 (0 = max filter, 255 = bypass) */
-#define SPI_CMD_SET_DELAY   0x03  /* (VAL_HI << 8 | VAL_LO) = delay in samples */
-#define SPI_CMD_SET_EFFECTS 0x04  /* VAL_HI = effects_mask bitmask */
+extern osMessageQId      spiQueueHandle;
+extern volatile uint8_t  spi_rx_buf[SPI_PKT_SIZE];
 
 void StartSPITask(void const *argument);
 
