@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccS3dVNd.s 			page 1
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccH4L62g.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -40,358 +40,379 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccS3dVNd.s 			page 1
    9:Core/Src/spi_task.c **** 
   10:Core/Src/spi_task.c ****    SPI2 is configured as a slave (SPI_MODE_0, MSB first, 8-bit, hardware NSS).
   11:Core/Src/spi_task.c ****    The Raspberry Pi drives NSS and clocks two bytes per transaction:
-  12:Core/Src/spi_task.c ****      Byte 0 — gesture  (1 = volume, 2 = delay, 3 = LPF, other = clear effects)
-  13:Core/Src/spi_task.c ****      Byte 1 — intensity (0-255 mapped to each parameter's range)
+  12:Core/Src/spi_task.c ****      Byte 0 — gesture  (1=volume, 2=chorus, 3=LPF, 4=pitch, 0/other=clear)
+  13:Core/Src/spi_task.c ****      Byte 1 — intensity (0-255 mapped to the parameter range)
   14:Core/Src/spi_task.c **** 
   15:Core/Src/spi_task.c ****    The ISR packs both bytes into a uint32_t (gesture << 8 | intensity) and posts
   16:Core/Src/spi_task.c ****    to spiQueueHandle.  Reading from the queue is atomic, so there is no race with
-  17:Core/Src/spi_task.c ****    the DMA circular buffer. */
+  17:Core/Src/spi_task.c ****    the DMA circular buffer.
   18:Core/Src/spi_task.c **** 
-  19:Core/Src/spi_task.c **** void StartSPITask(void const *argument)
-  20:Core/Src/spi_task.c **** {
-  30              		.loc 1 20 1 view -0
+  19:Core/Src/spi_task.c ****    LED assignments (GPIOD): LD3=volume, LD5=reverb, LD3+LD5=LPF, LD4=pitch, all off=clear. */
+  20:Core/Src/spi_task.c **** 
+  21:Core/Src/spi_task.c **** void StartSPITask(void const *argument)
+  22:Core/Src/spi_task.c **** {
+  30              		.loc 1 22 1 view -0
   31              		.cfi_startproc
   32              		@ args = 0, pretend = 0, frame = 16
   33              		@ frame_needed = 0, uses_anonymous_args = 0
-  34              		.loc 1 20 1 is_stmt 0 view .LVU1
+  34              		.loc 1 22 1 is_stmt 0 view .LVU1
   35 0000 30B5     		push	{r4, r5, lr}
   36              		.cfi_def_cfa_offset 12
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccH4L62g.s 			page 2
+
+
   37              		.cfi_offset 4, -12
   38              		.cfi_offset 5, -8
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccS3dVNd.s 			page 2
-
-
   39              		.cfi_offset 14, -4
   40 0002 85B0     		sub	sp, sp, #20
   41              		.cfi_def_cfa_offset 32
-  21:Core/Src/spi_task.c ****     osEvent evt;
-  42              		.loc 1 21 5 is_stmt 1 view .LVU2
-  22:Core/Src/spi_task.c **** 
-  23:Core/Src/spi_task.c ****     HAL_SPI_Receive_IT(&hspi2, (uint8_t *)spi_rx_buf, SPI_PKT_SIZE);
-  43              		.loc 1 23 5 view .LVU3
+  23:Core/Src/spi_task.c ****     osEvent evt;
+  42              		.loc 1 23 5 is_stmt 1 view .LVU2
+  24:Core/Src/spi_task.c **** 
+  25:Core/Src/spi_task.c ****     HAL_SPI_Receive_IT(&hspi2, (uint8_t *)spi_rx_buf, SPI_PKT_SIZE);
+  43              		.loc 1 25 5 view .LVU3
   44 0004 0222     		movs	r2, #2
-  45 0006 4549     		ldr	r1, .L9
-  46 0008 4548     		ldr	r0, .L9+4
+  45 0006 5149     		ldr	r1, .L12
+  46 0008 5148     		ldr	r0, .L12+4
   47              	.LVL1:
-  48              		.loc 1 23 5 is_stmt 0 view .LVU4
+  48              		.loc 1 25 5 is_stmt 0 view .LVU4
   49 000a FFF7FEFF 		bl	HAL_SPI_Receive_IT
   50              	.LVL2:
-  51 000e 1FE0     		b	.L2
+  51 000e 3BE0     		b	.L2
   52              	.LVL3:
-  53              	.L4:
+  53              	.L5:
   54              	.LBB2:
-  24:Core/Src/spi_task.c **** 
-  25:Core/Src/spi_task.c ****     for (;;)
-  26:Core/Src/spi_task.c ****     {
-  27:Core/Src/spi_task.c ****         evt = osMessageGet(spiQueueHandle, osWaitForever);
-  28:Core/Src/spi_task.c ****         if (evt.status != osEventMessage)
-  29:Core/Src/spi_task.c ****             continue;
-  30:Core/Src/spi_task.c **** 
-  31:Core/Src/spi_task.c ****         uint8_t gesture   = (uint8_t)((evt.value.v >> 8) & 0xFF);
-  32:Core/Src/spi_task.c ****         uint8_t intensity = (uint8_t)( evt.value.v        & 0xFF);
-  33:Core/Src/spi_task.c **** 
-  34:Core/Src/spi_task.c ****         osMutexWait(g_params_mutex, osWaitForever);
-  35:Core/Src/spi_task.c **** 
-  36:Core/Src/spi_task.c ****         switch (gesture)
-  37:Core/Src/spi_task.c ****         {
-  38:Core/Src/spi_task.c ****         case 1:
-  39:Core/Src/spi_task.c ****             g_audio_params.volume        = intensity / 255.0f;
-  40:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_VOLUME;
-  41:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_SET);
-  42:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_RESET);
-  43:Core/Src/spi_task.c ****             break;
-  44:Core/Src/spi_task.c **** 
-  45:Core/Src/spi_task.c ****         case 2:
-  46:Core/Src/spi_task.c ****             g_audio_params.delay_samples = (uint16_t)(((uint32_t)intensity * DELAY_BUF_SAMPLES) / 2
-  55              		.loc 1 46 13 is_stmt 1 view .LVU5
-  56              		.loc 1 46 76 is_stmt 0 view .LVU6
-  57 0010 E3B2     		uxtb	r3, r4
-  58 0012 4FF4FA52 		mov	r2, #8000
-  59 0016 02FB03F3 		mul	r3, r2, r3
-  60              		.loc 1 46 97 view .LVU7
-  61 001a 424A     		ldr	r2, .L9+8
-  62 001c A2FB0323 		umull	r2, r3, r2, r3
-  63              		.loc 1 46 44 view .LVU8
-  64 0020 DB09     		lsrs	r3, r3, #7
-  65              		.loc 1 46 42 view .LVU9
-  66 0022 414A     		ldr	r2, .L9+12
-  67 0024 1381     		strh	r3, [r2, #8]	@ movhi
-  47:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_DELAY;
-  68              		.loc 1 47 13 is_stmt 1 view .LVU10
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccS3dVNd.s 			page 3
-
-
-  69              		.loc 1 47 27 is_stmt 0 view .LVU11
-  70 0026 937A     		ldrb	r3, [r2, #10]	@ zero_extendqisi2
-  71              		.loc 1 47 41 view .LVU12
-  72 0028 43F00403 		orr	r3, r3, #4
-  73 002c 9372     		strb	r3, [r2, #10]
-  48:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_SET);
-  74              		.loc 1 48 13 is_stmt 1 view .LVU13
-  75 002e 3F4C     		ldr	r4, .L9+16
-  76              	.LVL4:
-  77              		.loc 1 48 13 is_stmt 0 view .LVU14
-  78 0030 0122     		movs	r2, #1
-  79 0032 4FF48041 		mov	r1, #16384
-  80 0036 2046     		mov	r0, r4
-  81 0038 FFF7FEFF 		bl	HAL_GPIO_WritePin
-  82              	.LVL5:
-  49:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_RESET);
-  83              		.loc 1 49 13 is_stmt 1 view .LVU15
-  84 003c 0022     		movs	r2, #0
-  85 003e 4FF40051 		mov	r1, #8192
-  86 0042 2046     		mov	r0, r4
-  87 0044 FFF7FEFF 		bl	HAL_GPIO_WritePin
-  88              	.LVL6:
-  50:Core/Src/spi_task.c ****             break;
-  89              		.loc 1 50 13 view .LVU16
-  90              	.L7:
-  51:Core/Src/spi_task.c **** 
-  52:Core/Src/spi_task.c ****         case 3:
-  53:Core/Src/spi_task.c ****             g_audio_params.lpf_alpha     = intensity / 255.0f;
-  54:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_LPF;
-  55:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_SET);
-  56:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_SET);
-  57:Core/Src/spi_task.c ****             break;
-  58:Core/Src/spi_task.c **** 
-  59:Core/Src/spi_task.c ****         default:
-  60:Core/Src/spi_task.c ****             g_audio_params.effects_mask  = 0;
-  61:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_RESET);
-  62:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_RESET);
-  63:Core/Src/spi_task.c ****             break;
-  64:Core/Src/spi_task.c ****         }
-  65:Core/Src/spi_task.c **** 
-  66:Core/Src/spi_task.c ****         osMutexRelease(g_params_mutex);
-  91              		.loc 1 66 9 view .LVU17
-  92 0048 394B     		ldr	r3, .L9+20
-  93 004a 1868     		ldr	r0, [r3]
-  94 004c FFF7FEFF 		bl	osMutexRelease
-  95              	.LVL7:
-  96              	.L2:
-  97              		.loc 1 66 9 is_stmt 0 view .LVU18
-  98              	.LBE2:
-  25:Core/Src/spi_task.c ****     {
-  99              		.loc 1 25 5 is_stmt 1 view .LVU19
- 100              	.LBB3:
-  27:Core/Src/spi_task.c ****         if (evt.status != osEventMessage)
- 101              		.loc 1 27 9 view .LVU20
-  27:Core/Src/spi_task.c ****         if (evt.status != osEventMessage)
- 102              		.loc 1 27 15 is_stmt 0 view .LVU21
- 103 0050 4FF0FF32 		mov	r2, #-1
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccS3dVNd.s 			page 4
-
-
- 104 0054 374B     		ldr	r3, .L9+24
- 105 0056 1968     		ldr	r1, [r3]
- 106 0058 01A8     		add	r0, sp, #4
- 107 005a FFF7FEFF 		bl	osMessageGet
- 108              	.LVL8:
-  28:Core/Src/spi_task.c ****             continue;
- 109              		.loc 1 28 9 is_stmt 1 view .LVU22
-  28:Core/Src/spi_task.c ****             continue;
- 110              		.loc 1 28 16 is_stmt 0 view .LVU23
- 111 005e 019B     		ldr	r3, [sp, #4]
-  28:Core/Src/spi_task.c ****             continue;
- 112              		.loc 1 28 12 view .LVU24
- 113 0060 102B     		cmp	r3, #16
- 114 0062 F5D1     		bne	.L2
-  31:Core/Src/spi_task.c ****         uint8_t intensity = (uint8_t)( evt.value.v        & 0xFF);
- 115              		.loc 1 31 9 is_stmt 1 view .LVU25
-  31:Core/Src/spi_task.c ****         uint8_t intensity = (uint8_t)( evt.value.v        & 0xFF);
- 116              		.loc 1 31 49 is_stmt 0 view .LVU26
- 117 0064 029C     		ldr	r4, [sp, #8]
-  31:Core/Src/spi_task.c ****         uint8_t intensity = (uint8_t)( evt.value.v        & 0xFF);
- 118              		.loc 1 31 52 view .LVU27
- 119 0066 250A     		lsrs	r5, r4, #8
- 120              	.LVL9:
+  26:Core/Src/spi_task.c **** 
+  27:Core/Src/spi_task.c ****     for (;;)
+  28:Core/Src/spi_task.c ****     {
+  29:Core/Src/spi_task.c ****         evt = osMessageGet(spiQueueHandle, osWaitForever);
+  30:Core/Src/spi_task.c ****         if (evt.status != osEventMessage)
+  31:Core/Src/spi_task.c ****             continue;
   32:Core/Src/spi_task.c **** 
- 121              		.loc 1 32 9 is_stmt 1 view .LVU28
+  33:Core/Src/spi_task.c ****         uint8_t gesture   = (uint8_t)((evt.value.v >> 8) & 0xFF);
+  34:Core/Src/spi_task.c ****         uint8_t intensity = (uint8_t)( evt.value.v        & 0xFF);
+  35:Core/Src/spi_task.c **** 
+  36:Core/Src/spi_task.c ****         osMutexWait(g_params_mutex, osWaitForever);
+  37:Core/Src/spi_task.c **** 
+  38:Core/Src/spi_task.c ****         /* Clear all effect LEDs before lighting the active one */
+  39:Core/Src/spi_task.c ****         HAL_GPIO_WritePin(GPIOD, LD3_Pin | LD4_Pin | LD5_Pin, GPIO_PIN_RESET);
+  40:Core/Src/spi_task.c **** 
+  41:Core/Src/spi_task.c ****         switch (gesture)
+  55              		.loc 1 41 9 view .LVU5
+  56 0010 042B     		cmp	r3, #4
+  57 0012 40F09780 		bne	.L8
+  42:Core/Src/spi_task.c ****         {
+  43:Core/Src/spi_task.c ****         case 1:   /* Volume: intensity maps to 0.0–1.0 */
+  44:Core/Src/spi_task.c ****             g_audio_params.volume        = intensity / 255.0f;
+  45:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_VOLUME;
+  46:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_SET);
+  47:Core/Src/spi_task.c ****             break;
+  48:Core/Src/spi_task.c **** 
+  49:Core/Src/spi_task.c ****         case 2:   /* Chorus: intensity maps LFO rate to 0.1–3.0 Hz */
+  50:Core/Src/spi_task.c ****             g_audio_params.chorus_rate   = 0.1f + (intensity / 255.0f) * 2.9f;
+  51:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_CHORUS;
+  52:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_SET);
+  53:Core/Src/spi_task.c ****             break;
+  54:Core/Src/spi_task.c **** 
+  55:Core/Src/spi_task.c ****         case 3:   /* LPF: intensity maps alpha to 0.3–1.0 (~2.3 kHz to bypass) */
+  56:Core/Src/spi_task.c ****             g_audio_params.lpf_alpha     = 0.3f + (intensity / 255.0f) * 0.7f;
+  57:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_LPF;
+  58:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD3_Pin | LD5_Pin, GPIO_PIN_SET);
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccH4L62g.s 			page 3
+
+
+  59:Core/Src/spi_task.c ****             break;
+  60:Core/Src/spi_task.c **** 
+  61:Core/Src/spi_task.c ****         case 4:   /* Pitch: intensity maps to -12 to +12 semitones */
+  62:Core/Src/spi_task.c ****             g_audio_params.pitch_semitones = (intensity / 255.0f) * 24.0f - 12.0f;
+  58              		.loc 1 62 13 is_stmt 1 view .LVU6
+  59              		.loc 1 62 57 is_stmt 0 view .LVU7
+  60 0016 E4B2     		uxtb	r4, r4
+  61              		.loc 1 62 57 view .LVU8
+  62 0018 07EE904A 		vmov	s15, r4	@ int
+  63 001c F8EEE77A 		vcvt.f32.s32	s15, s15
+  64 0020 DFED4C6A 		vldr.32	s13, .L12+8
+  65 0024 87EEA67A 		vdiv.f32	s14, s15, s13
+  66              		.loc 1 62 67 view .LVU9
+  67 0028 F3EE087A 		vmov.f32	s15, #2.4e+1
+  68 002c 67EE277A 		vmul.f32	s15, s14, s15
+  69              		.loc 1 62 75 view .LVU10
+  70 0030 B2EE087A 		vmov.f32	s14, #1.2e+1
+  71 0034 77EEC77A 		vsub.f32	s15, s15, s14
+  72              		.loc 1 62 44 view .LVU11
+  73 0038 474B     		ldr	r3, .L12+12
+  74 003a C3ED037A 		vstr.32	s15, [r3, #12]
+  63:Core/Src/spi_task.c ****             g_audio_params.effects_mask   |= EFFECT_PITCH;
+  75              		.loc 1 63 13 is_stmt 1 view .LVU12
+  76              		.loc 1 63 27 is_stmt 0 view .LVU13
+  77 003e 1A7C     		ldrb	r2, [r3, #16]	@ zero_extendqisi2
+  78              		.loc 1 63 43 view .LVU14
+  79 0040 42F00802 		orr	r2, r2, #8
+  80 0044 1A74     		strb	r2, [r3, #16]
+  64:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD4_Pin, GPIO_PIN_SET);
+  81              		.loc 1 64 13 is_stmt 1 view .LVU15
+  82 0046 0122     		movs	r2, #1
+  83 0048 4FF48051 		mov	r1, #4096
+  84 004c 4348     		ldr	r0, .L12+16
+  85 004e FFF7FEFF 		bl	HAL_GPIO_WritePin
+  86              	.LVL4:
+  65:Core/Src/spi_task.c ****             break;
+  87              		.loc 1 65 13 view .LVU16
+  88 0052 15E0     		b	.L10
+  89              	.L6:
+  44:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_VOLUME;
+  90              		.loc 1 44 13 view .LVU17
+  44:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_VOLUME;
+  91              		.loc 1 44 54 is_stmt 0 view .LVU18
+  92 0054 E4B2     		uxtb	r4, r4
+  44:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_VOLUME;
+  93              		.loc 1 44 54 view .LVU19
+  94 0056 07EE904A 		vmov	s15, r4	@ int
+  95 005a F8EEE77A 		vcvt.f32.s32	s15, s15
+  96 005e DFED3D6A 		vldr.32	s13, .L12+8
+  97 0062 87EEA67A 		vdiv.f32	s14, s15, s13
+  44:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_VOLUME;
+  98              		.loc 1 44 42 view .LVU20
+  99 0066 3C4B     		ldr	r3, .L12+12
+ 100 0068 83ED007A 		vstr.32	s14, [r3]
+  45:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_SET);
+ 101              		.loc 1 45 13 is_stmt 1 view .LVU21
+  45:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_SET);
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccH4L62g.s 			page 4
+
+
+ 102              		.loc 1 45 27 is_stmt 0 view .LVU22
+ 103 006c 1A7C     		ldrb	r2, [r3, #16]	@ zero_extendqisi2
+  45:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_SET);
+ 104              		.loc 1 45 41 view .LVU23
+ 105 006e 42F00102 		orr	r2, r2, #1
+ 106 0072 1A74     		strb	r2, [r3, #16]
+  46:Core/Src/spi_task.c ****             break;
+ 107              		.loc 1 46 13 is_stmt 1 view .LVU24
+ 108 0074 0122     		movs	r2, #1
+ 109 0076 4FF40051 		mov	r1, #8192
+ 110 007a 3848     		ldr	r0, .L12+16
+ 111 007c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 112              	.LVL5:
+  47:Core/Src/spi_task.c **** 
+ 113              		.loc 1 47 13 view .LVU25
+ 114              	.L10:
+  66:Core/Src/spi_task.c **** 
+  67:Core/Src/spi_task.c ****         default:  /* Clear all effects */
+  68:Core/Src/spi_task.c ****             g_audio_params.effects_mask  = 0;
+  69:Core/Src/spi_task.c ****             break;
+  70:Core/Src/spi_task.c ****         }
+  71:Core/Src/spi_task.c **** 
+  72:Core/Src/spi_task.c ****         osMutexRelease(g_params_mutex);
+ 115              		.loc 1 72 9 view .LVU26
+ 116 0080 374B     		ldr	r3, .L12+20
+ 117 0082 1868     		ldr	r0, [r3]
+ 118 0084 FFF7FEFF 		bl	osMutexRelease
+ 119              	.LVL6:
+ 120              	.L2:
+ 121              		.loc 1 72 9 is_stmt 0 view .LVU27
+ 122              	.LBE2:
+  27:Core/Src/spi_task.c ****     {
+ 123              		.loc 1 27 5 is_stmt 1 view .LVU28
+ 124              	.LBB3:
+  29:Core/Src/spi_task.c ****         if (evt.status != osEventMessage)
+ 125              		.loc 1 29 9 view .LVU29
+  29:Core/Src/spi_task.c ****         if (evt.status != osEventMessage)
+ 126              		.loc 1 29 15 is_stmt 0 view .LVU30
+ 127 0088 4FF0FF32 		mov	r2, #-1
+ 128 008c 354B     		ldr	r3, .L12+24
+ 129 008e 1968     		ldr	r1, [r3]
+ 130 0090 01A8     		add	r0, sp, #4
+ 131 0092 FFF7FEFF 		bl	osMessageGet
+ 132              	.LVL7:
+  30:Core/Src/spi_task.c ****             continue;
+ 133              		.loc 1 30 9 is_stmt 1 view .LVU31
+  30:Core/Src/spi_task.c ****             continue;
+ 134              		.loc 1 30 16 is_stmt 0 view .LVU32
+ 135 0096 019B     		ldr	r3, [sp, #4]
+  30:Core/Src/spi_task.c ****             continue;
+ 136              		.loc 1 30 12 view .LVU33
+ 137 0098 102B     		cmp	r3, #16
+ 138 009a F5D1     		bne	.L2
+  33:Core/Src/spi_task.c ****         uint8_t intensity = (uint8_t)( evt.value.v        & 0xFF);
+ 139              		.loc 1 33 9 is_stmt 1 view .LVU34
+  33:Core/Src/spi_task.c ****         uint8_t intensity = (uint8_t)( evt.value.v        & 0xFF);
+ 140              		.loc 1 33 49 is_stmt 0 view .LVU35
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccH4L62g.s 			page 5
+
+
+ 141 009c 029C     		ldr	r4, [sp, #8]
+  33:Core/Src/spi_task.c ****         uint8_t intensity = (uint8_t)( evt.value.v        & 0xFF);
+ 142              		.loc 1 33 52 view .LVU36
+ 143 009e 250A     		lsrs	r5, r4, #8
+ 144              	.LVL8:
   34:Core/Src/spi_task.c **** 
- 122              		.loc 1 34 9 view .LVU29
- 123 0068 4FF0FF31 		mov	r1, #-1
- 124 006c 304B     		ldr	r3, .L9+20
- 125 006e 1868     		ldr	r0, [r3]
- 126 0070 FFF7FEFF 		bl	osMutexWait
- 127              	.LVL10:
-  36:Core/Src/spi_task.c ****         {
- 128              		.loc 1 36 9 view .LVU30
- 129 0074 EBB2     		uxtb	r3, r5
- 130 0076 022B     		cmp	r3, #2
- 131 0078 CAD0     		beq	.L4
- 132 007a 032B     		cmp	r3, #3
- 133 007c 1FD0     		beq	.L5
- 134 007e 012B     		cmp	r3, #1
- 135 0080 3BD1     		bne	.L6
-  39:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_VOLUME;
- 136              		.loc 1 39 13 view .LVU31
-  39:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_VOLUME;
- 137              		.loc 1 39 54 is_stmt 0 view .LVU32
- 138 0082 E4B2     		uxtb	r4, r4
-  39:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_VOLUME;
- 139              		.loc 1 39 54 view .LVU33
- 140 0084 07EE904A 		vmov	s15, r4	@ int
- 141 0088 F8EEE77A 		vcvt.f32.s32	s15, s15
- 142 008c DFED2A6A 		vldr.32	s13, .L9+28
- 143 0090 87EEA67A 		vdiv.f32	s14, s15, s13
-  39:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_VOLUME;
- 144              		.loc 1 39 42 view .LVU34
- 145 0094 244B     		ldr	r3, .L9+12
- 146 0096 83ED007A 		vstr.32	s14, [r3]
-  40:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_SET);
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccS3dVNd.s 			page 5
+ 145              		.loc 1 34 9 is_stmt 1 view .LVU37
+  36:Core/Src/spi_task.c **** 
+ 146              		.loc 1 36 9 view .LVU38
+ 147 00a0 4FF0FF31 		mov	r1, #-1
+ 148 00a4 2E4B     		ldr	r3, .L12+20
+ 149 00a6 1868     		ldr	r0, [r3]
+ 150 00a8 FFF7FEFF 		bl	osMutexWait
+ 151              	.LVL9:
+  39:Core/Src/spi_task.c **** 
+ 152              		.loc 1 39 9 view .LVU39
+ 153 00ac 0022     		movs	r2, #0
+ 154 00ae 4FF4E041 		mov	r1, #28672
+ 155 00b2 2A48     		ldr	r0, .L12+16
+ 156 00b4 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 157              	.LVL10:
+  41:Core/Src/spi_task.c ****         {
+ 158              		.loc 1 41 9 view .LVU40
+ 159 00b8 EBB2     		uxtb	r3, r5
+ 160 00ba 032B     		cmp	r3, #3
+ 161 00bc 23D0     		beq	.L4
+ 162 00be A7D8     		bhi	.L5
+ 163 00c0 012B     		cmp	r3, #1
+ 164 00c2 C7D0     		beq	.L6
+ 165 00c4 022B     		cmp	r3, #2
+ 166 00c6 3DD1     		bne	.L8
+  50:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_CHORUS;
+ 167              		.loc 1 50 13 view .LVU41
+  50:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_CHORUS;
+ 168              		.loc 1 50 62 is_stmt 0 view .LVU42
+ 169 00c8 E4B2     		uxtb	r4, r4
+  50:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_CHORUS;
+ 170              		.loc 1 50 62 view .LVU43
+ 171 00ca 07EE904A 		vmov	s15, r4	@ int
+ 172 00ce F8EEE77A 		vcvt.f32.s32	s15, s15
+ 173 00d2 DFED206A 		vldr.32	s13, .L12+8
+ 174 00d6 87EEA67A 		vdiv.f32	s14, s15, s13
+  50:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_CHORUS;
+ 175              		.loc 1 50 72 view .LVU44
+ 176 00da DFED237A 		vldr.32	s15, .L12+28
+ 177 00de 67EE277A 		vmul.f32	s15, s14, s15
+  50:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_CHORUS;
+ 178              		.loc 1 50 49 view .LVU45
+ 179 00e2 9FED227A 		vldr.32	s14, .L12+32
+ 180 00e6 77EE877A 		vadd.f32	s15, s15, s14
+  50:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_CHORUS;
+ 181              		.loc 1 50 42 view .LVU46
+ 182 00ea 1B4B     		ldr	r3, .L12+12
+ 183 00ec C3ED027A 		vstr.32	s15, [r3, #8]
+  51:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_SET);
+ 184              		.loc 1 51 13 is_stmt 1 view .LVU47
+  51:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_SET);
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccH4L62g.s 			page 6
 
 
- 147              		.loc 1 40 13 is_stmt 1 view .LVU35
-  40:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_SET);
- 148              		.loc 1 40 27 is_stmt 0 view .LVU36
- 149 009a 9A7A     		ldrb	r2, [r3, #10]	@ zero_extendqisi2
-  40:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_SET);
- 150              		.loc 1 40 41 view .LVU37
- 151 009c 42F00102 		orr	r2, r2, #1
- 152 00a0 9A72     		strb	r2, [r3, #10]
-  41:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_RESET);
- 153              		.loc 1 41 13 is_stmt 1 view .LVU38
- 154 00a2 224C     		ldr	r4, .L9+16
- 155              	.LVL11:
-  41:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_RESET);
- 156              		.loc 1 41 13 is_stmt 0 view .LVU39
- 157 00a4 0122     		movs	r2, #1
- 158 00a6 4FF40051 		mov	r1, #8192
- 159 00aa 2046     		mov	r0, r4
- 160 00ac FFF7FEFF 		bl	HAL_GPIO_WritePin
- 161              	.LVL12:
-  42:Core/Src/spi_task.c ****             break;
- 162              		.loc 1 42 13 is_stmt 1 view .LVU40
- 163 00b0 0022     		movs	r2, #0
- 164 00b2 4FF48041 		mov	r1, #16384
- 165 00b6 2046     		mov	r0, r4
- 166 00b8 FFF7FEFF 		bl	HAL_GPIO_WritePin
- 167              	.LVL13:
-  43:Core/Src/spi_task.c **** 
- 168              		.loc 1 43 13 view .LVU41
- 169 00bc C4E7     		b	.L7
- 170              	.LVL14:
- 171              	.L5:
-  53:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_LPF;
- 172              		.loc 1 53 13 view .LVU42
-  53:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_LPF;
- 173              		.loc 1 53 54 is_stmt 0 view .LVU43
- 174 00be E4B2     		uxtb	r4, r4
-  53:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_LPF;
- 175              		.loc 1 53 54 view .LVU44
- 176 00c0 07EE904A 		vmov	s15, r4	@ int
- 177 00c4 F8EEE77A 		vcvt.f32.s32	s15, s15
- 178 00c8 DFED1B6A 		vldr.32	s13, .L9+28
- 179 00cc 87EEA67A 		vdiv.f32	s14, s15, s13
-  53:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_LPF;
- 180              		.loc 1 53 42 view .LVU45
- 181 00d0 154B     		ldr	r3, .L9+12
- 182 00d2 83ED017A 		vstr.32	s14, [r3, #4]
-  54:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_SET);
- 183              		.loc 1 54 13 is_stmt 1 view .LVU46
-  54:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_SET);
- 184              		.loc 1 54 27 is_stmt 0 view .LVU47
- 185 00d6 9A7A     		ldrb	r2, [r3, #10]	@ zero_extendqisi2
-  54:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_SET);
- 186              		.loc 1 54 41 view .LVU48
- 187 00d8 42F00202 		orr	r2, r2, #2
- 188 00dc 9A72     		strb	r2, [r3, #10]
-  55:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_SET);
- 189              		.loc 1 55 13 is_stmt 1 view .LVU49
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccS3dVNd.s 			page 6
+ 185              		.loc 1 51 27 is_stmt 0 view .LVU48
+ 186 00f0 1A7C     		ldrb	r2, [r3, #16]	@ zero_extendqisi2
+  51:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_SET);
+ 187              		.loc 1 51 41 view .LVU49
+ 188 00f2 42F00402 		orr	r2, r2, #4
+ 189 00f6 1A74     		strb	r2, [r3, #16]
+  52:Core/Src/spi_task.c ****             break;
+ 190              		.loc 1 52 13 is_stmt 1 view .LVU50
+ 191 00f8 0122     		movs	r2, #1
+ 192 00fa 4FF48041 		mov	r1, #16384
+ 193 00fe 1748     		ldr	r0, .L12+16
+ 194 0100 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 195              	.LVL11:
+  53:Core/Src/spi_task.c **** 
+ 196              		.loc 1 53 13 view .LVU51
+ 197 0104 BCE7     		b	.L10
+ 198              	.L4:
+  56:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_LPF;
+ 199              		.loc 1 56 13 view .LVU52
+  56:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_LPF;
+ 200              		.loc 1 56 62 is_stmt 0 view .LVU53
+ 201 0106 E4B2     		uxtb	r4, r4
+  56:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_LPF;
+ 202              		.loc 1 56 62 view .LVU54
+ 203 0108 07EE904A 		vmov	s15, r4	@ int
+ 204 010c F8EEE77A 		vcvt.f32.s32	s15, s15
+ 205 0110 DFED106A 		vldr.32	s13, .L12+8
+ 206 0114 87EEA67A 		vdiv.f32	s14, s15, s13
+  56:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_LPF;
+ 207              		.loc 1 56 72 view .LVU55
+ 208 0118 DFED157A 		vldr.32	s15, .L12+36
+ 209 011c 67EE277A 		vmul.f32	s15, s14, s15
+  56:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_LPF;
+ 210              		.loc 1 56 49 view .LVU56
+ 211 0120 9FED147A 		vldr.32	s14, .L12+40
+ 212 0124 77EE877A 		vadd.f32	s15, s15, s14
+  56:Core/Src/spi_task.c ****             g_audio_params.effects_mask |= EFFECT_LPF;
+ 213              		.loc 1 56 42 view .LVU57
+ 214 0128 0B4B     		ldr	r3, .L12+12
+ 215 012a C3ED017A 		vstr.32	s15, [r3, #4]
+  57:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD3_Pin | LD5_Pin, GPIO_PIN_SET);
+ 216              		.loc 1 57 13 is_stmt 1 view .LVU58
+  57:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD3_Pin | LD5_Pin, GPIO_PIN_SET);
+ 217              		.loc 1 57 27 is_stmt 0 view .LVU59
+ 218 012e 1A7C     		ldrb	r2, [r3, #16]	@ zero_extendqisi2
+  57:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD3_Pin | LD5_Pin, GPIO_PIN_SET);
+ 219              		.loc 1 57 41 view .LVU60
+ 220 0130 42F00202 		orr	r2, r2, #2
+ 221 0134 1A74     		strb	r2, [r3, #16]
+  58:Core/Src/spi_task.c ****             break;
+ 222              		.loc 1 58 13 is_stmt 1 view .LVU61
+ 223 0136 0122     		movs	r2, #1
+ 224 0138 4FF4C041 		mov	r1, #24576
+ 225 013c 0748     		ldr	r0, .L12+16
+ 226 013e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 227              	.LVL12:
+  59:Core/Src/spi_task.c **** 
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccH4L62g.s 			page 7
 
 
- 190 00de 134C     		ldr	r4, .L9+16
- 191              	.LVL15:
-  55:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_SET);
- 192              		.loc 1 55 13 is_stmt 0 view .LVU50
- 193 00e0 0122     		movs	r2, #1
- 194 00e2 4FF40051 		mov	r1, #8192
- 195 00e6 2046     		mov	r0, r4
- 196 00e8 FFF7FEFF 		bl	HAL_GPIO_WritePin
- 197              	.LVL16:
-  56:Core/Src/spi_task.c ****             break;
- 198              		.loc 1 56 13 is_stmt 1 view .LVU51
- 199 00ec 0122     		movs	r2, #1
- 200 00ee 4FF48041 		mov	r1, #16384
- 201 00f2 2046     		mov	r0, r4
- 202 00f4 FFF7FEFF 		bl	HAL_GPIO_WritePin
- 203              	.LVL17:
-  57:Core/Src/spi_task.c **** 
- 204              		.loc 1 57 13 view .LVU52
- 205 00f8 A6E7     		b	.L7
- 206              	.LVL18:
- 207              	.L6:
-  60:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_RESET);
- 208              		.loc 1 60 13 view .LVU53
-  60:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_RESET);
- 209              		.loc 1 60 42 is_stmt 0 view .LVU54
- 210 00fa 0024     		movs	r4, #0
- 211              	.LVL19:
-  60:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_RESET);
- 212              		.loc 1 60 42 view .LVU55
- 213 00fc 0A4B     		ldr	r3, .L9+12
- 214 00fe 9C72     		strb	r4, [r3, #10]
-  61:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_RESET);
- 215              		.loc 1 61 13 is_stmt 1 view .LVU56
- 216 0100 0A4D     		ldr	r5, .L9+16
- 217              	.LVL20:
-  61:Core/Src/spi_task.c ****             HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_RESET);
- 218              		.loc 1 61 13 is_stmt 0 view .LVU57
- 219 0102 2246     		mov	r2, r4
- 220 0104 4FF40051 		mov	r1, #8192
- 221 0108 2846     		mov	r0, r5
- 222 010a FFF7FEFF 		bl	HAL_GPIO_WritePin
- 223              	.LVL21:
-  62:Core/Src/spi_task.c ****             break;
- 224              		.loc 1 62 13 is_stmt 1 view .LVU58
- 225 010e 2246     		mov	r2, r4
- 226 0110 4FF48041 		mov	r1, #16384
- 227 0114 2846     		mov	r0, r5
- 228 0116 FFF7FEFF 		bl	HAL_GPIO_WritePin
- 229              	.LVL22:
-  63:Core/Src/spi_task.c ****         }
- 230              		.loc 1 63 13 view .LVU59
- 231 011a 95E7     		b	.L7
- 232              	.L10:
- 233              		.align	2
- 234              	.L9:
- 235 011c 00000000 		.word	spi_rx_buf
- 236 0120 00000000 		.word	hspi2
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccS3dVNd.s 			page 7
-
-
- 237 0124 81808080 		.word	-2139062143
- 238 0128 00000000 		.word	g_audio_params
- 239 012c 000C0240 		.word	1073875968
- 240 0130 00000000 		.word	g_params_mutex
- 241 0134 00000000 		.word	spiQueueHandle
- 242 0138 00007F43 		.word	1132396544
- 243              	.LBE3:
- 244              		.cfi_endproc
- 245              	.LFE139:
- 247              		.text
- 248              	.Letext0:
- 249              		.file 2 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
- 250              		.file 3 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
- 251              		.file 4 "Middlewares/Third_Party/FreeRTOS/Source/include/queue.h"
- 252              		.file 5 "Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h"
- 253              		.file 6 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h"
- 254              		.file 7 "Core/Inc/spi_task.h"
- 255              		.file 8 "Core/Inc/dsp_task.h"
- 256              		.file 9 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
- 257              		.file 10 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
- 258              		.file 11 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h"
- 259              		.file 12 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
- 260              		.file 13 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h"
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccS3dVNd.s 			page 8
+ 228              		.loc 1 59 13 view .LVU62
+ 229 0142 9DE7     		b	.L10
+ 230              	.L8:
+  68:Core/Src/spi_task.c ****             break;
+ 231              		.loc 1 68 13 view .LVU63
+  68:Core/Src/spi_task.c ****             break;
+ 232              		.loc 1 68 42 is_stmt 0 view .LVU64
+ 233 0144 044B     		ldr	r3, .L12+12
+ 234 0146 0022     		movs	r2, #0
+ 235 0148 1A74     		strb	r2, [r3, #16]
+  69:Core/Src/spi_task.c ****         }
+ 236              		.loc 1 69 13 is_stmt 1 view .LVU65
+ 237 014a 99E7     		b	.L10
+ 238              	.L13:
+ 239              		.align	2
+ 240              	.L12:
+ 241 014c 00000000 		.word	spi_rx_buf
+ 242 0150 00000000 		.word	hspi2
+ 243 0154 00007F43 		.word	1132396544
+ 244 0158 00000000 		.word	g_audio_params
+ 245 015c 000C0240 		.word	1073875968
+ 246 0160 00000000 		.word	g_params_mutex
+ 247 0164 00000000 		.word	spiQueueHandle
+ 248 0168 9A993940 		.word	1077516698
+ 249 016c CDCCCC3D 		.word	1036831949
+ 250 0170 3333333F 		.word	1060320051
+ 251 0174 9A99993E 		.word	1050253722
+ 252              	.LBE3:
+ 253              		.cfi_endproc
+ 254              	.LFE139:
+ 256              		.text
+ 257              	.Letext0:
+ 258              		.file 2 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
+ 259              		.file 3 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
+ 260              		.file 4 "Middlewares/Third_Party/FreeRTOS/Source/include/queue.h"
+ 261              		.file 5 "Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h"
+ 262              		.file 6 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h"
+ 263              		.file 7 "Core/Inc/spi_task.h"
+ 264              		.file 8 "Core/Inc/dsp_task.h"
+ 265              		.file 9 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
+ 266              		.file 10 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 267              		.file 11 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h"
+ 268              		.file 12 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
+ 269              		.file 13 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h"
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccH4L62g.s 			page 8
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 spi_task.c
-C:\Users\leejo\AppData\Local\Temp\ccS3dVNd.s:21     .text.StartSPITask:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccS3dVNd.s:27     .text.StartSPITask:00000000 StartSPITask
-C:\Users\leejo\AppData\Local\Temp\ccS3dVNd.s:235    .text.StartSPITask:0000011c $d
+C:\Users\leejo\AppData\Local\Temp\ccH4L62g.s:21     .text.StartSPITask:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccH4L62g.s:27     .text.StartSPITask:00000000 StartSPITask
+C:\Users\leejo\AppData\Local\Temp\ccH4L62g.s:241    .text.StartSPITask:0000014c $d
 
 UNDEFINED SYMBOLS
 HAL_SPI_Receive_IT

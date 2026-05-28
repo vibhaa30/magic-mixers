@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s 			page 1
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -31,123 +31,134 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s 			page 1
    1:Core/Src/dsp_task.c **** #include "dsp_task.h"
    2:Core/Src/dsp_task.c **** #include "main.h"
    3:Core/Src/dsp_task.c **** #include <string.h>
-   4:Core/Src/dsp_task.c **** 
-   5:Core/Src/dsp_task.c **** extern I2S_HandleTypeDef hi2s3;
-   6:Core/Src/dsp_task.c **** 
-   7:Core/Src/dsp_task.c **** /* Defaults: volume at 80%, LPF bypassed, 256-sample delay, only volume on */
-   8:Core/Src/dsp_task.c **** AudioEffectParams_t g_audio_params = {
-   9:Core/Src/dsp_task.c ****     .volume        = 0.8f,
-  10:Core/Src/dsp_task.c ****     .lpf_alpha     = 1.0f,
-  11:Core/Src/dsp_task.c ****     .delay_samples = 256,
-  12:Core/Src/dsp_task.c ****     .effects_mask  = EFFECT_VOLUME,
-  13:Core/Src/dsp_task.c **** };
-  14:Core/Src/dsp_task.c **** osMutexId g_params_mutex;
-  15:Core/Src/dsp_task.c **** 
-  16:Core/Src/dsp_task.c **** /* Ping-pong DMA buffers: two blocks back-to-back.
-  17:Core/Src/dsp_task.c ****    DMA (circular) writes into one half while DSP reads the other.
-  18:Core/Src/dsp_task.c ****    24-bit I2S layout per stereo pair: [L_MSW, L_LSW, R_MSW, R_LSW],
-  19:Core/Src/dsp_task.c ****    so each block is AUDIO_BLOCK_SAMPLES * 4 uint16_t words. */
-  20:Core/Src/dsp_task.c **** #define HALF_BUF_LEN  (AUDIO_BLOCK_SAMPLES * 4)
-  21:Core/Src/dsp_task.c **** static uint16_t rx_dma_buf[HALF_BUF_LEN * 2];
-  22:Core/Src/dsp_task.c **** static uint16_t tx_dma_buf[HALF_BUF_LEN * 2];
-  23:Core/Src/dsp_task.c **** 
-  24:Core/Src/dsp_task.c **** /* Per-channel delay ring buffers */
-  25:Core/Src/dsp_task.c **** static int16_t  delay_line_L[DELAY_BUF_SAMPLES];
-  26:Core/Src/dsp_task.c **** static int16_t  delay_line_R[DELAY_BUF_SAMPLES];
-  27:Core/Src/dsp_task.c **** static uint16_t delay_wr = 0;
-  28:Core/Src/dsp_task.c **** 
-  29:Core/Src/dsp_task.c **** /* Per-channel IIR state */
-  30:Core/Src/dsp_task.c **** static float lpf_L = 0.0f;
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s 			page 2
+   4:Core/Src/dsp_task.c **** #include <math.h>
+   5:Core/Src/dsp_task.c **** 
+   6:Core/Src/dsp_task.c **** extern I2S_HandleTypeDef hi2s3;
+   7:Core/Src/dsp_task.c **** 
+   8:Core/Src/dsp_task.c **** /* Defaults: volume at 80%, LPF bypassed, chorus at 0.5 Hz, pitch shift at +7 semitones */
+   9:Core/Src/dsp_task.c **** AudioEffectParams_t g_audio_params = {
+  10:Core/Src/dsp_task.c ****     .volume          = 0.8f,
+  11:Core/Src/dsp_task.c ****     .lpf_alpha       = 1.0f,
+  12:Core/Src/dsp_task.c ****     .chorus_rate     = 0.5f,
+  13:Core/Src/dsp_task.c ****     .pitch_semitones = 7.0f,
+  14:Core/Src/dsp_task.c ****     .effects_mask    = EFFECT_VOLUME,
+  15:Core/Src/dsp_task.c **** };
+  16:Core/Src/dsp_task.c **** osMutexId g_params_mutex;
+  17:Core/Src/dsp_task.c **** 
+  18:Core/Src/dsp_task.c **** /* Ping-pong DMA buffers: two blocks back-to-back.
+  19:Core/Src/dsp_task.c ****    DMA (circular) writes into one half while DSP reads the other.
+  20:Core/Src/dsp_task.c ****    24-bit I2S layout per stereo pair: [L_MSW, L_LSW, R_MSW, R_LSW],
+  21:Core/Src/dsp_task.c ****    so each block is AUDIO_BLOCK_SAMPLES * 4 uint16_t words. */
+  22:Core/Src/dsp_task.c **** #define HALF_BUF_LEN  (AUDIO_BLOCK_SAMPLES * 4)
+  23:Core/Src/dsp_task.c **** static uint16_t rx_dma_buf[HALF_BUF_LEN * 2];
+  24:Core/Src/dsp_task.c **** static uint16_t tx_dma_buf[HALF_BUF_LEN * 2];
+  25:Core/Src/dsp_task.c **** 
+  26:Core/Src/dsp_task.c **** /* Chorus: circular delay lines, one per channel, plus LFO phase accumulator */
+  27:Core/Src/dsp_task.c **** static int16_t  chorus_buf_L[CHORUS_BUF_SAMPLES];
+  28:Core/Src/dsp_task.c **** static int16_t  chorus_buf_R[CHORUS_BUF_SAMPLES];
+  29:Core/Src/dsp_task.c **** static uint32_t chorus_wr  = 0;
+  30:Core/Src/dsp_task.c **** static float    chorus_lfo = 0.0f;
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 2
 
 
-  31:Core/Src/dsp_task.c **** static float lpf_R = 0.0f;
-  32:Core/Src/dsp_task.c **** 
-  33:Core/Src/dsp_task.c **** /* Ping-pong signaling: set by ISR callbacks, consumed by task */
-  34:Core/Src/dsp_task.c **** #define SIG_DMA_RDY   0x0001
-  35:Core/Src/dsp_task.c **** static volatile uint8_t active_half = 0;
-  36:Core/Src/dsp_task.c **** static osThreadId       dsp_task_id;
-  37:Core/Src/dsp_task.c **** 
-  38:Core/Src/dsp_task.c **** /* HAL weak-symbol overrides — called from DMA ISR context.
-  39:Core/Src/dsp_task.c ****    HalfCplt: first block is ready (DMA now filling second).
-  40:Core/Src/dsp_task.c ****    TxRxCplt:  second block is ready (DMA wraps to first). */
-  41:Core/Src/dsp_task.c **** void HAL_I2SEx_TxRxHalfCpltCallback(I2S_HandleTypeDef *hi2s)
-  42:Core/Src/dsp_task.c **** {
-  43:Core/Src/dsp_task.c ****     active_half = 0;
-  44:Core/Src/dsp_task.c ****     osSignalSet(dsp_task_id, SIG_DMA_RDY);
-  45:Core/Src/dsp_task.c **** }
-  46:Core/Src/dsp_task.c **** 
-  47:Core/Src/dsp_task.c **** void HAL_I2SEx_TxRxCpltCallback(I2S_HandleTypeDef *hi2s)
-  48:Core/Src/dsp_task.c **** {
-  49:Core/Src/dsp_task.c ****     active_half = 1;
-  50:Core/Src/dsp_task.c ****     osSignalSet(dsp_task_id, SIG_DMA_RDY);
-  51:Core/Src/dsp_task.c **** }
-  52:Core/Src/dsp_task.c **** 
-  53:Core/Src/dsp_task.c **** /* Scale every sample by vol.
-  54:Core/Src/dsp_task.c ****    24-bit layout stride: MSW at i, LSW at i+1; step by 2 to hit every MSW. */
-  55:Core/Src/dsp_task.c **** static void apply_volume(uint16_t *buf, float vol)
-  56:Core/Src/dsp_task.c **** {
-  29              		.loc 1 56 1 view -0
+  31:Core/Src/dsp_task.c **** 
+  32:Core/Src/dsp_task.c **** /* Pitch shift: circular delay lines and two read heads for granular OLA */
+  33:Core/Src/dsp_task.c **** static int16_t  pitch_buf_L[PITCH_BUF_SAMPLES];
+  34:Core/Src/dsp_task.c **** static int16_t  pitch_buf_R[PITCH_BUF_SAMPLES];
+  35:Core/Src/dsp_task.c **** static uint32_t pitch_wr   = 0;
+  36:Core/Src/dsp_task.c **** static float    pitch_rd1  = (float)(PITCH_BUF_SAMPLES - PITCH_GRAIN); /* primary read head */
+  37:Core/Src/dsp_task.c **** static float    pitch_rd2  = 0.0f;                                      /* secondary read head */
+  38:Core/Src/dsp_task.c **** static int32_t  pitch_xfade = 0;    /* crossfade samples remaining (0 = idle) */
+  39:Core/Src/dsp_task.c **** 
+  40:Core/Src/dsp_task.c **** /* Per-channel IIR state */
+  41:Core/Src/dsp_task.c **** static float lpf_L = 0.0f;
+  42:Core/Src/dsp_task.c **** static float lpf_R = 0.0f;
+  43:Core/Src/dsp_task.c **** 
+  44:Core/Src/dsp_task.c **** /* Ping-pong signaling: set by ISR callbacks, consumed by task */
+  45:Core/Src/dsp_task.c **** #define SIG_DMA_RDY   0x0001
+  46:Core/Src/dsp_task.c **** static volatile uint8_t active_half = 0;
+  47:Core/Src/dsp_task.c **** static osThreadId       dsp_task_id;
+  48:Core/Src/dsp_task.c **** 
+  49:Core/Src/dsp_task.c **** /* HAL weak-symbol overrides — called from DMA ISR context.
+  50:Core/Src/dsp_task.c ****    HalfCplt: first block is ready (DMA now filling second).
+  51:Core/Src/dsp_task.c ****    TxRxCplt:  second block is ready (DMA wraps to first). */
+  52:Core/Src/dsp_task.c **** void HAL_I2SEx_TxRxHalfCpltCallback(I2S_HandleTypeDef *hi2s)
+  53:Core/Src/dsp_task.c **** {
+  54:Core/Src/dsp_task.c ****     active_half = 0;
+  55:Core/Src/dsp_task.c ****     osSignalSet(dsp_task_id, SIG_DMA_RDY);
+  56:Core/Src/dsp_task.c **** }
+  57:Core/Src/dsp_task.c **** 
+  58:Core/Src/dsp_task.c **** void HAL_I2SEx_TxRxCpltCallback(I2S_HandleTypeDef *hi2s)
+  59:Core/Src/dsp_task.c **** {
+  60:Core/Src/dsp_task.c ****     active_half = 1;
+  61:Core/Src/dsp_task.c ****     osSignalSet(dsp_task_id, SIG_DMA_RDY);
+  62:Core/Src/dsp_task.c **** }
+  63:Core/Src/dsp_task.c **** 
+  64:Core/Src/dsp_task.c **** /* Scale every sample by vol.
+  65:Core/Src/dsp_task.c ****    24-bit layout stride: MSW at i, LSW at i+1; step by 2 to hit every MSW. */
+  66:Core/Src/dsp_task.c **** static void apply_volume(uint16_t *buf, float vol)
+  67:Core/Src/dsp_task.c **** {
+  29              		.loc 1 67 1 view -0
   30              		.cfi_startproc
   31              		@ args = 0, pretend = 0, frame = 0
   32              		@ frame_needed = 0, uses_anonymous_args = 0
   33              		@ link register save eliminated.
-  57:Core/Src/dsp_task.c ****     for (int i = 0; i < HALF_BUF_LEN; i += 2) {
-  34              		.loc 1 57 5 view .LVU1
+  68:Core/Src/dsp_task.c ****     for (int i = 0; i < HALF_BUF_LEN; i += 2) {
+  34              		.loc 1 68 5 view .LVU1
   35              	.LBB2:
-  36              		.loc 1 57 10 view .LVU2
-  37              		.loc 1 57 14 is_stmt 0 view .LVU3
+  36              		.loc 1 68 10 view .LVU2
+  37              		.loc 1 68 14 is_stmt 0 view .LVU3
   38 0000 0023     		movs	r3, #0
-  39              		.loc 1 57 5 view .LVU4
+  39              		.loc 1 68 5 view .LVU4
   40 0002 12E0     		b	.L2
   41              	.LVL1:
   42              	.L3:
   43              	.LBB3:
-  58:Core/Src/dsp_task.c ****         float s    = (float)(int16_t)buf[i] * vol;
-  44              		.loc 1 58 9 is_stmt 1 view .LVU5
-  45              		.loc 1 58 29 is_stmt 0 view .LVU6
+  69:Core/Src/dsp_task.c ****         float s    = (float)(int16_t)buf[i] * vol;
+  44              		.loc 1 69 9 is_stmt 1 view .LVU5
+  45              		.loc 1 69 29 is_stmt 0 view .LVU6
   46 0004 30F91320 		ldrsh	r2, [r0, r3, lsl #1]
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 3
+
+
   47 0008 07EE902A 		vmov	s15, r2	@ int
-  48              		.loc 1 58 22 view .LVU7
+  48              		.loc 1 69 22 view .LVU7
   49 000c F8EEE77A 		vcvt.f32.s32	s15, s15
-  50              		.loc 1 58 15 view .LVU8
+  50              		.loc 1 69 15 view .LVU8
   51 0010 67EE807A 		vmul.f32	s15, s15, s0
   52              	.LVL2:
-  59:Core/Src/dsp_task.c ****         buf[i]     = (uint16_t)(int16_t)s;
-  53              		.loc 1 59 9 is_stmt 1 view .LVU9
-  54              		.loc 1 59 32 is_stmt 0 view .LVU10
+  70:Core/Src/dsp_task.c ****         buf[i]     = (uint16_t)(int16_t)s;
+  53              		.loc 1 70 9 is_stmt 1 view .LVU9
+  54              		.loc 1 70 32 is_stmt 0 view .LVU10
   55 0014 FDEEE77A 		vcvt.s32.f32	s15, s15
   56              	.LVL3:
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s 			page 3
-
-
-  57              		.loc 1 59 20 view .LVU11
+  57              		.loc 1 70 20 view .LVU11
   58 0018 17EE902A 		vmov	r2, s15	@ int
   59              	.LVL4:
-  60              		.loc 1 59 20 view .LVU12
+  60              		.loc 1 70 20 view .LVU12
   61 001c 20F81320 		strh	r2, [r0, r3, lsl #1]	@ movhi
   62              	.LVL5:
-  60:Core/Src/dsp_task.c ****         buf[i + 1] = 0;
-  63              		.loc 1 60 9 is_stmt 1 view .LVU13
-  64              		.loc 1 60 15 is_stmt 0 view .LVU14
+  71:Core/Src/dsp_task.c ****         buf[i + 1] = 0;
+  63              		.loc 1 71 9 is_stmt 1 view .LVU13
+  64              		.loc 1 71 15 is_stmt 0 view .LVU14
   65 0020 5A1C     		adds	r2, r3, #1
-  66              		.loc 1 60 20 view .LVU15
+  66              		.loc 1 71 20 view .LVU15
   67 0022 0021     		movs	r1, #0
   68 0024 20F81210 		strh	r1, [r0, r2, lsl #1]	@ movhi
   69              	.LBE3:
-  57:Core/Src/dsp_task.c ****         float s    = (float)(int16_t)buf[i] * vol;
-  70              		.loc 1 57 41 is_stmt 1 discriminator 3 view .LVU16
+  68:Core/Src/dsp_task.c ****         float s    = (float)(int16_t)buf[i] * vol;
+  70              		.loc 1 68 41 is_stmt 1 discriminator 3 view .LVU16
   71 0028 0233     		adds	r3, r3, #2
   72              	.LVL6:
   73              	.L2:
-  57:Core/Src/dsp_task.c ****         float s    = (float)(int16_t)buf[i] * vol;
-  74              		.loc 1 57 23 discriminator 1 view .LVU17
+  68:Core/Src/dsp_task.c ****         float s    = (float)(int16_t)buf[i] * vol;
+  74              		.loc 1 68 23 discriminator 1 view .LVU17
   75 002a 3F2B     		cmp	r3, #63
   76 002c EADD     		ble	.L3
   77              	.LBE2:
-  61:Core/Src/dsp_task.c ****     }
-  62:Core/Src/dsp_task.c **** }
-  78              		.loc 1 62 1 is_stmt 0 view .LVU18
+  72:Core/Src/dsp_task.c ****     }
+  73:Core/Src/dsp_task.c **** }
+  78              		.loc 1 73 1 is_stmt 0 view .LVU18
   79 002e 7047     		bx	lr
   80              		.cfi_endproc
   81              	.LFE141:
@@ -159,127 +170,127 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s 			page 1
   89              	apply_lpf:
   90              	.LVL7:
   91              	.LFB142:
-  63:Core/Src/dsp_task.c **** 
-  64:Core/Src/dsp_task.c **** /* First-order IIR: y[n] = alpha*x[n] + (1-alpha)*y[n-1]
-  65:Core/Src/dsp_task.c ****    alpha=1.0 is all-pass; alpha near 0 cuts more high frequencies.
-  66:Core/Src/dsp_task.c ****    24-bit layout: L_MSW at i, L_LSW at i+1, R_MSW at i+2, R_LSW at i+3; step by 4. */
-  67:Core/Src/dsp_task.c **** static void apply_lpf(uint16_t *buf, float alpha)
-  68:Core/Src/dsp_task.c **** {
-  92              		.loc 1 68 1 is_stmt 1 view -0
+  74:Core/Src/dsp_task.c **** 
+  75:Core/Src/dsp_task.c **** /* First-order IIR: y[n] = alpha*x[n] + (1-alpha)*y[n-1]
+  76:Core/Src/dsp_task.c ****    alpha=1.0 is all-pass; alpha near 0 cuts more high frequencies.
+  77:Core/Src/dsp_task.c ****    24-bit layout: L_MSW at i, L_LSW at i+1, R_MSW at i+2, R_LSW at i+3; step by 4. */
+  78:Core/Src/dsp_task.c **** static void apply_lpf(uint16_t *buf, float alpha)
+  79:Core/Src/dsp_task.c **** {
+  92              		.loc 1 79 1 is_stmt 1 view -0
   93              		.cfi_startproc
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 4
+
+
   94              		@ args = 0, pretend = 0, frame = 0
   95              		@ frame_needed = 0, uses_anonymous_args = 0
   96              		@ link register save eliminated.
-  69:Core/Src/dsp_task.c ****     float beta = 1.0f - alpha;
-  97              		.loc 1 69 5 view .LVU20
-  98              		.loc 1 69 11 is_stmt 0 view .LVU21
+  80:Core/Src/dsp_task.c ****     float beta = 1.0f - alpha;
+  97              		.loc 1 80 5 view .LVU20
+  98              		.loc 1 80 11 is_stmt 0 view .LVU21
   99 0000 B7EE006A 		vmov.f32	s12, #1.0e+0
  100 0004 36EE406A 		vsub.f32	s12, s12, s0
  101              	.LVL8:
-  70:Core/Src/dsp_task.c ****     for (int i = 0; i < HALF_BUF_LEN; i += 4) {
- 102              		.loc 1 70 5 is_stmt 1 view .LVU22
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s 			page 4
-
-
+  81:Core/Src/dsp_task.c ****     for (int i = 0; i < HALF_BUF_LEN; i += 4) {
+ 102              		.loc 1 81 5 is_stmt 1 view .LVU22
  103              	.LBB4:
- 104              		.loc 1 70 10 view .LVU23
- 105              		.loc 1 70 14 is_stmt 0 view .LVU24
+ 104              		.loc 1 81 10 view .LVU23
+ 105              		.loc 1 81 14 is_stmt 0 view .LVU24
  106 0008 0023     		movs	r3, #0
- 107              		.loc 1 70 5 view .LVU25
+ 107              		.loc 1 81 5 view .LVU25
  108 000a 37E0     		b	.L5
  109              	.LVL9:
  110              	.L6:
  111              	.LBB5:
-  71:Core/Src/dsp_task.c ****         float xL = (float)(int16_t)buf[i];
- 112              		.loc 1 71 9 is_stmt 1 view .LVU26
- 113              		.loc 1 71 27 is_stmt 0 view .LVU27
+  82:Core/Src/dsp_task.c ****         float xL = (float)(int16_t)buf[i];
+ 112              		.loc 1 82 9 is_stmt 1 view .LVU26
+ 113              		.loc 1 82 27 is_stmt 0 view .LVU27
  114 000c 30F91320 		ldrsh	r2, [r0, r3, lsl #1]
  115 0010 07EE102A 		vmov	s14, r2	@ int
- 116              		.loc 1 71 15 view .LVU28
+ 116              		.loc 1 82 15 view .LVU28
  117 0014 B8EEC77A 		vcvt.f32.s32	s14, s14
  118              	.LVL10:
-  72:Core/Src/dsp_task.c ****         float xR = (float)(int16_t)buf[i + 2];
- 119              		.loc 1 72 9 is_stmt 1 view .LVU29
- 120              		.loc 1 72 42 is_stmt 0 view .LVU30
+  83:Core/Src/dsp_task.c ****         float xR = (float)(int16_t)buf[i + 2];
+ 119              		.loc 1 83 9 is_stmt 1 view .LVU29
+ 120              		.loc 1 83 42 is_stmt 0 view .LVU30
  121 0018 991C     		adds	r1, r3, #2
- 122              		.loc 1 72 27 view .LVU31
+ 122              		.loc 1 83 27 view .LVU31
  123 001a 30F91120 		ldrsh	r2, [r0, r1, lsl #1]
  124 001e 07EE902A 		vmov	s15, r2	@ int
- 125              		.loc 1 72 15 view .LVU32
+ 125              		.loc 1 83 15 view .LVU32
  126 0022 F8EEE77A 		vcvt.f32.s32	s15, s15
  127              	.LVL11:
-  73:Core/Src/dsp_task.c ****         lpf_L    = alpha * xL + beta * lpf_L;
- 128              		.loc 1 73 9 is_stmt 1 view .LVU33
- 129              		.loc 1 73 26 is_stmt 0 view .LVU34
+  84:Core/Src/dsp_task.c ****         lpf_L    = alpha * xL + beta * lpf_L;
+ 128              		.loc 1 84 9 is_stmt 1 view .LVU33
+ 129              		.loc 1 84 26 is_stmt 0 view .LVU34
  130 0026 20EE077A 		vmul.f32	s14, s0, s14
  131              	.LVL12:
- 132              		.loc 1 73 38 view .LVU35
+ 132              		.loc 1 84 38 view .LVU35
  133 002a 164A     		ldr	r2, .L7
  134 002c D2ED006A 		vldr.32	s13, [r2]
  135 0030 66EE266A 		vmul.f32	s13, s12, s13
- 136              		.loc 1 73 31 view .LVU36
+ 136              		.loc 1 84 31 view .LVU36
  137 0034 37EE267A 		vadd.f32	s14, s14, s13
- 138              		.loc 1 73 18 view .LVU37
+ 138              		.loc 1 84 18 view .LVU37
  139 0038 82ED007A 		vstr.32	s14, [r2]
-  74:Core/Src/dsp_task.c ****         lpf_R    = alpha * xR + beta * lpf_R;
- 140              		.loc 1 74 9 is_stmt 1 view .LVU38
- 141              		.loc 1 74 26 is_stmt 0 view .LVU39
+  85:Core/Src/dsp_task.c ****         lpf_R    = alpha * xR + beta * lpf_R;
+ 140              		.loc 1 85 9 is_stmt 1 view .LVU38
+ 141              		.loc 1 85 26 is_stmt 0 view .LVU39
  142 003c 60EE277A 		vmul.f32	s15, s0, s15
  143              	.LVL13:
- 144              		.loc 1 74 38 view .LVU40
+ 144              		.loc 1 85 38 view .LVU40
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 5
+
+
  145 0040 114A     		ldr	r2, .L7+4
  146 0042 D2ED006A 		vldr.32	s13, [r2]
  147 0046 66EE266A 		vmul.f32	s13, s12, s13
- 148              		.loc 1 74 31 view .LVU41
+ 148              		.loc 1 85 31 view .LVU41
  149 004a 77EEA67A 		vadd.f32	s15, s15, s13
- 150              		.loc 1 74 18 view .LVU42
+ 150              		.loc 1 85 18 view .LVU42
  151 004e C2ED007A 		vstr.32	s15, [r2]
-  75:Core/Src/dsp_task.c ****         buf[i]     = (uint16_t)(int16_t)lpf_L;
- 152              		.loc 1 75 9 is_stmt 1 view .LVU43
- 153              		.loc 1 75 32 is_stmt 0 view .LVU44
+  86:Core/Src/dsp_task.c ****         buf[i]     = (uint16_t)(int16_t)lpf_L;
+ 152              		.loc 1 86 9 is_stmt 1 view .LVU43
+ 153              		.loc 1 86 32 is_stmt 0 view .LVU44
  154 0052 BDEEC77A 		vcvt.s32.f32	s14, s14
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s 			page 5
-
-
- 155              		.loc 1 75 20 view .LVU45
+ 155              		.loc 1 86 20 view .LVU45
  156 0056 17EE102A 		vmov	r2, s14	@ int
  157 005a 20F81320 		strh	r2, [r0, r3, lsl #1]	@ movhi
  158              	.LVL14:
-  76:Core/Src/dsp_task.c ****         buf[i + 1] = 0;
- 159              		.loc 1 76 9 is_stmt 1 view .LVU46
- 160              		.loc 1 76 15 is_stmt 0 view .LVU47
+  87:Core/Src/dsp_task.c ****         buf[i + 1] = 0;
+ 159              		.loc 1 87 9 is_stmt 1 view .LVU46
+ 160              		.loc 1 87 15 is_stmt 0 view .LVU47
  161 005e 03F1010C 		add	ip, r3, #1
- 162              		.loc 1 76 20 view .LVU48
+ 162              		.loc 1 87 20 view .LVU48
  163 0062 0022     		movs	r2, #0
  164 0064 20F81C20 		strh	r2, [r0, ip, lsl #1]	@ movhi
-  77:Core/Src/dsp_task.c ****         buf[i + 2] = (uint16_t)(int16_t)lpf_R;
- 165              		.loc 1 77 9 is_stmt 1 view .LVU49
- 166              		.loc 1 77 32 is_stmt 0 view .LVU50
+  88:Core/Src/dsp_task.c ****         buf[i + 2] = (uint16_t)(int16_t)lpf_R;
+ 165              		.loc 1 88 9 is_stmt 1 view .LVU49
+ 166              		.loc 1 88 32 is_stmt 0 view .LVU50
  167 0068 FDEEE77A 		vcvt.s32.f32	s15, s15
- 168              		.loc 1 77 20 view .LVU51
+ 168              		.loc 1 88 20 view .LVU51
  169 006c 17EE90CA 		vmov	ip, s15	@ int
  170 0070 20F811C0 		strh	ip, [r0, r1, lsl #1]	@ movhi
  171              	.LVL15:
-  78:Core/Src/dsp_task.c ****         buf[i + 3] = 0;
- 172              		.loc 1 78 9 is_stmt 1 view .LVU52
- 173              		.loc 1 78 15 is_stmt 0 view .LVU53
+  89:Core/Src/dsp_task.c ****         buf[i + 3] = 0;
+ 172              		.loc 1 89 9 is_stmt 1 view .LVU52
+ 173              		.loc 1 89 15 is_stmt 0 view .LVU53
  174 0074 D91C     		adds	r1, r3, #3
- 175              		.loc 1 78 20 view .LVU54
+ 175              		.loc 1 89 20 view .LVU54
  176 0076 20F81120 		strh	r2, [r0, r1, lsl #1]	@ movhi
  177              	.LBE5:
-  70:Core/Src/dsp_task.c ****         float xL = (float)(int16_t)buf[i];
- 178              		.loc 1 70 41 is_stmt 1 discriminator 3 view .LVU55
+  81:Core/Src/dsp_task.c ****         float xL = (float)(int16_t)buf[i];
+ 178              		.loc 1 81 41 is_stmt 1 discriminator 3 view .LVU55
  179 007a 0433     		adds	r3, r3, #4
  180              	.LVL16:
  181              	.L5:
-  70:Core/Src/dsp_task.c ****         float xL = (float)(int16_t)buf[i];
- 182              		.loc 1 70 23 discriminator 1 view .LVU56
+  81:Core/Src/dsp_task.c ****         float xL = (float)(int16_t)buf[i];
+ 182              		.loc 1 81 23 discriminator 1 view .LVU56
  183 007c 3F2B     		cmp	r3, #63
  184 007e C5DD     		ble	.L6
  185              	.LBE4:
-  79:Core/Src/dsp_task.c ****     }
-  80:Core/Src/dsp_task.c **** }
- 186              		.loc 1 80 1 is_stmt 0 view .LVU57
+  90:Core/Src/dsp_task.c ****     }
+  91:Core/Src/dsp_task.c **** }
+ 186              		.loc 1 91 1 is_stmt 0 view .LVU57
  187 0080 7047     		bx	lr
  188              	.L8:
  189 0082 00BF     		.align	2
@@ -287,814 +298,1794 @@ ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s 			page 1
  191 0084 00000000 		.word	lpf_L
  192 0088 00000000 		.word	lpf_R
  193              		.cfi_endproc
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 6
+
+
  194              	.LFE142:
- 196              		.section	.text.apply_delay,"ax",%progbits
+ 196              		.section	.text.pitch_read,"ax",%progbits
  197              		.align	1
  198              		.syntax unified
  199              		.thumb
  200              		.thumb_func
- 202              	apply_delay:
+ 202              	pitch_read:
  203              	.LVL17:
- 204              	.LFB143:
-  81:Core/Src/dsp_task.c **** 
-  82:Core/Src/dsp_task.c **** /* Echo delay with feedback.
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s 			page 6
+ 204              	.LFB144:
+  92:Core/Src/dsp_task.c **** 
+  93:Core/Src/dsp_task.c **** /* Sinusoidal LFO chorus (Amposta Boquera 2016).
+  94:Core/Src/dsp_task.c ****    A single LFO modulates the read-head delay sinusoidally around CHORUS_BASE_DELAY.
+  95:Core/Src/dsp_task.c ****    Linear interpolation gives sub-sample accuracy.  Fixed wet mix of 50%.
+  96:Core/Src/dsp_task.c ****    rate: LFO frequency in Hz (0.1–3.0).
+  97:Core/Src/dsp_task.c ****    24-bit layout: L_MSW at i, L_LSW at i+1, R_MSW at i+2, R_LSW at i+3; step by 4. */
+  98:Core/Src/dsp_task.c **** #define CHORUS_WET  0.5f
+  99:Core/Src/dsp_task.c **** 
+ 100:Core/Src/dsp_task.c **** static void apply_chorus(uint16_t *buf, float rate)
+ 101:Core/Src/dsp_task.c **** {
+ 102:Core/Src/dsp_task.c ****     for (int i = 0; i < HALF_BUF_LEN; i += 4) {
+ 103:Core/Src/dsp_task.c ****         float inL = (float)(int16_t)buf[i];
+ 104:Core/Src/dsp_task.c ****         float inR = (float)(int16_t)buf[i + 2];
+ 105:Core/Src/dsp_task.c **** 
+ 106:Core/Src/dsp_task.c ****         chorus_buf_L[chorus_wr] = (int16_t)inL;
+ 107:Core/Src/dsp_task.c ****         chorus_buf_R[chorus_wr] = (int16_t)inR;
+ 108:Core/Src/dsp_task.c **** 
+ 109:Core/Src/dsp_task.c ****         float lfo   = sinf(chorus_lfo * 6.28318f);
+ 110:Core/Src/dsp_task.c ****         chorus_lfo += rate / 48000.0f;
+ 111:Core/Src/dsp_task.c ****         if (chorus_lfo >= 1.0f) chorus_lfo -= 1.0f;
+ 112:Core/Src/dsp_task.c **** 
+ 113:Core/Src/dsp_task.c ****         float delay = (float)CHORUS_BASE_DELAY + (float)CHORUS_DEPTH * lfo;
+ 114:Core/Src/dsp_task.c ****         float rd_f  = (float)chorus_wr - delay;
+ 115:Core/Src/dsp_task.c ****         if (rd_f < 0.0f) rd_f += (float)CHORUS_BUF_SAMPLES;
+ 116:Core/Src/dsp_task.c **** 
+ 117:Core/Src/dsp_task.c ****         uint32_t i0 = (uint32_t)rd_f % CHORUS_BUF_SAMPLES;
+ 118:Core/Src/dsp_task.c ****         uint32_t i1 = (i0 + 1) % CHORUS_BUF_SAMPLES;
+ 119:Core/Src/dsp_task.c ****         float    fr = rd_f - (float)(uint32_t)rd_f;
+ 120:Core/Src/dsp_task.c **** 
+ 121:Core/Src/dsp_task.c ****         float wetL = (float)chorus_buf_L[i0] * (1.0f - fr) + (float)chorus_buf_L[i1] * fr;
+ 122:Core/Src/dsp_task.c ****         float wetR = (float)chorus_buf_R[i0] * (1.0f - fr) + (float)chorus_buf_R[i1] * fr;
+ 123:Core/Src/dsp_task.c **** 
+ 124:Core/Src/dsp_task.c ****         chorus_wr = (chorus_wr + 1) % CHORUS_BUF_SAMPLES;
+ 125:Core/Src/dsp_task.c **** 
+ 126:Core/Src/dsp_task.c ****         float outL = inL * (1.0f - CHORUS_WET) + wetL * CHORUS_WET;
+ 127:Core/Src/dsp_task.c ****         float outR = inR * (1.0f - CHORUS_WET) + wetR * CHORUS_WET;
+ 128:Core/Src/dsp_task.c **** 
+ 129:Core/Src/dsp_task.c ****         if (outL >  32767.0f) outL =  32767.0f;
+ 130:Core/Src/dsp_task.c ****         if (outL < -32768.0f) outL = -32768.0f;
+ 131:Core/Src/dsp_task.c ****         if (outR >  32767.0f) outR =  32767.0f;
+ 132:Core/Src/dsp_task.c ****         if (outR < -32768.0f) outR = -32768.0f;
+ 133:Core/Src/dsp_task.c **** 
+ 134:Core/Src/dsp_task.c ****         buf[i]     = (uint16_t)(int16_t)outL;
+ 135:Core/Src/dsp_task.c ****         buf[i + 1] = 0;
+ 136:Core/Src/dsp_task.c ****         buf[i + 2] = (uint16_t)(int16_t)outR;
+ 137:Core/Src/dsp_task.c ****         buf[i + 3] = 0;
+ 138:Core/Src/dsp_task.c ****     }
+ 139:Core/Src/dsp_task.c **** }
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 7
 
 
-  83:Core/Src/dsp_task.c ****    Each echo repeats at DELAY_FEEDBACK level (natural decay), mixed at DELAY_WET into output.
-  84:Core/Src/dsp_task.c ****    24-bit layout: L_MSW at i, L_LSW at i+1, R_MSW at i+2, R_LSW at i+3; step by 4. */
-  85:Core/Src/dsp_task.c **** #define DELAY_FEEDBACK  0.45f
-  86:Core/Src/dsp_task.c **** #define DELAY_WET       0.50f
-  87:Core/Src/dsp_task.c **** 
-  88:Core/Src/dsp_task.c **** static void apply_delay(uint16_t *buf, uint16_t len)
-  89:Core/Src/dsp_task.c **** {
- 205              		.loc 1 89 1 is_stmt 1 view -0
+ 140:Core/Src/dsp_task.c **** 
+ 141:Core/Src/dsp_task.c **** /* Granular overlap-add (OLA) pitch shifter.
+ 142:Core/Src/dsp_task.c ****    Two read heads advance through a circular delay buffer at 'ratio' samples/step
+ 143:Core/Src/dsp_task.c ****    (ratio = 2^(semitones/12)).  When the primary head drifts too close to the write
+ 144:Core/Src/dsp_task.c ****    pointer (pitch up) or too far behind it (pitch down), a secondary head is placed
+ 145:Core/Src/dsp_task.c ****    PITCH_GRAIN samples away and crossfaded in over PITCH_OVERLAP samples, then the
+ 146:Core/Src/dsp_task.c ****    primary head snaps to the secondary position.  Linear interpolation gives sub-sample
+ 147:Core/Src/dsp_task.c ****    accuracy.  24-bit layout: L_MSW at i, L_LSW at i+1, R_MSW at i+2, R_LSW at i+3. */
+ 148:Core/Src/dsp_task.c **** static inline float pitch_read(int16_t *buf, float pos)
+ 149:Core/Src/dsp_task.c **** {
+ 205              		.loc 1 149 1 is_stmt 1 view -0
  206              		.cfi_startproc
  207              		@ args = 0, pretend = 0, frame = 0
  208              		@ frame_needed = 0, uses_anonymous_args = 0
- 209              		.loc 1 89 1 is_stmt 0 view .LVU59
- 210 0000 2DE9F047 		push	{r4, r5, r6, r7, r8, r9, r10, lr}
- 211              		.cfi_def_cfa_offset 32
- 212              		.cfi_offset 4, -32
- 213              		.cfi_offset 5, -28
- 214              		.cfi_offset 6, -24
- 215              		.cfi_offset 7, -20
- 216              		.cfi_offset 8, -16
- 217              		.cfi_offset 9, -12
- 218              		.cfi_offset 10, -8
- 219              		.cfi_offset 14, -4
-  90:Core/Src/dsp_task.c ****     if (len == 0) len = 1;
- 220              		.loc 1 90 5 is_stmt 1 view .LVU60
- 221              		.loc 1 90 8 is_stmt 0 view .LVU61
- 222 0004 31B1     		cbz	r1, .L15
- 223 0006 8E46     		mov	lr, r1
-  91:Core/Src/dsp_task.c ****     if (len > DELAY_BUF_SAMPLES) len = DELAY_BUF_SAMPLES;
- 224              		.loc 1 91 5 is_stmt 1 view .LVU62
- 225              		.loc 1 91 8 is_stmt 0 view .LVU63
- 226 0008 B1F5FA5F 		cmp	r1, #8000
- 227 000c 04D9     		bls	.L10
- 228              		.loc 1 91 38 discriminator 1 view .LVU64
- 229 000e 4FF4FA5E 		mov	lr, #8000
- 230 0012 01E0     		b	.L10
- 231              	.L15:
-  90:Core/Src/dsp_task.c ****     if (len == 0) len = 1;
- 232              		.loc 1 90 23 discriminator 1 view .LVU65
- 233 0014 4FF0010E 		mov	lr, #1
- 234              	.L10:
- 235              	.LVL18:
-  92:Core/Src/dsp_task.c **** 
-  93:Core/Src/dsp_task.c ****     for (int i = 0; i < HALF_BUF_LEN; i += 4) {
- 236              		.loc 1 93 5 is_stmt 1 view .LVU66
- 237              	.LBB6:
- 238              		.loc 1 93 10 view .LVU67
- 239              		.loc 1 93 14 is_stmt 0 view .LVU68
- 240 0018 0022     		movs	r2, #0
- 241              		.loc 1 93 5 view .LVU69
- 242 001a 27E0     		b	.L11
- 243              	.LVL19:
- 244              	.L17:
- 245              	.LBB7:
-  94:Core/Src/dsp_task.c ****         uint16_t rd   = (delay_wr + DELAY_BUF_SAMPLES - len) % DELAY_BUF_SAMPLES;
-  95:Core/Src/dsp_task.c ****         float    dryL = (float)(int16_t)buf[i];
-  96:Core/Src/dsp_task.c ****         float    dryR = (float)(int16_t)buf[i + 2];
-  97:Core/Src/dsp_task.c ****         float    echL = (float)delay_line_L[rd];
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s 			page 7
+ 209              		@ link register save eliminated.
+ 150:Core/Src/dsp_task.c ****     uint32_t i0 = (uint32_t)pos % PITCH_BUF_SAMPLES;
+ 210              		.loc 1 150 5 view .LVU59
+ 211              		.loc 1 150 19 is_stmt 0 view .LVU60
+ 212 0000 FCEEC07A 		vcvt.u32.f32	s15, s0
+ 213              		.loc 1 150 14 view .LVU61
+ 214 0004 17EE903A 		vmov	r3, s15	@ int
+ 215 0008 C3F30B02 		ubfx	r2, r3, #0, #12
+ 216              	.LVL18:
+ 151:Core/Src/dsp_task.c ****     uint32_t i1 = (i0 + 1) % PITCH_BUF_SAMPLES;
+ 217              		.loc 1 151 5 is_stmt 1 view .LVU62
+ 218              		.loc 1 151 23 is_stmt 0 view .LVU63
+ 219 000c 531C     		adds	r3, r2, #1
+ 220              		.loc 1 151 14 view .LVU64
+ 221 000e C3F30B03 		ubfx	r3, r3, #0, #12
+ 222              	.LVL19:
+ 152:Core/Src/dsp_task.c ****     float    f  = pos - (float)(uint32_t)pos;
+ 223              		.loc 1 152 5 is_stmt 1 view .LVU65
+ 224              		.loc 1 152 25 is_stmt 0 view .LVU66
+ 225 0012 F8EE677A 		vcvt.f32.u32	s15, s15
+ 226              		.loc 1 152 14 view .LVU67
+ 227 0016 70EE677A 		vsub.f32	s15, s0, s15
+ 228              	.LVL20:
+ 153:Core/Src/dsp_task.c ****     return (float)buf[i0] * (1.0f - f) + (float)buf[i1] * f;
+ 229              		.loc 1 153 5 is_stmt 1 view .LVU68
+ 230              		.loc 1 153 22 is_stmt 0 view .LVU69
+ 231 001a 30F91220 		ldrsh	r2, [r0, r2, lsl #1]
+ 232              	.LVL21:
+ 233              		.loc 1 153 22 view .LVU70
+ 234 001e 00EE102A 		vmov	s0, r2	@ int
+ 235              	.LVL22:
+ 236              		.loc 1 153 12 view .LVU71
+ 237 0022 B8EEC00A 		vcvt.f32.s32	s0, s0
+ 238              		.loc 1 153 35 view .LVU72
+ 239 0026 B7EE007A 		vmov.f32	s14, #1.0e+0
+ 240 002a 37EE677A 		vsub.f32	s14, s14, s15
+ 241              		.loc 1 153 27 view .LVU73
+ 242 002e 20EE070A 		vmul.f32	s0, s0, s14
+ 243              		.loc 1 153 52 view .LVU74
+ 244 0032 30F91330 		ldrsh	r3, [r0, r3, lsl #1]
+ 245              	.LVL23:
+ 246              		.loc 1 153 52 view .LVU75
+ 247 0036 07EE103A 		vmov	s14, r3	@ int
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 8
 
 
-  98:Core/Src/dsp_task.c ****         float    echR = (float)delay_line_R[rd];
-  99:Core/Src/dsp_task.c **** 
- 100:Core/Src/dsp_task.c ****         /* Write dry + decayed echo back into delay line → repeating echoes */
- 101:Core/Src/dsp_task.c ****         delay_line_L[delay_wr] = (int16_t)(dryL + echL * DELAY_FEEDBACK);
- 102:Core/Src/dsp_task.c ****         delay_line_R[delay_wr] = (int16_t)(dryR + echR * DELAY_FEEDBACK);
- 103:Core/Src/dsp_task.c ****         delay_wr = (delay_wr + 1) % DELAY_BUF_SAMPLES;
- 104:Core/Src/dsp_task.c **** 
- 105:Core/Src/dsp_task.c ****         float outL = dryL + echL * DELAY_WET;
- 106:Core/Src/dsp_task.c ****         float outR = dryR + echR * DELAY_WET;
- 107:Core/Src/dsp_task.c **** 
- 108:Core/Src/dsp_task.c ****         if (outL >  32767.0f) outL =  32767.0f;
- 246              		.loc 1 108 36 discriminator 1 view .LVU70
- 247 001c 9FED4C7A 		vldr.32	s14, .L23
- 248              	.LVL20:
- 249              	.L12:
- 109:Core/Src/dsp_task.c ****         if (outL < -32768.0f) outL = -32768.0f;
- 110:Core/Src/dsp_task.c ****         if (outR >  32767.0f) outR =  32767.0f;
- 250              		.loc 1 110 9 is_stmt 1 view .LVU71
- 251              		.loc 1 110 12 is_stmt 0 view .LVU72
- 252 0020 DFED4B6A 		vldr.32	s13, .L23
- 253 0024 F4EEE67A 		vcmpe.f32	s15, s13
- 254 0028 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
- 255 002c 09DC     		bgt	.L19
- 111:Core/Src/dsp_task.c ****         if (outR < -32768.0f) outR = -32768.0f;
- 256              		.loc 1 111 9 is_stmt 1 view .LVU73
- 257              		.loc 1 111 12 is_stmt 0 view .LVU74
- 258 002e DFED496A 		vldr.32	s13, .L23+4
- 259 0032 F4EEE67A 		vcmpe.f32	s15, s13
- 260 0036 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
- 261 003a 04D5     		bpl	.L13
- 262              		.loc 1 111 36 discriminator 1 view .LVU75
- 263 003c DFED457A 		vldr.32	s15, .L23+4
- 264              	.LVL21:
- 265              		.loc 1 111 36 discriminator 1 view .LVU76
- 266 0040 01E0     		b	.L13
- 267              	.LVL22:
- 268              	.L19:
- 110:Core/Src/dsp_task.c ****         if (outR < -32768.0f) outR = -32768.0f;
- 269              		.loc 1 110 36 discriminator 1 view .LVU77
- 270 0042 DFED437A 		vldr.32	s15, .L23
- 271              	.LVL23:
- 272              	.L13:
- 112:Core/Src/dsp_task.c **** 
- 113:Core/Src/dsp_task.c ****         buf[i]     = (uint16_t)(int16_t)outL;
- 273              		.loc 1 113 9 is_stmt 1 view .LVU78
- 274              		.loc 1 113 32 is_stmt 0 view .LVU79
- 275 0046 BDEEC77A 		vcvt.s32.f32	s14, s14
- 276              	.LVL24:
- 277              		.loc 1 113 20 view .LVU80
- 278 004a 17EE103A 		vmov	r3, s14	@ int
- 279 004e 4353     		strh	r3, [r0, r5]	@ movhi
- 114:Core/Src/dsp_task.c ****         buf[i + 1] = 0;
- 280              		.loc 1 114 9 is_stmt 1 view .LVU81
- 281              		.loc 1 114 15 is_stmt 0 view .LVU82
- 282 0050 4C1C     		adds	r4, r1, #1
- 283              		.loc 1 114 20 view .LVU83
- 284 0052 0023     		movs	r3, #0
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s 			page 8
+ 248              		.loc 1 153 42 view .LVU76
+ 249 003a B8EEC77A 		vcvt.f32.s32	s14, s14
+ 250              		.loc 1 153 57 view .LVU77
+ 251 003e 67EE277A 		vmul.f32	s15, s14, s15
+ 252              	.LVL24:
+ 154:Core/Src/dsp_task.c **** }
+ 253              		.loc 1 154 1 view .LVU78
+ 254 0042 30EE270A 		vadd.f32	s0, s0, s15
+ 255 0046 7047     		bx	lr
+ 256              		.cfi_endproc
+ 257              	.LFE144:
+ 259              		.section	.text.apply_chorus,"ax",%progbits
+ 260              		.align	1
+ 261              		.syntax unified
+ 262              		.thumb
+ 263              		.thumb_func
+ 265              	apply_chorus:
+ 266              	.LVL25:
+ 267              	.LFB143:
+ 101:Core/Src/dsp_task.c ****     for (int i = 0; i < HALF_BUF_LEN; i += 4) {
+ 268              		.loc 1 101 1 is_stmt 1 view -0
+ 269              		.cfi_startproc
+ 270              		@ args = 0, pretend = 0, frame = 0
+ 271              		@ frame_needed = 0, uses_anonymous_args = 0
+ 101:Core/Src/dsp_task.c ****     for (int i = 0; i < HALF_BUF_LEN; i += 4) {
+ 272              		.loc 1 101 1 is_stmt 0 view .LVU80
+ 273 0000 2DE9F047 		push	{r4, r5, r6, r7, r8, r9, r10, lr}
+ 274              		.cfi_def_cfa_offset 32
+ 275              		.cfi_offset 4, -32
+ 276              		.cfi_offset 5, -28
+ 277              		.cfi_offset 6, -24
+ 278              		.cfi_offset 7, -20
+ 279              		.cfi_offset 8, -16
+ 280              		.cfi_offset 9, -12
+ 281              		.cfi_offset 10, -8
+ 282              		.cfi_offset 14, -4
+ 283 0004 2DED048B 		vpush.64	{d8, d9}
+ 284              		.cfi_def_cfa_offset 48
+ 285              		.cfi_offset 80, -48
+ 286              		.cfi_offset 81, -44
+ 287              		.cfi_offset 82, -40
+ 288              		.cfi_offset 83, -36
+ 289 0008 0646     		mov	r6, r0
+ 290 000a B0EE409A 		vmov.f32	s18, s0
+ 102:Core/Src/dsp_task.c ****         float inL = (float)(int16_t)buf[i];
+ 291              		.loc 1 102 5 is_stmt 1 view .LVU81
+ 292              	.LBB6:
+ 102:Core/Src/dsp_task.c ****         float inL = (float)(int16_t)buf[i];
+ 293              		.loc 1 102 10 view .LVU82
+ 294              	.LVL26:
+ 102:Core/Src/dsp_task.c ****         float inL = (float)(int16_t)buf[i];
+ 295              		.loc 1 102 14 is_stmt 0 view .LVU83
+ 296 000e 0025     		movs	r5, #0
+ 102:Core/Src/dsp_task.c ****         float inL = (float)(int16_t)buf[i];
+ 297              		.loc 1 102 5 view .LVU84
+ 298 0010 2DE0     		b	.L11
+ 299              	.LVL27:
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 9
 
 
- 285 0054 20F81430 		strh	r3, [r0, r4, lsl #1]	@ movhi
- 115:Core/Src/dsp_task.c ****         buf[i + 2] = (uint16_t)(int16_t)outR;
- 286              		.loc 1 115 9 is_stmt 1 view .LVU84
- 287              		.loc 1 115 32 is_stmt 0 view .LVU85
- 288 0058 FDEEE77A 		vcvt.s32.f32	s15, s15
- 289              	.LVL25:
- 290              		.loc 1 115 20 view .LVU86
- 291 005c 17EE904A 		vmov	r4, s15	@ int
- 292 0060 20F81C40 		strh	r4, [r0, ip, lsl #1]	@ movhi
- 116:Core/Src/dsp_task.c ****         buf[i + 3] = 0;
- 293              		.loc 1 116 9 is_stmt 1 view .LVU87
- 294              		.loc 1 116 15 is_stmt 0 view .LVU88
- 295 0064 0331     		adds	r1, r1, #3
- 296              	.LVL26:
- 297              		.loc 1 116 20 view .LVU89
- 298 0066 20F81130 		strh	r3, [r0, r1, lsl #1]	@ movhi
- 299              	.LBE7:
-  93:Core/Src/dsp_task.c ****         uint16_t rd   = (delay_wr + DELAY_BUF_SAMPLES - len) % DELAY_BUF_SAMPLES;
- 300              		.loc 1 93 41 is_stmt 1 discriminator 2 view .LVU90
- 301 006a 0432     		adds	r2, r2, #4
- 302              	.LVL27:
- 303              	.L11:
-  93:Core/Src/dsp_task.c ****         uint16_t rd   = (delay_wr + DELAY_BUF_SAMPLES - len) % DELAY_BUF_SAMPLES;
- 304              		.loc 1 93 23 discriminator 1 view .LVU91
- 305 006c 3F2A     		cmp	r2, #63
- 306 006e 6CDC     		bgt	.L22
- 307              	.LBB8:
-  94:Core/Src/dsp_task.c ****         float    dryL = (float)(int16_t)buf[i];
- 308              		.loc 1 94 9 view .LVU92
-  94:Core/Src/dsp_task.c ****         float    dryL = (float)(int16_t)buf[i];
- 309              		.loc 1 94 35 is_stmt 0 view .LVU93
- 310 0070 394C     		ldr	r4, .L23+8
- 311 0072 B4F80080 		ldrh	r8, [r4]
- 312 0076 08F5FA51 		add	r1, r8, #8000
-  94:Core/Src/dsp_task.c ****         float    dryL = (float)(int16_t)buf[i];
- 313              		.loc 1 94 55 view .LVU94
- 314 007a A1EB0E01 		sub	r1, r1, lr
-  94:Core/Src/dsp_task.c ****         float    dryL = (float)(int16_t)buf[i];
- 315              		.loc 1 94 62 view .LVU95
- 316 007e 374B     		ldr	r3, .L23+12
- 317 0080 83FB0165 		smull	r6, r5, r3, r1
- 318 0084 CF17     		asrs	r7, r1, #31
- 319 0086 C7EB6527 		rsb	r7, r7, r5, asr #9
- 320 008a 4FF4FA56 		mov	r6, #8000
- 321 008e 06FB1717 		mls	r7, r6, r7, r1
- 322              	.LVL28:
-  95:Core/Src/dsp_task.c ****         float    dryR = (float)(int16_t)buf[i + 2];
- 323              		.loc 1 95 9 is_stmt 1 view .LVU96
-  95:Core/Src/dsp_task.c ****         float    dryR = (float)(int16_t)buf[i + 2];
- 324              		.loc 1 95 44 is_stmt 0 view .LVU97
- 325 0092 1146     		mov	r1, r2
- 326 0094 5500     		lsls	r5, r2, #1
-  95:Core/Src/dsp_task.c ****         float    dryR = (float)(int16_t)buf[i + 2];
- 327              		.loc 1 95 32 view .LVU98
- 328 0096 30F912C0 		ldrsh	ip, [r0, r2, lsl #1]
- 329 009a 05EE10CA 		vmov	s10, ip	@ int
-  95:Core/Src/dsp_task.c ****         float    dryR = (float)(int16_t)buf[i + 2];
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s 			page 9
-
-
- 330              		.loc 1 95 18 view .LVU99
- 331 009e B8EEC55A 		vcvt.f32.s32	s10, s10
- 332              	.LVL29:
-  96:Core/Src/dsp_task.c ****         float    echL = (float)delay_line_L[rd];
- 333              		.loc 1 96 9 is_stmt 1 view .LVU100
-  96:Core/Src/dsp_task.c ****         float    echL = (float)delay_line_L[rd];
- 334              		.loc 1 96 47 is_stmt 0 view .LVU101
- 335 00a2 02F1020C 		add	ip, r2, #2
-  96:Core/Src/dsp_task.c ****         float    echL = (float)delay_line_L[rd];
- 336              		.loc 1 96 32 view .LVU102
- 337 00a6 30F91C90 		ldrsh	r9, [r0, ip, lsl #1]
- 338 00aa 05EE909A 		vmov	s11, r9	@ int
-  96:Core/Src/dsp_task.c ****         float    echL = (float)delay_line_L[rd];
- 339              		.loc 1 96 18 view .LVU103
- 340 00ae F8EEE55A 		vcvt.f32.s32	s11, s11
- 341              	.LVL30:
-  97:Core/Src/dsp_task.c ****         float    echR = (float)delay_line_R[rd];
- 342              		.loc 1 97 9 is_stmt 1 view .LVU104
- 343 00b2 1FFA87FA 		uxth	r10, r7
-  97:Core/Src/dsp_task.c ****         float    echR = (float)delay_line_R[rd];
- 344              		.loc 1 97 44 is_stmt 0 view .LVU105
- 345 00b6 DFF8B090 		ldr	r9, .L23+24
- 346 00ba 39F91A70 		ldrsh	r7, [r9, r10, lsl #1]
- 347              	.LVL31:
-  97:Core/Src/dsp_task.c ****         float    echR = (float)delay_line_R[rd];
- 348              		.loc 1 97 44 view .LVU106
- 349 00be 07EE107A 		vmov	s14, r7	@ int
-  97:Core/Src/dsp_task.c ****         float    echR = (float)delay_line_R[rd];
- 350              		.loc 1 97 18 view .LVU107
- 351 00c2 B8EEC77A 		vcvt.f32.s32	s14, s14
- 352              	.LVL32:
-  98:Core/Src/dsp_task.c **** 
- 353              		.loc 1 98 9 is_stmt 1 view .LVU108
-  98:Core/Src/dsp_task.c **** 
- 354              		.loc 1 98 44 is_stmt 0 view .LVU109
- 355 00c6 264F     		ldr	r7, .L23+16
- 356 00c8 37F91AA0 		ldrsh	r10, [r7, r10, lsl #1]
- 357              	.LVL33:
-  98:Core/Src/dsp_task.c **** 
- 358              		.loc 1 98 44 view .LVU110
- 359 00cc 07EE90AA 		vmov	s15, r10	@ int
-  98:Core/Src/dsp_task.c **** 
- 360              		.loc 1 98 18 view .LVU111
- 361 00d0 F8EEE77A 		vcvt.f32.s32	s15, s15
- 362              	.LVL34:
- 101:Core/Src/dsp_task.c ****         delay_line_R[delay_wr] = (int16_t)(dryR + echR * DELAY_FEEDBACK);
- 363              		.loc 1 101 9 is_stmt 1 view .LVU112
- 101:Core/Src/dsp_task.c ****         delay_line_R[delay_wr] = (int16_t)(dryR + echR * DELAY_FEEDBACK);
- 364              		.loc 1 101 56 is_stmt 0 view .LVU113
- 365 00d4 DFED236A 		vldr.32	s13, .L23+20
- 366 00d8 27EE266A 		vmul.f32	s12, s14, s13
- 101:Core/Src/dsp_task.c ****         delay_line_R[delay_wr] = (int16_t)(dryR + echR * DELAY_FEEDBACK);
- 367              		.loc 1 101 49 view .LVU114
- 368 00dc 36EE056A 		vadd.f32	s12, s12, s10
- 101:Core/Src/dsp_task.c ****         delay_line_R[delay_wr] = (int16_t)(dryR + echR * DELAY_FEEDBACK);
- 369              		.loc 1 101 34 view .LVU115
- 370 00e0 BDEEC66A 		vcvt.s32.f32	s12, s12
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s 			page 10
-
-
- 101:Core/Src/dsp_task.c ****         delay_line_R[delay_wr] = (int16_t)(dryR + echR * DELAY_FEEDBACK);
- 371              		.loc 1 101 32 view .LVU116
- 372 00e4 16EE10AA 		vmov	r10, s12	@ int
- 373 00e8 29F818A0 		strh	r10, [r9, r8, lsl #1]	@ movhi
- 102:Core/Src/dsp_task.c ****         delay_wr = (delay_wr + 1) % DELAY_BUF_SAMPLES;
- 374              		.loc 1 102 9 is_stmt 1 view .LVU117
- 102:Core/Src/dsp_task.c ****         delay_wr = (delay_wr + 1) % DELAY_BUF_SAMPLES;
- 375              		.loc 1 102 56 is_stmt 0 view .LVU118
- 376 00ec 67EEA66A 		vmul.f32	s13, s15, s13
- 102:Core/Src/dsp_task.c ****         delay_wr = (delay_wr + 1) % DELAY_BUF_SAMPLES;
- 377              		.loc 1 102 49 view .LVU119
- 378 00f0 76EEA56A 		vadd.f32	s13, s13, s11
- 102:Core/Src/dsp_task.c ****         delay_wr = (delay_wr + 1) % DELAY_BUF_SAMPLES;
- 379              		.loc 1 102 34 view .LVU120
- 380 00f4 FDEEE66A 		vcvt.s32.f32	s13, s13
- 102:Core/Src/dsp_task.c ****         delay_wr = (delay_wr + 1) % DELAY_BUF_SAMPLES;
- 381              		.loc 1 102 32 view .LVU121
- 382 00f8 16EE909A 		vmov	r9, s13	@ int
- 383 00fc 27F81890 		strh	r9, [r7, r8, lsl #1]	@ movhi
- 103:Core/Src/dsp_task.c **** 
- 384              		.loc 1 103 9 is_stmt 1 view .LVU122
- 103:Core/Src/dsp_task.c **** 
- 385              		.loc 1 103 30 is_stmt 0 view .LVU123
- 386 0100 08F10108 		add	r8, r8, #1
- 387              	.LVL35:
- 103:Core/Src/dsp_task.c **** 
- 388              		.loc 1 103 35 view .LVU124
- 389 0104 83FB0873 		smull	r7, r3, r3, r8
- 390              	.LVL36:
- 103:Core/Src/dsp_task.c **** 
- 391              		.loc 1 103 35 view .LVU125
- 392 0108 5B12     		asrs	r3, r3, #9
- 393 010a 06FB1383 		mls	r3, r6, r3, r8
- 103:Core/Src/dsp_task.c **** 
- 394              		.loc 1 103 18 view .LVU126
- 395 010e 2380     		strh	r3, [r4]	@ movhi
- 105:Core/Src/dsp_task.c ****         float outR = dryR + echR * DELAY_WET;
- 396              		.loc 1 105 9 is_stmt 1 view .LVU127
- 105:Core/Src/dsp_task.c ****         float outR = dryR + echR * DELAY_WET;
- 397              		.loc 1 105 34 is_stmt 0 view .LVU128
- 398 0110 F6EE006A 		vmov.f32	s13, #5.0e-1
- 399 0114 27EE267A 		vmul.f32	s14, s14, s13
- 400              	.LVL37:
- 105:Core/Src/dsp_task.c ****         float outR = dryR + echR * DELAY_WET;
- 401              		.loc 1 105 15 view .LVU129
- 402 0118 37EE057A 		vadd.f32	s14, s14, s10
- 403              	.LVL38:
- 106:Core/Src/dsp_task.c **** 
- 404              		.loc 1 106 9 is_stmt 1 view .LVU130
- 106:Core/Src/dsp_task.c **** 
- 405              		.loc 1 106 34 is_stmt 0 view .LVU131
- 406 011c 67EEA67A 		vmul.f32	s15, s15, s13
- 407              	.LVL39:
- 106:Core/Src/dsp_task.c **** 
- 408              		.loc 1 106 15 view .LVU132
- 409 0120 77EEA57A 		vadd.f32	s15, s15, s11
- 410              	.LVL40:
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s 			page 11
-
-
- 108:Core/Src/dsp_task.c ****         if (outL < -32768.0f) outL = -32768.0f;
- 411              		.loc 1 108 9 is_stmt 1 view .LVU133
- 108:Core/Src/dsp_task.c ****         if (outL < -32768.0f) outL = -32768.0f;
- 412              		.loc 1 108 12 is_stmt 0 view .LVU134
- 413 0124 DFED0A6A 		vldr.32	s13, .L23
- 414 0128 B4EEE67A 		vcmpe.f32	s14, s13
- 415 012c F1EE10FA 		vmrs	APSR_nzcv, FPSCR
- 416 0130 3FF774AF 		bgt	.L17
- 109:Core/Src/dsp_task.c ****         if (outR >  32767.0f) outR =  32767.0f;
- 417              		.loc 1 109 9 is_stmt 1 view .LVU135
- 109:Core/Src/dsp_task.c ****         if (outR >  32767.0f) outR =  32767.0f;
- 418              		.loc 1 109 12 is_stmt 0 view .LVU136
- 419 0134 DFED076A 		vldr.32	s13, .L23+4
- 420 0138 B4EEE67A 		vcmpe.f32	s14, s13
- 421 013c F1EE10FA 		vmrs	APSR_nzcv, FPSCR
- 422 0140 7FF56EAF 		bpl	.L12
- 109:Core/Src/dsp_task.c ****         if (outR >  32767.0f) outR =  32767.0f;
- 423              		.loc 1 109 36 discriminator 1 view .LVU137
- 424 0144 9FED037A 		vldr.32	s14, .L23+4
- 425              	.LVL41:
- 109:Core/Src/dsp_task.c ****         if (outR >  32767.0f) outR =  32767.0f;
- 426              		.loc 1 109 36 discriminator 1 view .LVU138
- 427 0148 6AE7     		b	.L12
- 428              	.LVL42:
- 429              	.L22:
- 109:Core/Src/dsp_task.c ****         if (outR >  32767.0f) outR =  32767.0f;
- 430              		.loc 1 109 36 discriminator 1 view .LVU139
- 431              	.LBE8:
- 432              	.LBE6:
- 117:Core/Src/dsp_task.c ****     }
- 118:Core/Src/dsp_task.c **** }
- 433              		.loc 1 118 1 view .LVU140
- 434 014a BDE8F087 		pop	{r4, r5, r6, r7, r8, r9, r10, pc}
- 435              	.L24:
- 436 014e 00BF     		.align	2
- 437              	.L23:
- 438 0150 00FEFF46 		.word	1191181824
- 439 0154 000000C7 		.word	-956301312
- 440 0158 00000000 		.word	delay_wr
- 441 015c D34D6210 		.word	274877907
- 442 0160 00000000 		.word	delay_line_R
- 443 0164 6666E63E 		.word	1055286886
- 444 0168 00000000 		.word	delay_line_L
- 445              		.cfi_endproc
- 446              	.LFE143:
- 448              		.section	.text.HAL_I2SEx_TxRxHalfCpltCallback,"ax",%progbits
- 449              		.align	1
- 450              		.global	HAL_I2SEx_TxRxHalfCpltCallback
- 451              		.syntax unified
- 452              		.thumb
- 453              		.thumb_func
- 455              	HAL_I2SEx_TxRxHalfCpltCallback:
- 456              	.LVL43:
- 457              	.LFB139:
-  42:Core/Src/dsp_task.c ****     active_half = 0;
- 458              		.loc 1 42 1 is_stmt 1 view -0
- 459              		.cfi_startproc
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s 			page 12
-
-
- 460              		@ args = 0, pretend = 0, frame = 0
- 461              		@ frame_needed = 0, uses_anonymous_args = 0
-  42:Core/Src/dsp_task.c ****     active_half = 0;
- 462              		.loc 1 42 1 is_stmt 0 view .LVU142
- 463 0000 08B5     		push	{r3, lr}
- 464              		.cfi_def_cfa_offset 8
- 465              		.cfi_offset 3, -8
- 466              		.cfi_offset 14, -4
-  43:Core/Src/dsp_task.c ****     osSignalSet(dsp_task_id, SIG_DMA_RDY);
- 467              		.loc 1 43 5 is_stmt 1 view .LVU143
-  43:Core/Src/dsp_task.c ****     osSignalSet(dsp_task_id, SIG_DMA_RDY);
- 468              		.loc 1 43 17 is_stmt 0 view .LVU144
- 469 0002 044B     		ldr	r3, .L27
- 470 0004 0022     		movs	r2, #0
- 471 0006 1A70     		strb	r2, [r3]
-  44:Core/Src/dsp_task.c **** }
- 472              		.loc 1 44 5 is_stmt 1 view .LVU145
- 473 0008 0121     		movs	r1, #1
- 474 000a 034B     		ldr	r3, .L27+4
- 475 000c 1868     		ldr	r0, [r3]
- 476              	.LVL44:
-  44:Core/Src/dsp_task.c **** }
- 477              		.loc 1 44 5 is_stmt 0 view .LVU146
- 478 000e FFF7FEFF 		bl	osSignalSet
- 479              	.LVL45:
-  45:Core/Src/dsp_task.c **** 
- 480              		.loc 1 45 1 view .LVU147
- 481 0012 08BD     		pop	{r3, pc}
- 482              	.L28:
- 483              		.align	2
- 484              	.L27:
- 485 0014 00000000 		.word	active_half
- 486 0018 00000000 		.word	dsp_task_id
- 487              		.cfi_endproc
- 488              	.LFE139:
- 490              		.section	.text.HAL_I2SEx_TxRxCpltCallback,"ax",%progbits
- 491              		.align	1
- 492              		.global	HAL_I2SEx_TxRxCpltCallback
- 493              		.syntax unified
- 494              		.thumb
- 495              		.thumb_func
- 497              	HAL_I2SEx_TxRxCpltCallback:
- 498              	.LVL46:
- 499              	.LFB140:
-  48:Core/Src/dsp_task.c ****     active_half = 1;
- 500              		.loc 1 48 1 is_stmt 1 view -0
- 501              		.cfi_startproc
- 502              		@ args = 0, pretend = 0, frame = 0
- 503              		@ frame_needed = 0, uses_anonymous_args = 0
-  48:Core/Src/dsp_task.c ****     active_half = 1;
- 504              		.loc 1 48 1 is_stmt 0 view .LVU149
- 505 0000 08B5     		push	{r3, lr}
- 506              		.cfi_def_cfa_offset 8
- 507              		.cfi_offset 3, -8
- 508              		.cfi_offset 14, -4
-  49:Core/Src/dsp_task.c ****     osSignalSet(dsp_task_id, SIG_DMA_RDY);
- 509              		.loc 1 49 5 is_stmt 1 view .LVU150
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s 			page 13
-
-
-  49:Core/Src/dsp_task.c ****     osSignalSet(dsp_task_id, SIG_DMA_RDY);
- 510              		.loc 1 49 17 is_stmt 0 view .LVU151
- 511 0002 0121     		movs	r1, #1
- 512 0004 034B     		ldr	r3, .L31
- 513 0006 1970     		strb	r1, [r3]
-  50:Core/Src/dsp_task.c **** }
- 514              		.loc 1 50 5 is_stmt 1 view .LVU152
- 515 0008 034B     		ldr	r3, .L31+4
- 516 000a 1868     		ldr	r0, [r3]
- 517              	.LVL47:
-  50:Core/Src/dsp_task.c **** }
- 518              		.loc 1 50 5 is_stmt 0 view .LVU153
- 519 000c FFF7FEFF 		bl	osSignalSet
- 520              	.LVL48:
-  51:Core/Src/dsp_task.c **** 
- 521              		.loc 1 51 1 view .LVU154
- 522 0010 08BD     		pop	{r3, pc}
- 523              	.L32:
- 524 0012 00BF     		.align	2
- 525              	.L31:
- 526 0014 00000000 		.word	active_half
- 527 0018 00000000 		.word	dsp_task_id
- 528              		.cfi_endproc
- 529              	.LFE140:
- 531              		.section	.text.StartDSPTask,"ax",%progbits
- 532              		.align	1
- 533              		.global	StartDSPTask
- 534              		.syntax unified
- 535              		.thumb
- 536              		.thumb_func
- 538              	StartDSPTask:
- 539              	.LVL49:
- 540              	.LFB144:
- 119:Core/Src/dsp_task.c **** 
- 120:Core/Src/dsp_task.c **** /* DSP task: highest priority.
- 121:Core/Src/dsp_task.c ****    Receives audio from PCM1808 ADC (I2S RX) and sends processed audio
- 122:Core/Src/dsp_task.c ****    to PCM5102A DAC (I2S TX) using full-duplex I2S3.
- 123:Core/Src/dsp_task.c **** 
- 124:Core/Src/dsp_task.c ****    Ping-pong: DMA (circular) continuously streams into rx_dma_buf and out
- 125:Core/Src/dsp_task.c ****    of tx_dma_buf.  HalfCplt signals that the first HALF_BUF_LEN words are
- 126:Core/Src/dsp_task.c ****    ready; TxRxCplt signals that the second half is ready.  The task wakes,
- 127:Core/Src/dsp_task.c ****    copies the fresh RX half into the corresponding TX half, applies effects,
- 128:Core/Src/dsp_task.c ****    and goes back to sleep — all before DMA wraps around to that half again. */
- 129:Core/Src/dsp_task.c **** void StartDSPTask(void const *argument)
- 130:Core/Src/dsp_task.c **** {
- 541              		.loc 1 130 1 is_stmt 1 view -0
- 542              		.cfi_startproc
- 543              		@ args = 0, pretend = 0, frame = 32
- 544              		@ frame_needed = 0, uses_anonymous_args = 0
- 545              		.loc 1 130 1 is_stmt 0 view .LVU156
- 546 0000 30B5     		push	{r4, r5, lr}
- 547              		.cfi_def_cfa_offset 12
- 548              		.cfi_offset 4, -12
- 549              		.cfi_offset 5, -8
- 550              		.cfi_offset 14, -4
- 551 0002 89B0     		sub	sp, sp, #36
- 552              		.cfi_def_cfa_offset 48
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s 			page 14
-
-
- 131:Core/Src/dsp_task.c ****     AudioEffectParams_t params;
- 553              		.loc 1 131 5 is_stmt 1 view .LVU157
+ 300              	.L27:
+ 301              	.LBB7:
+ 115:Core/Src/dsp_task.c **** 
+ 302              		.loc 1 115 26 is_stmt 1 discriminator 1 view .LVU85
+ 115:Core/Src/dsp_task.c **** 
+ 303              		.loc 1 115 31 is_stmt 0 discriminator 1 view .LVU86
+ 304 0012 9FED6D7A 		vldr.32	s14, .L28
+ 305 0016 77EE877A 		vadd.f32	s15, s15, s14
+ 306              	.LVL28:
+ 115:Core/Src/dsp_task.c **** 
+ 307              		.loc 1 115 31 discriminator 1 view .LVU87
+ 308 001a 74E0     		b	.L14
+ 309              	.LVL29:
+ 310              	.L19:
+ 129:Core/Src/dsp_task.c ****         if (outL < -32768.0f) outL = -32768.0f;
+ 311              		.loc 1 129 36 discriminator 1 view .LVU88
+ 312 001c 9FED6B7A 		vldr.32	s14, .L28+4
+ 313              	.LVL30:
+ 314              	.L16:
+ 131:Core/Src/dsp_task.c ****         if (outR < -32768.0f) outR = -32768.0f;
+ 315              		.loc 1 131 9 is_stmt 1 view .LVU89
+ 131:Core/Src/dsp_task.c ****         if (outR < -32768.0f) outR = -32768.0f;
+ 316              		.loc 1 131 12 is_stmt 0 view .LVU90
+ 317 0020 DFED6A6A 		vldr.32	s13, .L28+4
+ 318 0024 F4EEE67A 		vcmpe.f32	s15, s13
+ 319 0028 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 320 002c 09DC     		bgt	.L21
  132:Core/Src/dsp_task.c **** 
- 133:Core/Src/dsp_task.c ****     dsp_task_id = osThreadGetId();
- 554              		.loc 1 133 5 view .LVU158
- 555              		.loc 1 133 19 is_stmt 0 view .LVU159
- 556 0004 FFF7FEFF 		bl	osThreadGetId
- 557              	.LVL50:
- 558              		.loc 1 133 17 discriminator 1 view .LVU160
- 559 0008 264B     		ldr	r3, .L41
- 560 000a 1860     		str	r0, [r3]
- 134:Core/Src/dsp_task.c **** 
- 135:Core/Src/dsp_task.c ****     memset(tx_dma_buf, 0, sizeof(tx_dma_buf));
- 561              		.loc 1 135 5 is_stmt 1 view .LVU161
- 562 000c 264C     		ldr	r4, .L41+4
- 563 000e 4FF48072 		mov	r2, #256
- 564 0012 0021     		movs	r1, #0
- 565 0014 2046     		mov	r0, r4
- 566 0016 FFF7FEFF 		bl	memset
- 567              	.LVL51:
- 136:Core/Src/dsp_task.c **** 
- 137:Core/Src/dsp_task.c ****     /* HAL doubles Size internally for 24-bit format (TxXferSize = Size << 1).
- 138:Core/Src/dsp_task.c ****        Buffer holds HALF_BUF_LEN uint16_t per half = HALF_BUF_LEN/2 32-bit words per half.
- 139:Core/Src/dsp_task.c ****        Full double-buffer = HALF_BUF_LEN/2 * 2 halves = HALF_BUF_LEN/2 WORD transfers pre-doubling.
- 140:Core/Src/dsp_task.c ****        After HAL doubles: HALF_BUF_LEN WORD transfers = 256 bytes = exact buffer size. */
- 141:Core/Src/dsp_task.c ****     HAL_I2SEx_TransmitReceive_DMA(&hi2s3, tx_dma_buf, rx_dma_buf,
- 568              		.loc 1 141 5 view .LVU162
- 569 001a 2023     		movs	r3, #32
- 570 001c 234A     		ldr	r2, .L41+8
- 571 001e 2146     		mov	r1, r4
- 572 0020 2348     		ldr	r0, .L41+12
- 573 0022 FFF7FEFF 		bl	HAL_I2SEx_TransmitReceive_DMA
- 574              	.LVL52:
- 575 0026 05E0     		b	.L36
- 576              	.LVL53:
- 577              	.L34:
- 578              	.LBB9:
- 142:Core/Src/dsp_task.c ****                                   HALF_BUF_LEN / 2);
- 143:Core/Src/dsp_task.c **** 
- 144:Core/Src/dsp_task.c ****     for (;;) {
- 145:Core/Src/dsp_task.c ****         osSignalWait(SIG_DMA_RDY, osWaitForever);
- 146:Core/Src/dsp_task.c **** 
- 147:Core/Src/dsp_task.c ****         /* Snapshot which half the ISR marked ready, then derive pointers */
- 148:Core/Src/dsp_task.c ****         uint8_t   half    = active_half;
- 149:Core/Src/dsp_task.c ****         uint16_t *rx_half = &rx_dma_buf[half * HALF_BUF_LEN];
- 150:Core/Src/dsp_task.c ****         uint16_t *tx_half = &tx_dma_buf[half * HALF_BUF_LEN];
- 151:Core/Src/dsp_task.c **** 
- 152:Core/Src/dsp_task.c ****         /* Copy fresh ADC samples into the output half, then process in-place */
- 153:Core/Src/dsp_task.c ****         memcpy(tx_half, rx_half, HALF_BUF_LEN * sizeof(uint16_t));
- 154:Core/Src/dsp_task.c **** 
- 155:Core/Src/dsp_task.c ****         osMutexWait(g_params_mutex, osWaitForever);
- 156:Core/Src/dsp_task.c ****         params = g_audio_params;
- 157:Core/Src/dsp_task.c ****         osMutexRelease(g_params_mutex);
- 158:Core/Src/dsp_task.c ****         if (params.effects_mask & EFFECT_VOLUME)
- 159:Core/Src/dsp_task.c ****             apply_volume(tx_half, params.volume);
- 160:Core/Src/dsp_task.c ****             
- 161:Core/Src/dsp_task.c ****         if (params.effects_mask & EFFECT_LPF)
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s 			page 15
+ 321              		.loc 1 132 9 is_stmt 1 view .LVU91
+ 132:Core/Src/dsp_task.c **** 
+ 322              		.loc 1 132 12 is_stmt 0 view .LVU92
+ 323 002e DFED686A 		vldr.32	s13, .L28+8
+ 324 0032 F4EEE67A 		vcmpe.f32	s15, s13
+ 325 0036 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 326 003a 04D5     		bpl	.L17
+ 132:Core/Src/dsp_task.c **** 
+ 327              		.loc 1 132 36 discriminator 1 view .LVU93
+ 328 003c DFED647A 		vldr.32	s15, .L28+8
+ 329              	.LVL31:
+ 132:Core/Src/dsp_task.c **** 
+ 330              		.loc 1 132 36 discriminator 1 view .LVU94
+ 331 0040 01E0     		b	.L17
+ 332              	.LVL32:
+ 333              	.L21:
+ 131:Core/Src/dsp_task.c ****         if (outR < -32768.0f) outR = -32768.0f;
+ 334              		.loc 1 131 36 discriminator 1 view .LVU95
+ 335 0042 DFED627A 		vldr.32	s15, .L28+4
+ 336              	.LVL33:
+ 337              	.L17:
+ 134:Core/Src/dsp_task.c ****         buf[i + 1] = 0;
+ 338              		.loc 1 134 9 is_stmt 1 view .LVU96
+ 134:Core/Src/dsp_task.c ****         buf[i + 1] = 0;
+ 339              		.loc 1 134 32 is_stmt 0 view .LVU97
+ 340 0046 BDEEC77A 		vcvt.s32.f32	s14, s14
+ 341              	.LVL34:
+ 134:Core/Src/dsp_task.c ****         buf[i + 1] = 0;
+ 342              		.loc 1 134 20 view .LVU98
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 10
 
 
- 579              		.loc 1 161 9 view .LVU163
- 580              		.loc 1 161 12 is_stmt 0 view .LVU164
- 581 0028 15F0020F 		tst	r5, #2
- 582 002c 2ED1     		bne	.L39
- 583              	.L35:
- 162:Core/Src/dsp_task.c ****             apply_lpf(tx_half, params.lpf_alpha);
- 163:Core/Src/dsp_task.c **** 
- 164:Core/Src/dsp_task.c ****         if (params.effects_mask & EFFECT_DELAY)
- 584              		.loc 1 164 9 is_stmt 1 view .LVU165
- 585              		.loc 1 164 12 is_stmt 0 view .LVU166
- 586 002e 15F0040F 		tst	r5, #4
- 587 0032 31D1     		bne	.L40
- 588              	.LVL54:
- 589              	.L36:
- 590              		.loc 1 164 12 view .LVU167
- 591              	.LBE9:
- 144:Core/Src/dsp_task.c ****         osSignalWait(SIG_DMA_RDY, osWaitForever);
- 592              		.loc 1 144 5 is_stmt 1 view .LVU168
- 593              	.LBB10:
- 145:Core/Src/dsp_task.c **** 
- 594              		.loc 1 145 9 view .LVU169
- 595 0034 4FF0FF32 		mov	r2, #-1
- 596 0038 0121     		movs	r1, #1
- 597 003a 6846     		mov	r0, sp
- 598 003c FFF7FEFF 		bl	osSignalWait
- 599              	.LVL55:
- 148:Core/Src/dsp_task.c ****         uint16_t *rx_half = &rx_dma_buf[half * HALF_BUF_LEN];
- 600              		.loc 1 148 9 view .LVU170
- 148:Core/Src/dsp_task.c ****         uint16_t *rx_half = &rx_dma_buf[half * HALF_BUF_LEN];
- 601              		.loc 1 148 19 is_stmt 0 view .LVU171
- 602 0040 1C4B     		ldr	r3, .L41+16
- 603 0042 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
- 604              	.LVL56:
- 149:Core/Src/dsp_task.c ****         uint16_t *tx_half = &tx_dma_buf[half * HALF_BUF_LEN];
- 605              		.loc 1 149 9 is_stmt 1 view .LVU172
- 150:Core/Src/dsp_task.c **** 
- 606              		.loc 1 150 9 view .LVU173
- 150:Core/Src/dsp_task.c **** 
- 607              		.loc 1 150 19 is_stmt 0 view .LVU174
- 608 0044 184C     		ldr	r4, .L41+4
- 609 0046 04EBC314 		add	r4, r4, r3, lsl #7
- 610              	.LVL57:
- 153:Core/Src/dsp_task.c **** 
- 611              		.loc 1 153 9 is_stmt 1 view .LVU175
- 612 004a 8022     		movs	r2, #128
- 613 004c 1749     		ldr	r1, .L41+8
- 614 004e 01EBC311 		add	r1, r1, r3, lsl #7
- 615              	.LVL58:
- 153:Core/Src/dsp_task.c **** 
- 616              		.loc 1 153 9 is_stmt 0 view .LVU176
- 617 0052 2046     		mov	r0, r4
- 618 0054 FFF7FEFF 		bl	memcpy
- 619              	.LVL59:
- 155:Core/Src/dsp_task.c ****         params = g_audio_params;
- 620              		.loc 1 155 9 is_stmt 1 view .LVU177
- 621 0058 174D     		ldr	r5, .L41+20
- 622 005a 4FF0FF31 		mov	r1, #-1
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s 			page 16
+ 343 004a 17EE103A 		vmov	r3, s14	@ int
+ 344 004e 26F80930 		strh	r3, [r6, r9]	@ movhi
+ 135:Core/Src/dsp_task.c ****         buf[i + 2] = (uint16_t)(int16_t)outR;
+ 345              		.loc 1 135 9 is_stmt 1 view .LVU99
+ 135:Core/Src/dsp_task.c ****         buf[i + 2] = (uint16_t)(int16_t)outR;
+ 346              		.loc 1 135 15 is_stmt 0 view .LVU100
+ 347 0052 7A1C     		adds	r2, r7, #1
+ 135:Core/Src/dsp_task.c ****         buf[i + 2] = (uint16_t)(int16_t)outR;
+ 348              		.loc 1 135 20 view .LVU101
+ 349 0054 0023     		movs	r3, #0
+ 350 0056 26F81230 		strh	r3, [r6, r2, lsl #1]	@ movhi
+ 136:Core/Src/dsp_task.c ****         buf[i + 3] = 0;
+ 351              		.loc 1 136 9 is_stmt 1 view .LVU102
+ 136:Core/Src/dsp_task.c ****         buf[i + 3] = 0;
+ 352              		.loc 1 136 32 is_stmt 0 view .LVU103
+ 353 005a FDEEE77A 		vcvt.s32.f32	s15, s15
+ 354              	.LVL35:
+ 136:Core/Src/dsp_task.c ****         buf[i + 3] = 0;
+ 355              		.loc 1 136 20 view .LVU104
+ 356 005e 17EE902A 		vmov	r2, s15	@ int
+ 357 0062 26F81820 		strh	r2, [r6, r8, lsl #1]	@ movhi
+ 137:Core/Src/dsp_task.c ****     }
+ 358              		.loc 1 137 9 is_stmt 1 view .LVU105
+ 137:Core/Src/dsp_task.c ****     }
+ 359              		.loc 1 137 15 is_stmt 0 view .LVU106
+ 360 0066 0337     		adds	r7, r7, #3
+ 137:Core/Src/dsp_task.c ****     }
+ 361              		.loc 1 137 20 view .LVU107
+ 362 0068 26F81730 		strh	r3, [r6, r7, lsl #1]	@ movhi
+ 363              	.LBE7:
+ 102:Core/Src/dsp_task.c ****         float inL = (float)(int16_t)buf[i];
+ 364              		.loc 1 102 41 is_stmt 1 discriminator 2 view .LVU108
+ 365 006c 0435     		adds	r5, r5, #4
+ 366              	.LVL36:
+ 367              	.L11:
+ 102:Core/Src/dsp_task.c ****         float inL = (float)(int16_t)buf[i];
+ 368              		.loc 1 102 23 discriminator 1 view .LVU109
+ 369 006e 3F2D     		cmp	r5, #63
+ 370 0070 00F3A680 		bgt	.L26
+ 371              	.LBB8:
+ 103:Core/Src/dsp_task.c ****         float inR = (float)(int16_t)buf[i + 2];
+ 372              		.loc 1 103 9 view .LVU110
+ 103:Core/Src/dsp_task.c ****         float inR = (float)(int16_t)buf[i + 2];
+ 373              		.loc 1 103 40 is_stmt 0 view .LVU111
+ 374 0074 2F46     		mov	r7, r5
+ 375 0076 4FEA4509 		lsl	r9, r5, #1
+ 103:Core/Src/dsp_task.c ****         float inR = (float)(int16_t)buf[i + 2];
+ 376              		.loc 1 103 28 view .LVU112
+ 377 007a 36F91520 		ldrsh	r2, [r6, r5, lsl #1]
+ 103:Core/Src/dsp_task.c ****         float inR = (float)(int16_t)buf[i + 2];
+ 378              		.loc 1 103 15 view .LVU113
+ 379 007e 07EE902A 		vmov	s15, r2	@ int
+ 380 0082 F8EEE78A 		vcvt.f32.s32	s17, s15
+ 381              	.LVL37:
+ 104:Core/Src/dsp_task.c **** 
+ 382              		.loc 1 104 9 is_stmt 1 view .LVU114
+ 104:Core/Src/dsp_task.c **** 
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 11
 
 
- 623 005e 2868     		ldr	r0, [r5]
- 624 0060 FFF7FEFF 		bl	osMutexWait
- 625              	.LVL60:
- 156:Core/Src/dsp_task.c ****         osMutexRelease(g_params_mutex);
- 626              		.loc 1 156 9 view .LVU178
- 156:Core/Src/dsp_task.c ****         osMutexRelease(g_params_mutex);
- 627              		.loc 1 156 16 is_stmt 0 view .LVU179
- 628 0064 154B     		ldr	r3, .L41+24
- 629 0066 93E80700 		ldm	r3, {r0, r1, r2}
- 630 006a 08AB     		add	r3, sp, #32
- 631 006c 03E90700 		stmdb	r3, {r0, r1, r2}
- 157:Core/Src/dsp_task.c ****         if (params.effects_mask & EFFECT_VOLUME)
- 632              		.loc 1 157 9 is_stmt 1 view .LVU180
- 633 0070 2868     		ldr	r0, [r5]
- 634 0072 FFF7FEFF 		bl	osMutexRelease
- 635              	.LVL61:
- 158:Core/Src/dsp_task.c ****             apply_volume(tx_half, params.volume);
- 636              		.loc 1 158 9 view .LVU181
- 158:Core/Src/dsp_task.c ****             apply_volume(tx_half, params.volume);
- 637              		.loc 1 158 19 is_stmt 0 view .LVU182
- 638 0076 9DF81E50 		ldrb	r5, [sp, #30]	@ zero_extendqisi2
- 158:Core/Src/dsp_task.c ****             apply_volume(tx_half, params.volume);
- 639              		.loc 1 158 12 view .LVU183
- 640 007a 15F0010F 		tst	r5, #1
- 641 007e D3D0     		beq	.L34
- 159:Core/Src/dsp_task.c ****             
- 642              		.loc 1 159 13 is_stmt 1 view .LVU184
- 643 0080 9DED050A 		vldr.32	s0, [sp, #20]
- 644 0084 2046     		mov	r0, r4
- 645 0086 FFF7FEFF 		bl	apply_volume
- 646              	.LVL62:
- 647 008a CDE7     		b	.L34
- 648              	.L39:
- 162:Core/Src/dsp_task.c **** 
- 649              		.loc 1 162 13 view .LVU185
- 650 008c 9DED060A 		vldr.32	s0, [sp, #24]
- 651 0090 2046     		mov	r0, r4
- 652 0092 FFF7FEFF 		bl	apply_lpf
- 653              	.LVL63:
- 654 0096 CAE7     		b	.L35
- 655              	.L40:
- 165:Core/Src/dsp_task.c ****             apply_delay(tx_half, params.delay_samples);
- 656              		.loc 1 165 13 view .LVU186
- 657 0098 BDF81C10 		ldrh	r1, [sp, #28]
- 658 009c 2046     		mov	r0, r4
- 659 009e FFF7FEFF 		bl	apply_delay
- 660              	.LVL64:
- 661 00a2 C7E7     		b	.L36
- 662              	.L42:
- 663              		.align	2
- 664              	.L41:
- 665 00a4 00000000 		.word	dsp_task_id
- 666 00a8 00000000 		.word	tx_dma_buf
- 667 00ac 00000000 		.word	rx_dma_buf
- 668 00b0 00000000 		.word	hi2s3
- 669 00b4 00000000 		.word	active_half
- 670 00b8 00000000 		.word	g_params_mutex
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s 			page 17
+ 383              		.loc 1 104 43 is_stmt 0 view .LVU115
+ 384 0086 05F10208 		add	r8, r5, #2
+ 104:Core/Src/dsp_task.c **** 
+ 385              		.loc 1 104 28 view .LVU116
+ 386 008a 36F91830 		ldrsh	r3, [r6, r8, lsl #1]
+ 104:Core/Src/dsp_task.c **** 
+ 387              		.loc 1 104 15 view .LVU117
+ 388 008e 07EE903A 		vmov	s15, r3	@ int
+ 389 0092 B8EEE78A 		vcvt.f32.s32	s16, s15
+ 390              	.LVL38:
+ 106:Core/Src/dsp_task.c ****         chorus_buf_R[chorus_wr] = (int16_t)inR;
+ 391              		.loc 1 106 9 is_stmt 1 view .LVU118
+ 106:Core/Src/dsp_task.c ****         chorus_buf_R[chorus_wr] = (int16_t)inR;
+ 392              		.loc 1 106 21 is_stmt 0 view .LVU119
+ 393 0096 4F49     		ldr	r1, .L28+12
+ 394 0098 0C68     		ldr	r4, [r1]
+ 106:Core/Src/dsp_task.c ****         chorus_buf_R[chorus_wr] = (int16_t)inR;
+ 395              		.loc 1 106 33 view .LVU120
+ 396 009a 4F49     		ldr	r1, .L28+16
+ 397 009c 21F81420 		strh	r2, [r1, r4, lsl #1]	@ movhi
+ 107:Core/Src/dsp_task.c **** 
+ 398              		.loc 1 107 9 is_stmt 1 view .LVU121
+ 107:Core/Src/dsp_task.c **** 
+ 399              		.loc 1 107 33 is_stmt 0 view .LVU122
+ 400 00a0 4E4A     		ldr	r2, .L28+20
+ 401 00a2 22F81430 		strh	r3, [r2, r4, lsl #1]	@ movhi
+ 109:Core/Src/dsp_task.c ****         chorus_lfo += rate / 48000.0f;
+ 402              		.loc 1 109 9 is_stmt 1 view .LVU123
+ 109:Core/Src/dsp_task.c ****         chorus_lfo += rate / 48000.0f;
+ 403              		.loc 1 109 23 is_stmt 0 view .LVU124
+ 404 00a6 DFF848A1 		ldr	r10, .L28+40
+ 405 00aa DAED009A 		vldr.32	s19, [r10]
+ 406 00ae 9FED4C0A 		vldr.32	s0, .L28+24
+ 407 00b2 29EE800A 		vmul.f32	s0, s19, s0
+ 408 00b6 FFF7FEFF 		bl	sinf
+ 409              	.LVL39:
+ 110:Core/Src/dsp_task.c ****         if (chorus_lfo >= 1.0f) chorus_lfo -= 1.0f;
+ 410              		.loc 1 110 9 is_stmt 1 view .LVU125
+ 110:Core/Src/dsp_task.c ****         if (chorus_lfo >= 1.0f) chorus_lfo -= 1.0f;
+ 411              		.loc 1 110 28 is_stmt 0 view .LVU126
+ 412 00ba 9FED4A7A 		vldr.32	s14, .L28+28
+ 413 00be C9EE077A 		vdiv.f32	s15, s18, s14
+ 110:Core/Src/dsp_task.c ****         if (chorus_lfo >= 1.0f) chorus_lfo -= 1.0f;
+ 414              		.loc 1 110 20 view .LVU127
+ 415 00c2 79EEA77A 		vadd.f32	s15, s19, s15
+ 416 00c6 CAED007A 		vstr.32	s15, [r10]
+ 111:Core/Src/dsp_task.c **** 
+ 417              		.loc 1 111 9 is_stmt 1 view .LVU128
+ 111:Core/Src/dsp_task.c **** 
+ 418              		.loc 1 111 12 is_stmt 0 view .LVU129
+ 419 00ca B7EE007A 		vmov.f32	s14, #1.0e+0
+ 420 00ce F4EEC77A 		vcmpe.f32	s15, s14
+ 421 00d2 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 422 00d6 03DB     		blt	.L12
+ 111:Core/Src/dsp_task.c **** 
+ 423              		.loc 1 111 33 is_stmt 1 discriminator 1 view .LVU130
+ 111:Core/Src/dsp_task.c **** 
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 12
 
 
- 671 00bc 00000000 		.word	g_audio_params
- 672              	.LBE10:
- 673              		.cfi_endproc
- 674              	.LFE144:
- 676              		.section	.bss.dsp_task_id,"aw",%nobits
- 677              		.align	2
- 680              	dsp_task_id:
- 681 0000 00000000 		.space	4
- 682              		.section	.bss.active_half,"aw",%nobits
- 685              	active_half:
- 686 0000 00       		.space	1
- 687              		.section	.bss.lpf_R,"aw",%nobits
- 688              		.align	2
- 691              	lpf_R:
- 692 0000 00000000 		.space	4
- 693              		.section	.bss.lpf_L,"aw",%nobits
- 694              		.align	2
- 697              	lpf_L:
- 698 0000 00000000 		.space	4
- 699              		.section	.bss.delay_wr,"aw",%nobits
- 700              		.align	1
- 703              	delay_wr:
- 704 0000 0000     		.space	2
- 705              		.section	.bss.delay_line_R,"aw",%nobits
- 706              		.align	2
- 709              	delay_line_R:
- 710 0000 00000000 		.space	16000
- 710      00000000 
- 710      00000000 
- 710      00000000 
- 710      00000000 
- 711              		.section	.bss.delay_line_L,"aw",%nobits
- 712              		.align	2
- 715              	delay_line_L:
- 716 0000 00000000 		.space	16000
- 716      00000000 
- 716      00000000 
- 716      00000000 
- 716      00000000 
- 717              		.section	.bss.tx_dma_buf,"aw",%nobits
- 718              		.align	2
- 721              	tx_dma_buf:
- 722 0000 00000000 		.space	256
- 722      00000000 
- 722      00000000 
- 722      00000000 
- 722      00000000 
- 723              		.section	.bss.rx_dma_buf,"aw",%nobits
- 724              		.align	2
- 727              	rx_dma_buf:
- 728 0000 00000000 		.space	256
- 728      00000000 
- 728      00000000 
- 728      00000000 
- 728      00000000 
- 729              		.global	g_params_mutex
- 730              		.section	.bss.g_params_mutex,"aw",%nobits
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s 			page 18
+ 424              		.loc 1 111 44 is_stmt 0 discriminator 1 view .LVU131
+ 425 00d8 77EEC77A 		vsub.f32	s15, s15, s14
+ 426 00dc CAED007A 		vstr.32	s15, [r10]
+ 427              	.L12:
+ 113:Core/Src/dsp_task.c ****         float rd_f  = (float)chorus_wr - delay;
+ 428              		.loc 1 113 9 is_stmt 1 view .LVU132
+ 113:Core/Src/dsp_task.c ****         float rd_f  = (float)chorus_wr - delay;
+ 429              		.loc 1 113 70 is_stmt 0 view .LVU133
+ 430 00e0 DFED417A 		vldr.32	s15, .L28+32
+ 431 00e4 20EE270A 		vmul.f32	s0, s0, s15
+ 432              	.LVL40:
+ 113:Core/Src/dsp_task.c ****         float rd_f  = (float)chorus_wr - delay;
+ 433              		.loc 1 113 15 view .LVU134
+ 434 00e8 DFED407A 		vldr.32	s15, .L28+36
+ 435 00ec 30EE270A 		vadd.f32	s0, s0, s15
+ 436              	.LVL41:
+ 114:Core/Src/dsp_task.c ****         if (rd_f < 0.0f) rd_f += (float)CHORUS_BUF_SAMPLES;
+ 437              		.loc 1 114 9 is_stmt 1 view .LVU135
+ 114:Core/Src/dsp_task.c ****         if (rd_f < 0.0f) rd_f += (float)CHORUS_BUF_SAMPLES;
+ 438              		.loc 1 114 23 is_stmt 0 view .LVU136
+ 439 00f0 07EE904A 		vmov	s15, r4	@ int
+ 440 00f4 F8EE677A 		vcvt.f32.u32	s15, s15
+ 114:Core/Src/dsp_task.c ****         if (rd_f < 0.0f) rd_f += (float)CHORUS_BUF_SAMPLES;
+ 441              		.loc 1 114 15 view .LVU137
+ 442 00f8 77EEC07A 		vsub.f32	s15, s15, s0
+ 443              	.LVL42:
+ 115:Core/Src/dsp_task.c **** 
+ 444              		.loc 1 115 9 is_stmt 1 view .LVU138
+ 115:Core/Src/dsp_task.c **** 
+ 445              		.loc 1 115 12 is_stmt 0 view .LVU139
+ 446 00fc F5EEC07A 		vcmpe.f32	s15, #0
+ 447 0100 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 448 0104 85D4     		bmi	.L27
+ 449              	.LVL43:
+ 450              	.L14:
+ 117:Core/Src/dsp_task.c ****         uint32_t i1 = (i0 + 1) % CHORUS_BUF_SAMPLES;
+ 451              		.loc 1 117 9 is_stmt 1 view .LVU140
+ 117:Core/Src/dsp_task.c ****         uint32_t i1 = (i0 + 1) % CHORUS_BUF_SAMPLES;
+ 452              		.loc 1 117 23 is_stmt 0 view .LVU141
+ 453 0106 BCEEE77A 		vcvt.u32.f32	s14, s15
+ 117:Core/Src/dsp_task.c ****         uint32_t i1 = (i0 + 1) % CHORUS_BUF_SAMPLES;
+ 454              		.loc 1 117 18 view .LVU142
+ 455 010a 17EE103A 		vmov	r3, s14	@ int
+ 456 010e C3F30A02 		ubfx	r2, r3, #0, #11
+ 457              	.LVL44:
+ 118:Core/Src/dsp_task.c ****         float    fr = rd_f - (float)(uint32_t)rd_f;
+ 458              		.loc 1 118 9 is_stmt 1 view .LVU143
+ 118:Core/Src/dsp_task.c ****         float    fr = rd_f - (float)(uint32_t)rd_f;
+ 459              		.loc 1 118 27 is_stmt 0 view .LVU144
+ 460 0112 531C     		adds	r3, r2, #1
+ 118:Core/Src/dsp_task.c ****         float    fr = rd_f - (float)(uint32_t)rd_f;
+ 461              		.loc 1 118 18 view .LVU145
+ 462 0114 C3F30A03 		ubfx	r3, r3, #0, #11
+ 463              	.LVL45:
+ 119:Core/Src/dsp_task.c **** 
+ 464              		.loc 1 119 9 is_stmt 1 view .LVU146
+ 119:Core/Src/dsp_task.c **** 
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 13
 
 
- 731              		.align	2
- 734              	g_params_mutex:
- 735 0000 00000000 		.space	4
- 736              		.global	g_audio_params
- 737              		.section	.data.g_audio_params,"aw"
- 738              		.align	2
- 741              	g_audio_params:
- 742 0000 CDCC4C3F 		.word	1061997773
- 743 0004 0000803F 		.word	1065353216
- 744 0008 0001     		.short	256
- 745 000a 01       		.byte	1
- 746 000b 00       		.space	1
- 747              		.text
- 748              	.Letext0:
- 749              		.file 2 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
- 750              		.file 3 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
- 751              		.file 4 "Middlewares/Third_Party/FreeRTOS/Source/include/task.h"
- 752              		.file 5 "Middlewares/Third_Party/FreeRTOS/Source/include/queue.h"
- 753              		.file 6 "Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h"
- 754              		.file 7 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h"
- 755              		.file 8 "Core/Inc/dsp_task.h"
- 756              		.file 9 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
- 757              		.file 10 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
- 758              		.file 11 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
- 759              		.file 12 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2s.h"
- 760              		.file 13 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-t
- 761              		.file 14 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2s_ex.h"
- 762              		.file 15 "<built-in>"
-ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s 			page 19
+ 465              		.loc 1 119 30 is_stmt 0 view .LVU147
+ 466 0118 B8EE477A 		vcvt.f32.u32	s14, s14
+ 119:Core/Src/dsp_task.c **** 
+ 467              		.loc 1 119 18 view .LVU148
+ 468 011c 37EEC77A 		vsub.f32	s14, s15, s14
+ 469              	.LVL46:
+ 121:Core/Src/dsp_task.c ****         float wetR = (float)chorus_buf_R[i0] * (1.0f - fr) + (float)chorus_buf_R[i1] * fr;
+ 470              		.loc 1 121 9 is_stmt 1 view .LVU149
+ 121:Core/Src/dsp_task.c ****         float wetR = (float)chorus_buf_R[i0] * (1.0f - fr) + (float)chorus_buf_R[i1] * fr;
+ 471              		.loc 1 121 41 is_stmt 0 view .LVU150
+ 472 0120 2D49     		ldr	r1, .L28+16
+ 473 0122 31F91200 		ldrsh	r0, [r1, r2, lsl #1]
+ 474 0126 06EE900A 		vmov	s13, r0	@ int
+ 121:Core/Src/dsp_task.c ****         float wetR = (float)chorus_buf_R[i0] * (1.0f - fr) + (float)chorus_buf_R[i1] * fr;
+ 475              		.loc 1 121 22 view .LVU151
+ 476 012a F8EEE66A 		vcvt.f32.s32	s13, s13
+ 121:Core/Src/dsp_task.c ****         float wetR = (float)chorus_buf_R[i0] * (1.0f - fr) + (float)chorus_buf_R[i1] * fr;
+ 477              		.loc 1 121 54 view .LVU152
+ 478 012e F7EE007A 		vmov.f32	s15, #1.0e+0
+ 479              	.LVL47:
+ 121:Core/Src/dsp_task.c ****         float wetR = (float)chorus_buf_R[i0] * (1.0f - fr) + (float)chorus_buf_R[i1] * fr;
+ 480              		.loc 1 121 54 view .LVU153
+ 481 0132 77EEC77A 		vsub.f32	s15, s15, s14
+ 121:Core/Src/dsp_task.c ****         float wetR = (float)chorus_buf_R[i0] * (1.0f - fr) + (float)chorus_buf_R[i1] * fr;
+ 482              		.loc 1 121 46 view .LVU154
+ 483 0136 66EEA76A 		vmul.f32	s13, s13, s15
+ 121:Core/Src/dsp_task.c ****         float wetR = (float)chorus_buf_R[i0] * (1.0f - fr) + (float)chorus_buf_R[i1] * fr;
+ 484              		.loc 1 121 81 view .LVU155
+ 485 013a 31F91310 		ldrsh	r1, [r1, r3, lsl #1]
+ 486 013e 06EE101A 		vmov	s12, r1	@ int
+ 121:Core/Src/dsp_task.c ****         float wetR = (float)chorus_buf_R[i0] * (1.0f - fr) + (float)chorus_buf_R[i1] * fr;
+ 487              		.loc 1 121 62 view .LVU156
+ 488 0142 B8EEC66A 		vcvt.f32.s32	s12, s12
+ 121:Core/Src/dsp_task.c ****         float wetR = (float)chorus_buf_R[i0] * (1.0f - fr) + (float)chorus_buf_R[i1] * fr;
+ 489              		.loc 1 121 86 view .LVU157
+ 490 0146 26EE076A 		vmul.f32	s12, s12, s14
+ 121:Core/Src/dsp_task.c ****         float wetR = (float)chorus_buf_R[i0] * (1.0f - fr) + (float)chorus_buf_R[i1] * fr;
+ 491              		.loc 1 121 15 view .LVU158
+ 492 014a 76EE866A 		vadd.f32	s13, s13, s12
+ 493              	.LVL48:
+ 122:Core/Src/dsp_task.c **** 
+ 494              		.loc 1 122 9 is_stmt 1 view .LVU159
+ 122:Core/Src/dsp_task.c **** 
+ 495              		.loc 1 122 41 is_stmt 0 view .LVU160
+ 496 014e 2349     		ldr	r1, .L28+20
+ 497 0150 31F91220 		ldrsh	r2, [r1, r2, lsl #1]
+ 498              	.LVL49:
+ 122:Core/Src/dsp_task.c **** 
+ 499              		.loc 1 122 41 view .LVU161
+ 500 0154 06EE102A 		vmov	s12, r2	@ int
+ 122:Core/Src/dsp_task.c **** 
+ 501              		.loc 1 122 22 view .LVU162
+ 502 0158 B8EEC66A 		vcvt.f32.s32	s12, s12
+ 122:Core/Src/dsp_task.c **** 
+ 503              		.loc 1 122 46 view .LVU163
+ 504 015c 67EE867A 		vmul.f32	s15, s15, s12
+ 122:Core/Src/dsp_task.c **** 
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 14
+
+
+ 505              		.loc 1 122 81 view .LVU164
+ 506 0160 31F91330 		ldrsh	r3, [r1, r3, lsl #1]
+ 507              	.LVL50:
+ 122:Core/Src/dsp_task.c **** 
+ 508              		.loc 1 122 81 view .LVU165
+ 509 0164 06EE103A 		vmov	s12, r3	@ int
+ 122:Core/Src/dsp_task.c **** 
+ 510              		.loc 1 122 62 view .LVU166
+ 511 0168 B8EEC66A 		vcvt.f32.s32	s12, s12
+ 122:Core/Src/dsp_task.c **** 
+ 512              		.loc 1 122 86 view .LVU167
+ 513 016c 26EE077A 		vmul.f32	s14, s12, s14
+ 514              	.LVL51:
+ 122:Core/Src/dsp_task.c **** 
+ 515              		.loc 1 122 15 view .LVU168
+ 516 0170 77EE877A 		vadd.f32	s15, s15, s14
+ 517              	.LVL52:
+ 124:Core/Src/dsp_task.c **** 
+ 518              		.loc 1 124 9 is_stmt 1 view .LVU169
+ 124:Core/Src/dsp_task.c **** 
+ 519              		.loc 1 124 32 is_stmt 0 view .LVU170
+ 520 0174 0134     		adds	r4, r4, #1
+ 124:Core/Src/dsp_task.c **** 
+ 521              		.loc 1 124 37 view .LVU171
+ 522 0176 C4F30A04 		ubfx	r4, r4, #0, #11
+ 124:Core/Src/dsp_task.c **** 
+ 523              		.loc 1 124 19 view .LVU172
+ 524 017a 164B     		ldr	r3, .L28+12
+ 525 017c 1C60     		str	r4, [r3]
+ 126:Core/Src/dsp_task.c ****         float outR = inR * (1.0f - CHORUS_WET) + wetR * CHORUS_WET;
+ 526              		.loc 1 126 9 is_stmt 1 view .LVU173
+ 126:Core/Src/dsp_task.c ****         float outR = inR * (1.0f - CHORUS_WET) + wetR * CHORUS_WET;
+ 527              		.loc 1 126 26 is_stmt 0 view .LVU174
+ 528 017e B6EE006A 		vmov.f32	s12, #5.0e-1
+ 529 0182 28EE867A 		vmul.f32	s14, s17, s12
+ 126:Core/Src/dsp_task.c ****         float outR = inR * (1.0f - CHORUS_WET) + wetR * CHORUS_WET;
+ 530              		.loc 1 126 55 view .LVU175
+ 531 0186 66EE866A 		vmul.f32	s13, s13, s12
+ 532              	.LVL53:
+ 126:Core/Src/dsp_task.c ****         float outR = inR * (1.0f - CHORUS_WET) + wetR * CHORUS_WET;
+ 533              		.loc 1 126 15 view .LVU176
+ 534 018a 37EE267A 		vadd.f32	s14, s14, s13
+ 535              	.LVL54:
+ 127:Core/Src/dsp_task.c **** 
+ 536              		.loc 1 127 9 is_stmt 1 view .LVU177
+ 127:Core/Src/dsp_task.c **** 
+ 537              		.loc 1 127 26 is_stmt 0 view .LVU178
+ 538 018e 28EE068A 		vmul.f32	s16, s16, s12
+ 539              	.LVL55:
+ 127:Core/Src/dsp_task.c **** 
+ 540              		.loc 1 127 55 view .LVU179
+ 541 0192 67EE867A 		vmul.f32	s15, s15, s12
+ 542              	.LVL56:
+ 127:Core/Src/dsp_task.c **** 
+ 543              		.loc 1 127 15 view .LVU180
+ 544 0196 78EE277A 		vadd.f32	s15, s16, s15
+ 545              	.LVL57:
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 15
+
+
+ 129:Core/Src/dsp_task.c ****         if (outL < -32768.0f) outL = -32768.0f;
+ 546              		.loc 1 129 9 is_stmt 1 view .LVU181
+ 129:Core/Src/dsp_task.c ****         if (outL < -32768.0f) outL = -32768.0f;
+ 547              		.loc 1 129 12 is_stmt 0 view .LVU182
+ 548 019a DFED0C6A 		vldr.32	s13, .L28+4
+ 549 019e B4EEE67A 		vcmpe.f32	s14, s13
+ 550 01a2 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 551 01a6 3FF739AF 		bgt	.L19
+ 130:Core/Src/dsp_task.c ****         if (outR >  32767.0f) outR =  32767.0f;
+ 552              		.loc 1 130 9 is_stmt 1 view .LVU183
+ 130:Core/Src/dsp_task.c ****         if (outR >  32767.0f) outR =  32767.0f;
+ 553              		.loc 1 130 12 is_stmt 0 view .LVU184
+ 554 01aa DFED096A 		vldr.32	s13, .L28+8
+ 555 01ae B4EEE67A 		vcmpe.f32	s14, s13
+ 556 01b2 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 557 01b6 7FF533AF 		bpl	.L16
+ 130:Core/Src/dsp_task.c ****         if (outR >  32767.0f) outR =  32767.0f;
+ 558              		.loc 1 130 36 discriminator 1 view .LVU185
+ 559 01ba 9FED057A 		vldr.32	s14, .L28+8
+ 560              	.LVL58:
+ 130:Core/Src/dsp_task.c ****         if (outR >  32767.0f) outR =  32767.0f;
+ 561              		.loc 1 130 36 discriminator 1 view .LVU186
+ 562 01be 2FE7     		b	.L16
+ 563              	.LVL59:
+ 564              	.L26:
+ 130:Core/Src/dsp_task.c ****         if (outR >  32767.0f) outR =  32767.0f;
+ 565              		.loc 1 130 36 discriminator 1 view .LVU187
+ 566              	.LBE8:
+ 567              	.LBE6:
+ 139:Core/Src/dsp_task.c **** 
+ 568              		.loc 1 139 1 view .LVU188
+ 569 01c0 BDEC048B 		vldm	sp!, {d8-d9}
+ 570              		.cfi_restore 82
+ 571              		.cfi_restore 83
+ 572              		.cfi_restore 80
+ 573              		.cfi_restore 81
+ 574              		.cfi_def_cfa_offset 32
+ 575              	.LVL60:
+ 139:Core/Src/dsp_task.c **** 
+ 576              		.loc 1 139 1 view .LVU189
+ 577 01c4 BDE8F087 		pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+ 578              	.LVL61:
+ 579              	.L29:
+ 139:Core/Src/dsp_task.c **** 
+ 580              		.loc 1 139 1 view .LVU190
+ 581              		.align	2
+ 582              	.L28:
+ 583 01c8 00000045 		.word	1157627904
+ 584 01cc 00FEFF46 		.word	1191181824
+ 585 01d0 000000C7 		.word	-956301312
+ 586 01d4 00000000 		.word	chorus_wr
+ 587 01d8 00000000 		.word	chorus_buf_L
+ 588 01dc 00000000 		.word	chorus_buf_R
+ 589 01e0 D00FC940 		.word	1086918608
+ 590 01e4 00803B47 		.word	1195081728
+ 591 01e8 00007043 		.word	1131413504
+ 592 01ec 00007044 		.word	1148190720
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 16
+
+
+ 593 01f0 00000000 		.word	chorus_lfo
+ 594              		.cfi_endproc
+ 595              	.LFE143:
+ 597              		.section	.text.apply_pitch_shift,"ax",%progbits
+ 598              		.align	1
+ 599              		.syntax unified
+ 600              		.thumb
+ 601              		.thumb_func
+ 603              	apply_pitch_shift:
+ 604              	.LVL62:
+ 605              	.LFB145:
+ 155:Core/Src/dsp_task.c **** 
+ 156:Core/Src/dsp_task.c **** static void apply_pitch_shift(uint16_t *buf, float semitones)
+ 157:Core/Src/dsp_task.c **** {
+ 606              		.loc 1 157 1 is_stmt 1 view -0
+ 607              		.cfi_startproc
+ 608              		@ args = 0, pretend = 0, frame = 0
+ 609              		@ frame_needed = 0, uses_anonymous_args = 0
+ 610              		.loc 1 157 1 is_stmt 0 view .LVU192
+ 611 0000 2DE9F84F 		push	{r3, r4, r5, r6, r7, r8, r9, r10, fp, lr}
+ 612              		.cfi_def_cfa_offset 40
+ 613              		.cfi_offset 3, -40
+ 614              		.cfi_offset 4, -36
+ 615              		.cfi_offset 5, -32
+ 616              		.cfi_offset 6, -28
+ 617              		.cfi_offset 7, -24
+ 618              		.cfi_offset 8, -20
+ 619              		.cfi_offset 9, -16
+ 620              		.cfi_offset 10, -12
+ 621              		.cfi_offset 11, -8
+ 622              		.cfi_offset 14, -4
+ 623 0004 2DED088B 		vpush.64	{d8, d9, d10, d11}
+ 624              		.cfi_def_cfa_offset 72
+ 625              		.cfi_offset 80, -72
+ 626              		.cfi_offset 81, -68
+ 627              		.cfi_offset 82, -64
+ 628              		.cfi_offset 83, -60
+ 629              		.cfi_offset 84, -56
+ 630              		.cfi_offset 85, -52
+ 631              		.cfi_offset 86, -48
+ 632              		.cfi_offset 87, -44
+ 633 0008 0646     		mov	r6, r0
+ 158:Core/Src/dsp_task.c ****     float ratio = powf(2.0f, semitones / 12.0f);
+ 634              		.loc 1 158 5 is_stmt 1 view .LVU193
+ 635              		.loc 1 158 19 is_stmt 0 view .LVU194
+ 636 000a F2EE080A 		vmov.f32	s1, #1.2e+1
+ 637 000e C0EE200A 		vdiv.f32	s1, s0, s1
+ 638 0012 B0EE000A 		vmov.f32	s0, #2.0e+0
+ 639              	.LVL63:
+ 640              		.loc 1 158 19 view .LVU195
+ 641 0016 FFF7FEFF 		bl	powf
+ 642              	.LVL64:
+ 643              		.loc 1 158 19 view .LVU196
+ 644 001a F0EE40AA 		vmov.f32	s21, s0
+ 645              	.LVL65:
+ 159:Core/Src/dsp_task.c **** 
+ 160:Core/Src/dsp_task.c ****     for (int i = 0; i < HALF_BUF_LEN; i += 4) {
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 17
+
+
+ 646              		.loc 1 160 5 is_stmt 1 view .LVU197
+ 647              	.LBB9:
+ 648              		.loc 1 160 10 view .LVU198
+ 649              		.loc 1 160 14 is_stmt 0 view .LVU199
+ 650 001e 0025     		movs	r5, #0
+ 651              		.loc 1 160 5 view .LVU200
+ 652 0020 8EE0     		b	.L31
+ 653              	.LVL66:
+ 654              	.L35:
+ 655              	.LBB10:
+ 656              	.LBB11:
+ 161:Core/Src/dsp_task.c ****         /* Write input sample into delay line */
+ 162:Core/Src/dsp_task.c ****         pitch_buf_L[pitch_wr] = (int16_t)buf[i];
+ 163:Core/Src/dsp_task.c ****         pitch_buf_R[pitch_wr] = (int16_t)buf[i + 2];
+ 164:Core/Src/dsp_task.c ****         pitch_wr = (pitch_wr + 1) % PITCH_BUF_SAMPLES;
+ 165:Core/Src/dsp_task.c **** 
+ 166:Core/Src/dsp_task.c ****         /* Read primary grain */
+ 167:Core/Src/dsp_task.c ****         float outL = pitch_read(pitch_buf_L, pitch_rd1);
+ 168:Core/Src/dsp_task.c ****         float outR = pitch_read(pitch_buf_R, pitch_rd1);
+ 169:Core/Src/dsp_task.c **** 
+ 170:Core/Src/dsp_task.c ****         if (pitch_xfade > 0) {
+ 171:Core/Src/dsp_task.c ****             /* Blend secondary grain; alpha ramps 0→1 over PITCH_OVERLAP steps */
+ 172:Core/Src/dsp_task.c ****             float alpha = (float)(PITCH_OVERLAP - pitch_xfade) / (float)PITCH_OVERLAP;
+ 173:Core/Src/dsp_task.c ****             outL = outL * (1.0f - alpha) + pitch_read(pitch_buf_L, pitch_rd2) * alpha;
+ 174:Core/Src/dsp_task.c ****             outR = outR * (1.0f - alpha) + pitch_read(pitch_buf_R, pitch_rd2) * alpha;
+ 175:Core/Src/dsp_task.c **** 
+ 176:Core/Src/dsp_task.c ****             pitch_rd2 += ratio;
+ 177:Core/Src/dsp_task.c ****             if (pitch_rd2 >= (float)PITCH_BUF_SAMPLES) pitch_rd2 -= (float)PITCH_BUF_SAMPLES;
+ 178:Core/Src/dsp_task.c **** 
+ 179:Core/Src/dsp_task.c ****             if (--pitch_xfade == 0) {
+ 180:Core/Src/dsp_task.c ****                 pitch_rd1 = pitch_rd2; /* snap primary to secondary (already advanced) */
+ 181:Core/Src/dsp_task.c ****             } else {
+ 182:Core/Src/dsp_task.c ****                 pitch_rd1 += ratio;
+ 657              		.loc 1 182 17 is_stmt 1 view .LVU201
+ 658              		.loc 1 182 27 is_stmt 0 view .LVU202
+ 659 0022 39EE2A9A 		vadd.f32	s18, s18, s21
+ 660 0026 9C4B     		ldr	r3, .L73
+ 661 0028 83ED009A 		vstr.32	s18, [r3]
+ 183:Core/Src/dsp_task.c ****                 if (pitch_rd1 >= (float)PITCH_BUF_SAMPLES) pitch_rd1 -= (float)PITCH_BUF_SAMPLES;
+ 662              		.loc 1 183 17 is_stmt 1 view .LVU203
+ 663              		.loc 1 183 20 is_stmt 0 view .LVU204
+ 664 002c DFED9B7A 		vldr.32	s15, .L73+4
+ 665 0030 B4EEE79A 		vcmpe.f32	s18, s15
+ 666 0034 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 667 0038 C0F2F480 		blt	.L36
+ 668              		.loc 1 183 60 is_stmt 1 discriminator 1 view .LVU205
+ 669              		.loc 1 183 70 is_stmt 0 discriminator 1 view .LVU206
+ 670 003c 39EE679A 		vsub.f32	s18, s18, s15
+ 671 0040 83ED009A 		vstr.32	s18, [r3]
+ 672 0044 EEE0     		b	.L36
+ 673              	.LVL67:
+ 674              	.L32:
+ 675              		.loc 1 183 70 discriminator 1 view .LVU207
+ 676              	.LBE11:
+ 184:Core/Src/dsp_task.c ****             }
+ 185:Core/Src/dsp_task.c ****         } else {
+ 186:Core/Src/dsp_task.c ****             pitch_rd1 += ratio;
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 18
+
+
+ 677              		.loc 1 186 13 is_stmt 1 view .LVU208
+ 678              		.loc 1 186 23 is_stmt 0 view .LVU209
+ 679 0046 39EE2A9A 		vadd.f32	s18, s18, s21
+ 680 004a 934B     		ldr	r3, .L73
+ 681 004c 83ED009A 		vstr.32	s18, [r3]
+ 187:Core/Src/dsp_task.c ****             if (pitch_rd1 >= (float)PITCH_BUF_SAMPLES) pitch_rd1 -= (float)PITCH_BUF_SAMPLES;
+ 682              		.loc 1 187 13 is_stmt 1 view .LVU210
+ 683              		.loc 1 187 16 is_stmt 0 view .LVU211
+ 684 0050 DFED927A 		vldr.32	s15, .L73+4
+ 685 0054 B4EEE79A 		vcmpe.f32	s18, s15
+ 686 0058 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 687 005c C0F2E280 		blt	.L36
+ 688              		.loc 1 187 56 is_stmt 1 discriminator 1 view .LVU212
+ 689              		.loc 1 187 66 is_stmt 0 discriminator 1 view .LVU213
+ 690 0060 39EE679A 		vsub.f32	s18, s18, s15
+ 691 0064 83ED009A 		vstr.32	s18, [r3]
+ 692 0068 DCE0     		b	.L36
+ 693              	.LVL68:
+ 694              	.L71:
+ 695              	.LBB12:
+ 188:Core/Src/dsp_task.c ****         }
+ 189:Core/Src/dsp_task.c **** 
+ 190:Core/Src/dsp_task.c ****         /* Check if a new crossfade is needed */
+ 191:Core/Src/dsp_task.c ****         if (pitch_xfade == 0) {
+ 192:Core/Src/dsp_task.c ****             float dist = (float)pitch_wr - pitch_rd1;
+ 193:Core/Src/dsp_task.c ****             if (dist < 0.0f) dist += (float)PITCH_BUF_SAMPLES;
+ 696              		.loc 1 193 30 is_stmt 1 discriminator 1 view .LVU214
+ 697              		.loc 1 193 35 is_stmt 0 discriminator 1 view .LVU215
+ 698 006a DFED8C6A 		vldr.32	s13, .L73+4
+ 699 006e 77EEA67A 		vadd.f32	s15, s15, s13
+ 700              	.LVL69:
+ 701              		.loc 1 193 35 discriminator 1 view .LVU216
+ 702 0072 EBE0     		b	.L40
+ 703              	.LVL70:
+ 704              	.L72:
+ 194:Core/Src/dsp_task.c **** 
+ 195:Core/Src/dsp_task.c ****             if (ratio >= 1.0f && dist < (float)PITCH_OVERLAP) {
+ 196:Core/Src/dsp_task.c ****                 /* Pitch up: primary caught up to write ptr — jump back GRAIN samples */
+ 197:Core/Src/dsp_task.c ****                 pitch_rd2   = pitch_rd1 - (float)PITCH_GRAIN;
+ 198:Core/Src/dsp_task.c ****                 if (pitch_rd2 < 0.0f) pitch_rd2 += (float)PITCH_BUF_SAMPLES;
+ 705              		.loc 1 198 39 is_stmt 1 discriminator 1 view .LVU217
+ 706              		.loc 1 198 49 is_stmt 0 discriminator 1 view .LVU218
+ 707 0074 DFED897A 		vldr.32	s15, .L73+4
+ 708 0078 37EE277A 		vadd.f32	s14, s14, s15
+ 709 007c 83ED007A 		vstr.32	s14, [r3]
+ 710 0080 01E1     		b	.L45
+ 711              	.LVL71:
+ 712              	.L42:
+ 199:Core/Src/dsp_task.c ****                 pitch_xfade = PITCH_OVERLAP;
+ 200:Core/Src/dsp_task.c ****             } else if (ratio < 1.0f && dist > (float)(PITCH_BUF_SAMPLES - PITCH_OVERLAP)) {
+ 713              		.loc 1 200 20 is_stmt 1 view .LVU219
+ 714              		.loc 1 200 23 is_stmt 0 view .LVU220
+ 715 0082 F7EE006A 		vmov.f32	s13, #1.0e+0
+ 716 0086 F4EEE6AA 		vcmpe.f32	s21, s13
+ 717 008a F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 718 008e 10D4     		bmi	.L69
+ 719              	.LVL72:
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 19
+
+
+ 720              	.L39:
+ 721              		.loc 1 200 23 view .LVU221
+ 722              	.LBE12:
+ 201:Core/Src/dsp_task.c ****                 /* Pitch down: write ptr ran too far ahead — jump forward GRAIN samples */
+ 202:Core/Src/dsp_task.c ****                 pitch_rd2   = pitch_rd1 + (float)PITCH_GRAIN;
+ 203:Core/Src/dsp_task.c ****                 if (pitch_rd2 >= (float)PITCH_BUF_SAMPLES) pitch_rd2 -= (float)PITCH_BUF_SAMPLES;
+ 204:Core/Src/dsp_task.c ****                 pitch_xfade = PITCH_OVERLAP;
+ 205:Core/Src/dsp_task.c ****             }
+ 206:Core/Src/dsp_task.c ****         }
+ 207:Core/Src/dsp_task.c **** 
+ 208:Core/Src/dsp_task.c ****         if (outL >  32767.0f) outL =  32767.0f;
+ 723              		.loc 1 208 9 is_stmt 1 view .LVU222
+ 724              		.loc 1 208 12 is_stmt 0 view .LVU223
+ 725 0090 DFED837A 		vldr.32	s15, .L73+8
+ 726 0094 F4EEE78A 		vcmpe.f32	s17, s15
+ 727 0098 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 728 009c 27DC     		bgt	.L54
+ 209:Core/Src/dsp_task.c ****         if (outL < -32768.0f) outL = -32768.0f;
+ 729              		.loc 1 209 9 is_stmt 1 view .LVU224
+ 730              		.loc 1 209 12 is_stmt 0 view .LVU225
+ 731 009e DFED817A 		vldr.32	s15, .L73+12
+ 732 00a2 F4EEE78A 		vcmpe.f32	s17, s15
+ 733 00a6 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 734 00aa 22D5     		bpl	.L51
+ 735              		.loc 1 209 36 discriminator 1 view .LVU226
+ 736 00ac DFED7D8A 		vldr.32	s17, .L73+12
+ 737              	.LVL73:
+ 738              		.loc 1 209 36 discriminator 1 view .LVU227
+ 739 00b0 1FE0     		b	.L51
+ 740              	.LVL74:
+ 741              	.L69:
+ 742              	.LBB13:
+ 200:Core/Src/dsp_task.c ****                 /* Pitch down: write ptr ran too far ahead — jump forward GRAIN samples */
+ 743              		.loc 1 200 37 discriminator 1 view .LVU228
+ 744 00b2 DFED7D6A 		vldr.32	s13, .L73+16
+ 745 00b6 F4EEE67A 		vcmpe.f32	s15, s13
+ 746 00ba F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 747 00be E7DD     		ble	.L39
+ 202:Core/Src/dsp_task.c ****                 if (pitch_rd2 >= (float)PITCH_BUF_SAMPLES) pitch_rd2 -= (float)PITCH_BUF_SAMPLES;
+ 748              		.loc 1 202 17 is_stmt 1 view .LVU229
+ 202:Core/Src/dsp_task.c ****                 if (pitch_rd2 >= (float)PITCH_BUF_SAMPLES) pitch_rd2 -= (float)PITCH_BUF_SAMPLES;
+ 749              		.loc 1 202 41 is_stmt 0 view .LVU230
+ 750 00c0 DFED7A7A 		vldr.32	s15, .L73+20
+ 751              	.LVL75:
+ 202:Core/Src/dsp_task.c ****                 if (pitch_rd2 >= (float)PITCH_BUF_SAMPLES) pitch_rd2 -= (float)PITCH_BUF_SAMPLES;
+ 752              		.loc 1 202 41 view .LVU231
+ 753 00c4 37EE277A 		vadd.f32	s14, s14, s15
+ 202:Core/Src/dsp_task.c ****                 if (pitch_rd2 >= (float)PITCH_BUF_SAMPLES) pitch_rd2 -= (float)PITCH_BUF_SAMPLES;
+ 754              		.loc 1 202 29 view .LVU232
+ 755 00c8 794B     		ldr	r3, .L73+24
+ 756 00ca 83ED007A 		vstr.32	s14, [r3]
+ 203:Core/Src/dsp_task.c ****                 pitch_xfade = PITCH_OVERLAP;
+ 757              		.loc 1 203 17 is_stmt 1 view .LVU233
+ 203:Core/Src/dsp_task.c ****                 pitch_xfade = PITCH_OVERLAP;
+ 758              		.loc 1 203 20 is_stmt 0 view .LVU234
+ 759 00ce DFED737A 		vldr.32	s15, .L73+4
+ 760 00d2 B4EEE77A 		vcmpe.f32	s14, s15
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 20
+
+
+ 761 00d6 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 762 00da 03DB     		blt	.L49
+ 203:Core/Src/dsp_task.c ****                 pitch_xfade = PITCH_OVERLAP;
+ 763              		.loc 1 203 60 is_stmt 1 discriminator 1 view .LVU235
+ 203:Core/Src/dsp_task.c ****                 pitch_xfade = PITCH_OVERLAP;
+ 764              		.loc 1 203 70 is_stmt 0 discriminator 1 view .LVU236
+ 765 00dc 37EE677A 		vsub.f32	s14, s14, s15
+ 766 00e0 83ED007A 		vstr.32	s14, [r3]
+ 767              	.L49:
+ 204:Core/Src/dsp_task.c ****             }
+ 768              		.loc 1 204 17 is_stmt 1 view .LVU237
+ 204:Core/Src/dsp_task.c ****             }
+ 769              		.loc 1 204 29 is_stmt 0 view .LVU238
+ 770 00e4 734B     		ldr	r3, .L73+28
+ 771 00e6 4FF48072 		mov	r2, #256
+ 772 00ea 1A60     		str	r2, [r3]
+ 773 00ec D0E7     		b	.L39
+ 774              	.LVL76:
+ 775              	.L54:
+ 204:Core/Src/dsp_task.c ****             }
+ 776              		.loc 1 204 29 view .LVU239
+ 777              	.LBE13:
+ 208:Core/Src/dsp_task.c ****         if (outL < -32768.0f) outL = -32768.0f;
+ 778              		.loc 1 208 36 discriminator 1 view .LVU240
+ 779 00ee DFED6C8A 		vldr.32	s17, .L73+8
+ 780              	.LVL77:
+ 781              	.L51:
+ 210:Core/Src/dsp_task.c ****         if (outR >  32767.0f) outR =  32767.0f;
+ 782              		.loc 1 210 9 is_stmt 1 view .LVU241
+ 783              		.loc 1 210 12 is_stmt 0 view .LVU242
+ 784 00f2 DFED6B7A 		vldr.32	s15, .L73+8
+ 785 00f6 B4EEE78A 		vcmpe.f32	s16, s15
+ 786 00fa F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 787 00fe 09DC     		bgt	.L56
+ 211:Core/Src/dsp_task.c ****         if (outR < -32768.0f) outR = -32768.0f;
+ 788              		.loc 1 211 9 is_stmt 1 view .LVU243
+ 789              		.loc 1 211 12 is_stmt 0 view .LVU244
+ 790 0100 DFED687A 		vldr.32	s15, .L73+12
+ 791 0104 B4EEE78A 		vcmpe.f32	s16, s15
+ 792 0108 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 793 010c 04D5     		bpl	.L52
+ 794              		.loc 1 211 36 discriminator 1 view .LVU245
+ 795 010e 9FED658A 		vldr.32	s16, .L73+12
+ 796              	.LVL78:
+ 797              		.loc 1 211 36 discriminator 1 view .LVU246
+ 798 0112 01E0     		b	.L52
+ 799              	.LVL79:
+ 800              	.L56:
+ 210:Core/Src/dsp_task.c ****         if (outR >  32767.0f) outR =  32767.0f;
+ 801              		.loc 1 210 36 discriminator 1 view .LVU247
+ 802 0114 9FED628A 		vldr.32	s16, .L73+8
+ 803              	.LVL80:
+ 804              	.L52:
+ 212:Core/Src/dsp_task.c **** 
+ 213:Core/Src/dsp_task.c ****         buf[i]     = (uint16_t)(int16_t)outL;
+ 805              		.loc 1 213 9 is_stmt 1 view .LVU248
+ 806              		.loc 1 213 32 is_stmt 0 view .LVU249
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 21
+
+
+ 807 0118 FDEEE88A 		vcvt.s32.f32	s17, s17
+ 808              	.LVL81:
+ 809              		.loc 1 213 20 view .LVU250
+ 810 011c 18EE903A 		vmov	r3, s17	@ int
+ 811 0120 26F80930 		strh	r3, [r6, r9]	@ movhi
+ 214:Core/Src/dsp_task.c ****         buf[i + 1] = 0;
+ 812              		.loc 1 214 9 is_stmt 1 view .LVU251
+ 813              		.loc 1 214 15 is_stmt 0 view .LVU252
+ 814 0124 7A1C     		adds	r2, r7, #1
+ 815              		.loc 1 214 20 view .LVU253
+ 816 0126 0023     		movs	r3, #0
+ 817 0128 26F81230 		strh	r3, [r6, r2, lsl #1]	@ movhi
+ 215:Core/Src/dsp_task.c ****         buf[i + 2] = (uint16_t)(int16_t)outR;
+ 818              		.loc 1 215 9 is_stmt 1 view .LVU254
+ 819              		.loc 1 215 32 is_stmt 0 view .LVU255
+ 820 012c BDEEC88A 		vcvt.s32.f32	s16, s16
+ 821              	.LVL82:
+ 822              		.loc 1 215 20 view .LVU256
+ 823 0130 18EE102A 		vmov	r2, s16	@ int
+ 824 0134 26F81820 		strh	r2, [r6, r8, lsl #1]	@ movhi
+ 216:Core/Src/dsp_task.c ****         buf[i + 3] = 0;
+ 825              		.loc 1 216 9 is_stmt 1 view .LVU257
+ 826              		.loc 1 216 15 is_stmt 0 view .LVU258
+ 827 0138 0337     		adds	r7, r7, #3
+ 828              		.loc 1 216 20 view .LVU259
+ 829 013a 26F81730 		strh	r3, [r6, r7, lsl #1]	@ movhi
+ 830              	.LBE10:
+ 160:Core/Src/dsp_task.c ****         /* Write input sample into delay line */
+ 831              		.loc 1 160 41 is_stmt 1 discriminator 2 view .LVU260
+ 832 013e 0435     		adds	r5, r5, #4
+ 833              	.LVL83:
+ 834              	.L31:
+ 160:Core/Src/dsp_task.c ****         /* Write input sample into delay line */
+ 835              		.loc 1 160 23 discriminator 1 view .LVU261
+ 836 0140 3F2D     		cmp	r5, #63
+ 837 0142 00F3A580 		bgt	.L70
+ 838              	.LBB16:
+ 162:Core/Src/dsp_task.c ****         pitch_buf_R[pitch_wr] = (int16_t)buf[i + 2];
+ 839              		.loc 1 162 9 view .LVU262
+ 162:Core/Src/dsp_task.c ****         pitch_buf_R[pitch_wr] = (int16_t)buf[i + 2];
+ 840              		.loc 1 162 45 is_stmt 0 view .LVU263
+ 841 0146 2F46     		mov	r7, r5
+ 842 0148 4FEA4509 		lsl	r9, r5, #1
+ 162:Core/Src/dsp_task.c ****         pitch_buf_R[pitch_wr] = (int16_t)buf[i + 2];
+ 843              		.loc 1 162 20 view .LVU264
+ 844 014c 5A4A     		ldr	r2, .L73+32
+ 845 014e 1368     		ldr	r3, [r2]
+ 162:Core/Src/dsp_task.c ****         pitch_buf_R[pitch_wr] = (int16_t)buf[i + 2];
+ 846              		.loc 1 162 33 view .LVU265
+ 847 0150 36F91510 		ldrsh	r1, [r6, r5, lsl #1]
+ 162:Core/Src/dsp_task.c ****         pitch_buf_R[pitch_wr] = (int16_t)buf[i + 2];
+ 848              		.loc 1 162 31 view .LVU266
+ 849 0154 5948     		ldr	r0, .L73+36
+ 850 0156 20F81310 		strh	r1, [r0, r3, lsl #1]	@ movhi
+ 163:Core/Src/dsp_task.c ****         pitch_wr = (pitch_wr + 1) % PITCH_BUF_SAMPLES;
+ 851              		.loc 1 163 9 is_stmt 1 view .LVU267
+ 163:Core/Src/dsp_task.c ****         pitch_wr = (pitch_wr + 1) % PITCH_BUF_SAMPLES;
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 22
+
+
+ 852              		.loc 1 163 48 is_stmt 0 view .LVU268
+ 853 015a 05F10208 		add	r8, r5, #2
+ 163:Core/Src/dsp_task.c ****         pitch_wr = (pitch_wr + 1) % PITCH_BUF_SAMPLES;
+ 854              		.loc 1 163 33 view .LVU269
+ 855 015e 36F91810 		ldrsh	r1, [r6, r8, lsl #1]
+ 163:Core/Src/dsp_task.c ****         pitch_wr = (pitch_wr + 1) % PITCH_BUF_SAMPLES;
+ 856              		.loc 1 163 31 view .LVU270
+ 857 0162 DFF860A1 		ldr	r10, .L73+44
+ 858 0166 2AF81310 		strh	r1, [r10, r3, lsl #1]	@ movhi
+ 164:Core/Src/dsp_task.c **** 
+ 859              		.loc 1 164 9 is_stmt 1 view .LVU271
+ 164:Core/Src/dsp_task.c **** 
+ 860              		.loc 1 164 30 is_stmt 0 view .LVU272
+ 861 016a 0133     		adds	r3, r3, #1
+ 164:Core/Src/dsp_task.c **** 
+ 862              		.loc 1 164 35 view .LVU273
+ 863 016c C3F30B04 		ubfx	r4, r3, #0, #12
+ 164:Core/Src/dsp_task.c **** 
+ 864              		.loc 1 164 18 view .LVU274
+ 865 0170 1460     		str	r4, [r2]
+ 167:Core/Src/dsp_task.c ****         float outR = pitch_read(pitch_buf_R, pitch_rd1);
+ 866              		.loc 1 167 9 is_stmt 1 view .LVU275
+ 167:Core/Src/dsp_task.c ****         float outR = pitch_read(pitch_buf_R, pitch_rd1);
+ 867              		.loc 1 167 22 is_stmt 0 view .LVU276
+ 868 0172 494B     		ldr	r3, .L73
+ 869 0174 93ED009A 		vldr.32	s18, [r3]
+ 870 0178 B0EE490A 		vmov.f32	s0, s18
+ 871 017c FFF7FEFF 		bl	pitch_read
+ 872              	.LVL84:
+ 873 0180 F0EE408A 		vmov.f32	s17, s0
+ 874              	.LVL85:
+ 168:Core/Src/dsp_task.c **** 
+ 875              		.loc 1 168 9 is_stmt 1 view .LVU277
+ 168:Core/Src/dsp_task.c **** 
+ 876              		.loc 1 168 22 is_stmt 0 view .LVU278
+ 877 0184 B0EE490A 		vmov.f32	s0, s18
+ 878              	.LVL86:
+ 168:Core/Src/dsp_task.c **** 
+ 879              		.loc 1 168 22 view .LVU279
+ 880 0188 5046     		mov	r0, r10
+ 881 018a FFF7FEFF 		bl	pitch_read
+ 882              	.LVL87:
+ 883 018e B0EE408A 		vmov.f32	s16, s0
+ 884              	.LVL88:
+ 170:Core/Src/dsp_task.c ****             /* Blend secondary grain; alpha ramps 0→1 over PITCH_OVERLAP steps */
+ 885              		.loc 1 170 9 is_stmt 1 view .LVU280
+ 170:Core/Src/dsp_task.c ****             /* Blend secondary grain; alpha ramps 0→1 over PITCH_OVERLAP steps */
+ 886              		.loc 1 170 25 is_stmt 0 view .LVU281
+ 887 0192 484B     		ldr	r3, .L73+28
+ 888 0194 D3F800A0 		ldr	r10, [r3]
+ 170:Core/Src/dsp_task.c ****             /* Blend secondary grain; alpha ramps 0→1 over PITCH_OVERLAP steps */
+ 889              		.loc 1 170 12 view .LVU282
+ 890 0198 BAF1000F 		cmp	r10, #0
+ 891 019c 7FF753AF 		ble	.L32
+ 892              	.LBB14:
+ 172:Core/Src/dsp_task.c ****             outL = outL * (1.0f - alpha) + pitch_read(pitch_buf_L, pitch_rd2) * alpha;
+ 893              		.loc 1 172 13 is_stmt 1 view .LVU283
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 23
+
+
+ 172:Core/Src/dsp_task.c ****             outL = outL * (1.0f - alpha) + pitch_read(pitch_buf_L, pitch_rd2) * alpha;
+ 894              		.loc 1 172 49 is_stmt 0 view .LVU284
+ 895 01a0 CAF58073 		rsb	r3, r10, #256
+ 896 01a4 0AEE103A 		vmov	s20, r3	@ int
+ 172:Core/Src/dsp_task.c ****             outL = outL * (1.0f - alpha) + pitch_read(pitch_buf_L, pitch_rd2) * alpha;
+ 897              		.loc 1 172 27 view .LVU285
+ 898 01a8 B8EECAAA 		vcvt.f32.s32	s20, s20
+ 172:Core/Src/dsp_task.c ****             outL = outL * (1.0f - alpha) + pitch_read(pitch_buf_L, pitch_rd2) * alpha;
+ 899              		.loc 1 172 19 view .LVU286
+ 900 01ac DFED447A 		vldr.32	s15, .L73+40
+ 901 01b0 2AEE27AA 		vmul.f32	s20, s20, s15
+ 902              	.LVL89:
+ 173:Core/Src/dsp_task.c ****             outR = outR * (1.0f - alpha) + pitch_read(pitch_buf_R, pitch_rd2) * alpha;
+ 903              		.loc 1 173 13 is_stmt 1 view .LVU287
+ 173:Core/Src/dsp_task.c ****             outR = outR * (1.0f - alpha) + pitch_read(pitch_buf_R, pitch_rd2) * alpha;
+ 904              		.loc 1 173 33 is_stmt 0 view .LVU288
+ 905 01b4 B7EE00BA 		vmov.f32	s22, #1.0e+0
+ 906 01b8 3BEE4ABA 		vsub.f32	s22, s22, s20
+ 173:Core/Src/dsp_task.c ****             outR = outR * (1.0f - alpha) + pitch_read(pitch_buf_R, pitch_rd2) * alpha;
+ 907              		.loc 1 173 25 view .LVU289
+ 908 01bc 6BEE288A 		vmul.f32	s17, s22, s17
+ 909              	.LVL90:
+ 173:Core/Src/dsp_task.c ****             outR = outR * (1.0f - alpha) + pitch_read(pitch_buf_R, pitch_rd2) * alpha;
+ 910              		.loc 1 173 44 view .LVU290
+ 911 01c0 DFF8ECB0 		ldr	fp, .L73+24
+ 912 01c4 DBED009A 		vldr.32	s19, [fp]
+ 913 01c8 B0EE690A 		vmov.f32	s0, s19
+ 914              	.LVL91:
+ 173:Core/Src/dsp_task.c ****             outR = outR * (1.0f - alpha) + pitch_read(pitch_buf_R, pitch_rd2) * alpha;
+ 915              		.loc 1 173 44 view .LVU291
+ 916 01cc 3B48     		ldr	r0, .L73+36
+ 917 01ce FFF7FEFF 		bl	pitch_read
+ 918              	.LVL92:
+ 173:Core/Src/dsp_task.c ****             outR = outR * (1.0f - alpha) + pitch_read(pitch_buf_R, pitch_rd2) * alpha;
+ 919              		.loc 1 173 79 discriminator 1 view .LVU292
+ 920 01d2 20EE0A0A 		vmul.f32	s0, s0, s20
+ 173:Core/Src/dsp_task.c ****             outR = outR * (1.0f - alpha) + pitch_read(pitch_buf_R, pitch_rd2) * alpha;
+ 921              		.loc 1 173 18 discriminator 1 view .LVU293
+ 922 01d6 78EE808A 		vadd.f32	s17, s17, s0
+ 923              	.LVL93:
+ 174:Core/Src/dsp_task.c **** 
+ 924              		.loc 1 174 13 is_stmt 1 view .LVU294
+ 174:Core/Src/dsp_task.c **** 
+ 925              		.loc 1 174 25 is_stmt 0 view .LVU295
+ 926 01da 2BEE08BA 		vmul.f32	s22, s22, s16
+ 174:Core/Src/dsp_task.c **** 
+ 927              		.loc 1 174 44 view .LVU296
+ 928 01de B0EE690A 		vmov.f32	s0, s19
+ 929 01e2 3848     		ldr	r0, .L73+44
+ 930 01e4 FFF7FEFF 		bl	pitch_read
+ 931              	.LVL94:
+ 174:Core/Src/dsp_task.c **** 
+ 932              		.loc 1 174 79 discriminator 1 view .LVU297
+ 933 01e8 20EE0A8A 		vmul.f32	s16, s0, s20
+ 934              	.LVL95:
+ 174:Core/Src/dsp_task.c **** 
+ 935              		.loc 1 174 18 discriminator 1 view .LVU298
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 24
+
+
+ 936 01ec 3BEE088A 		vadd.f32	s16, s22, s16
+ 937              	.LVL96:
+ 176:Core/Src/dsp_task.c ****             if (pitch_rd2 >= (float)PITCH_BUF_SAMPLES) pitch_rd2 -= (float)PITCH_BUF_SAMPLES;
+ 938              		.loc 1 176 13 is_stmt 1 view .LVU299
+ 176:Core/Src/dsp_task.c ****             if (pitch_rd2 >= (float)PITCH_BUF_SAMPLES) pitch_rd2 -= (float)PITCH_BUF_SAMPLES;
+ 939              		.loc 1 176 23 is_stmt 0 view .LVU300
+ 940 01f0 79EEAA9A 		vadd.f32	s19, s19, s21
+ 941 01f4 CBED009A 		vstr.32	s19, [fp]
+ 177:Core/Src/dsp_task.c **** 
+ 942              		.loc 1 177 13 is_stmt 1 view .LVU301
+ 177:Core/Src/dsp_task.c **** 
+ 943              		.loc 1 177 16 is_stmt 0 view .LVU302
+ 944 01f8 DFED287A 		vldr.32	s15, .L73+4
+ 945 01fc F4EEE79A 		vcmpe.f32	s19, s15
+ 946 0200 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 947 0204 03DB     		blt	.L33
+ 177:Core/Src/dsp_task.c **** 
+ 948              		.loc 1 177 56 is_stmt 1 discriminator 1 view .LVU303
+ 177:Core/Src/dsp_task.c **** 
+ 949              		.loc 1 177 66 is_stmt 0 discriminator 1 view .LVU304
+ 950 0206 79EEE79A 		vsub.f32	s19, s19, s15
+ 951 020a CBED009A 		vstr.32	s19, [fp]
+ 952              	.L33:
+ 179:Core/Src/dsp_task.c ****                 pitch_rd1 = pitch_rd2; /* snap primary to secondary (already advanced) */
+ 953              		.loc 1 179 13 is_stmt 1 view .LVU305
+ 179:Core/Src/dsp_task.c ****                 pitch_rd1 = pitch_rd2; /* snap primary to secondary (already advanced) */
+ 954              		.loc 1 179 17 is_stmt 0 view .LVU306
+ 955 020e 0AF1FF33 		add	r3, r10, #-1
+ 179:Core/Src/dsp_task.c ****                 pitch_rd1 = pitch_rd2; /* snap primary to secondary (already advanced) */
+ 956              		.loc 1 179 16 view .LVU307
+ 957 0212 284A     		ldr	r2, .L73+28
+ 958 0214 1360     		str	r3, [r2]
+ 959 0216 002B     		cmp	r3, #0
+ 960 0218 7FF403AF 		bne	.L35
+ 180:Core/Src/dsp_task.c ****             } else {
+ 961              		.loc 1 180 17 is_stmt 1 view .LVU308
+ 180:Core/Src/dsp_task.c ****             } else {
+ 962              		.loc 1 180 27 is_stmt 0 view .LVU309
+ 963 021c 244B     		ldr	r3, .L73+24
+ 964 021e 1A68     		ldr	r2, [r3]	@ float
+ 965 0220 1D4B     		ldr	r3, .L73
+ 966 0222 1A60     		str	r2, [r3]	@ float
+ 967              	.LVL97:
+ 968              	.L36:
+ 180:Core/Src/dsp_task.c ****             } else {
+ 969              		.loc 1 180 27 view .LVU310
+ 970              	.LBE14:
+ 191:Core/Src/dsp_task.c ****             float dist = (float)pitch_wr - pitch_rd1;
+ 971              		.loc 1 191 9 is_stmt 1 view .LVU311
+ 191:Core/Src/dsp_task.c ****             float dist = (float)pitch_wr - pitch_rd1;
+ 972              		.loc 1 191 25 is_stmt 0 view .LVU312
+ 973 0224 234B     		ldr	r3, .L73+28
+ 974 0226 1B68     		ldr	r3, [r3]
+ 191:Core/Src/dsp_task.c ****             float dist = (float)pitch_wr - pitch_rd1;
+ 975              		.loc 1 191 12 view .LVU313
+ 976 0228 002B     		cmp	r3, #0
+ 977 022a 7FF431AF 		bne	.L39
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 25
+
+
+ 978              	.LBB15:
+ 192:Core/Src/dsp_task.c ****             if (dist < 0.0f) dist += (float)PITCH_BUF_SAMPLES;
+ 979              		.loc 1 192 13 is_stmt 1 view .LVU314
+ 192:Core/Src/dsp_task.c ****             if (dist < 0.0f) dist += (float)PITCH_BUF_SAMPLES;
+ 980              		.loc 1 192 26 is_stmt 0 view .LVU315
+ 981 022e 07EE904A 		vmov	s15, r4	@ int
+ 982 0232 F8EE677A 		vcvt.f32.u32	s15, s15
+ 192:Core/Src/dsp_task.c ****             if (dist < 0.0f) dist += (float)PITCH_BUF_SAMPLES;
+ 983              		.loc 1 192 42 view .LVU316
+ 984 0236 184B     		ldr	r3, .L73
+ 985 0238 93ED007A 		vldr.32	s14, [r3]
+ 192:Core/Src/dsp_task.c ****             if (dist < 0.0f) dist += (float)PITCH_BUF_SAMPLES;
+ 986              		.loc 1 192 19 view .LVU317
+ 987 023c 77EEC77A 		vsub.f32	s15, s15, s14
+ 988              	.LVL98:
+ 193:Core/Src/dsp_task.c **** 
+ 989              		.loc 1 193 13 is_stmt 1 view .LVU318
+ 193:Core/Src/dsp_task.c **** 
+ 990              		.loc 1 193 16 is_stmt 0 view .LVU319
+ 991 0240 F5EEC07A 		vcmpe.f32	s15, #0
+ 992 0244 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 993 0248 3FF50FAF 		bmi	.L71
+ 994              	.LVL99:
+ 995              	.L40:
+ 195:Core/Src/dsp_task.c ****                 /* Pitch up: primary caught up to write ptr — jump back GRAIN samples */
+ 996              		.loc 1 195 13 is_stmt 1 view .LVU320
+ 195:Core/Src/dsp_task.c ****                 /* Pitch up: primary caught up to write ptr — jump back GRAIN samples */
+ 997              		.loc 1 195 16 is_stmt 0 view .LVU321
+ 998 024c F7EE006A 		vmov.f32	s13, #1.0e+0
+ 999 0250 F4EEE6AA 		vcmpe.f32	s21, s13
+ 1000 0254 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 1001 0258 FFF613AF 		blt	.L42
+ 195:Core/Src/dsp_task.c ****                 /* Pitch up: primary caught up to write ptr — jump back GRAIN samples */
+ 1002              		.loc 1 195 31 discriminator 1 view .LVU322
+ 1003 025c DFED1A6A 		vldr.32	s13, .L73+48
+ 1004 0260 F4EEE67A 		vcmpe.f32	s15, s13
+ 1005 0264 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 1006 0268 7FF50BAF 		bpl	.L42
+ 197:Core/Src/dsp_task.c ****                 if (pitch_rd2 < 0.0f) pitch_rd2 += (float)PITCH_BUF_SAMPLES;
+ 1007              		.loc 1 197 17 is_stmt 1 view .LVU323
+ 197:Core/Src/dsp_task.c ****                 if (pitch_rd2 < 0.0f) pitch_rd2 += (float)PITCH_BUF_SAMPLES;
+ 1008              		.loc 1 197 41 is_stmt 0 view .LVU324
+ 1009 026c DFED0F7A 		vldr.32	s15, .L73+20
+ 1010              	.LVL100:
+ 197:Core/Src/dsp_task.c ****                 if (pitch_rd2 < 0.0f) pitch_rd2 += (float)PITCH_BUF_SAMPLES;
+ 1011              		.loc 1 197 41 view .LVU325
+ 1012 0270 37EE677A 		vsub.f32	s14, s14, s15
+ 197:Core/Src/dsp_task.c ****                 if (pitch_rd2 < 0.0f) pitch_rd2 += (float)PITCH_BUF_SAMPLES;
+ 1013              		.loc 1 197 29 view .LVU326
+ 1014 0274 0E4B     		ldr	r3, .L73+24
+ 1015 0276 83ED007A 		vstr.32	s14, [r3]
+ 198:Core/Src/dsp_task.c ****                 pitch_xfade = PITCH_OVERLAP;
+ 1016              		.loc 1 198 17 is_stmt 1 view .LVU327
+ 198:Core/Src/dsp_task.c ****                 pitch_xfade = PITCH_OVERLAP;
+ 1017              		.loc 1 198 20 is_stmt 0 view .LVU328
+ 1018 027a B5EEC07A 		vcmpe.f32	s14, #0
+ 1019 027e F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 26
+
+
+ 1020 0282 3FF5F7AE 		bmi	.L72
+ 1021              	.L45:
+ 199:Core/Src/dsp_task.c ****             } else if (ratio < 1.0f && dist > (float)(PITCH_BUF_SAMPLES - PITCH_OVERLAP)) {
+ 1022              		.loc 1 199 17 is_stmt 1 view .LVU329
+ 199:Core/Src/dsp_task.c ****             } else if (ratio < 1.0f && dist > (float)(PITCH_BUF_SAMPLES - PITCH_OVERLAP)) {
+ 1023              		.loc 1 199 29 is_stmt 0 view .LVU330
+ 1024 0286 0B4B     		ldr	r3, .L73+28
+ 1025 0288 4FF48072 		mov	r2, #256
+ 1026 028c 1A60     		str	r2, [r3]
+ 1027 028e FFE6     		b	.L39
+ 1028              	.LVL101:
+ 1029              	.L70:
+ 199:Core/Src/dsp_task.c ****             } else if (ratio < 1.0f && dist > (float)(PITCH_BUF_SAMPLES - PITCH_OVERLAP)) {
+ 1030              		.loc 1 199 29 view .LVU331
+ 1031              	.LBE15:
+ 1032              	.LBE16:
+ 1033              	.LBE9:
+ 217:Core/Src/dsp_task.c ****     }
+ 218:Core/Src/dsp_task.c **** }
+ 1034              		.loc 1 218 1 view .LVU332
+ 1035 0290 BDEC088B 		vldm	sp!, {d8-d11}
+ 1036              		.cfi_restore 86
+ 1037              		.cfi_restore 87
+ 1038              		.cfi_restore 84
+ 1039              		.cfi_restore 85
+ 1040              		.cfi_restore 82
+ 1041              		.cfi_restore 83
+ 1042              		.cfi_restore 80
+ 1043              		.cfi_restore 81
+ 1044              		.cfi_def_cfa_offset 40
+ 1045 0294 BDE8F88F 		pop	{r3, r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 1046              	.LVL102:
+ 1047              	.L74:
+ 1048              		.loc 1 218 1 view .LVU333
+ 1049              		.align	2
+ 1050              	.L73:
+ 1051 0298 00000000 		.word	pitch_rd1
+ 1052 029c 00008045 		.word	1166016512
+ 1053 02a0 00FEFF46 		.word	1191181824
+ 1054 02a4 000000C7 		.word	-956301312
+ 1055 02a8 00007045 		.word	1164967936
+ 1056 02ac 00008044 		.word	1149239296
+ 1057 02b0 00000000 		.word	pitch_rd2
+ 1058 02b4 00000000 		.word	pitch_xfade
+ 1059 02b8 00000000 		.word	pitch_wr
+ 1060 02bc 00000000 		.word	pitch_buf_L
+ 1061 02c0 0000803B 		.word	998244352
+ 1062 02c4 00000000 		.word	pitch_buf_R
+ 1063 02c8 00008043 		.word	1132462080
+ 1064              		.cfi_endproc
+ 1065              	.LFE145:
+ 1067              		.section	.text.HAL_I2SEx_TxRxHalfCpltCallback,"ax",%progbits
+ 1068              		.align	1
+ 1069              		.global	HAL_I2SEx_TxRxHalfCpltCallback
+ 1070              		.syntax unified
+ 1071              		.thumb
+ 1072              		.thumb_func
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 27
+
+
+ 1074              	HAL_I2SEx_TxRxHalfCpltCallback:
+ 1075              	.LVL103:
+ 1076              	.LFB139:
+  53:Core/Src/dsp_task.c ****     active_half = 0;
+ 1077              		.loc 1 53 1 is_stmt 1 view -0
+ 1078              		.cfi_startproc
+ 1079              		@ args = 0, pretend = 0, frame = 0
+ 1080              		@ frame_needed = 0, uses_anonymous_args = 0
+  53:Core/Src/dsp_task.c ****     active_half = 0;
+ 1081              		.loc 1 53 1 is_stmt 0 view .LVU335
+ 1082 0000 08B5     		push	{r3, lr}
+ 1083              		.cfi_def_cfa_offset 8
+ 1084              		.cfi_offset 3, -8
+ 1085              		.cfi_offset 14, -4
+  54:Core/Src/dsp_task.c ****     osSignalSet(dsp_task_id, SIG_DMA_RDY);
+ 1086              		.loc 1 54 5 is_stmt 1 view .LVU336
+  54:Core/Src/dsp_task.c ****     osSignalSet(dsp_task_id, SIG_DMA_RDY);
+ 1087              		.loc 1 54 17 is_stmt 0 view .LVU337
+ 1088 0002 044B     		ldr	r3, .L77
+ 1089 0004 0022     		movs	r2, #0
+ 1090 0006 1A70     		strb	r2, [r3]
+  55:Core/Src/dsp_task.c **** }
+ 1091              		.loc 1 55 5 is_stmt 1 view .LVU338
+ 1092 0008 0121     		movs	r1, #1
+ 1093 000a 034B     		ldr	r3, .L77+4
+ 1094 000c 1868     		ldr	r0, [r3]
+ 1095              	.LVL104:
+  55:Core/Src/dsp_task.c **** }
+ 1096              		.loc 1 55 5 is_stmt 0 view .LVU339
+ 1097 000e FFF7FEFF 		bl	osSignalSet
+ 1098              	.LVL105:
+  56:Core/Src/dsp_task.c **** 
+ 1099              		.loc 1 56 1 view .LVU340
+ 1100 0012 08BD     		pop	{r3, pc}
+ 1101              	.L78:
+ 1102              		.align	2
+ 1103              	.L77:
+ 1104 0014 00000000 		.word	active_half
+ 1105 0018 00000000 		.word	dsp_task_id
+ 1106              		.cfi_endproc
+ 1107              	.LFE139:
+ 1109              		.section	.text.HAL_I2SEx_TxRxCpltCallback,"ax",%progbits
+ 1110              		.align	1
+ 1111              		.global	HAL_I2SEx_TxRxCpltCallback
+ 1112              		.syntax unified
+ 1113              		.thumb
+ 1114              		.thumb_func
+ 1116              	HAL_I2SEx_TxRxCpltCallback:
+ 1117              	.LVL106:
+ 1118              	.LFB140:
+  59:Core/Src/dsp_task.c ****     active_half = 1;
+ 1119              		.loc 1 59 1 is_stmt 1 view -0
+ 1120              		.cfi_startproc
+ 1121              		@ args = 0, pretend = 0, frame = 0
+ 1122              		@ frame_needed = 0, uses_anonymous_args = 0
+  59:Core/Src/dsp_task.c ****     active_half = 1;
+ 1123              		.loc 1 59 1 is_stmt 0 view .LVU342
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 28
+
+
+ 1124 0000 08B5     		push	{r3, lr}
+ 1125              		.cfi_def_cfa_offset 8
+ 1126              		.cfi_offset 3, -8
+ 1127              		.cfi_offset 14, -4
+  60:Core/Src/dsp_task.c ****     osSignalSet(dsp_task_id, SIG_DMA_RDY);
+ 1128              		.loc 1 60 5 is_stmt 1 view .LVU343
+  60:Core/Src/dsp_task.c ****     osSignalSet(dsp_task_id, SIG_DMA_RDY);
+ 1129              		.loc 1 60 17 is_stmt 0 view .LVU344
+ 1130 0002 0121     		movs	r1, #1
+ 1131 0004 034B     		ldr	r3, .L81
+ 1132 0006 1970     		strb	r1, [r3]
+  61:Core/Src/dsp_task.c **** }
+ 1133              		.loc 1 61 5 is_stmt 1 view .LVU345
+ 1134 0008 034B     		ldr	r3, .L81+4
+ 1135 000a 1868     		ldr	r0, [r3]
+ 1136              	.LVL107:
+  61:Core/Src/dsp_task.c **** }
+ 1137              		.loc 1 61 5 is_stmt 0 view .LVU346
+ 1138 000c FFF7FEFF 		bl	osSignalSet
+ 1139              	.LVL108:
+  62:Core/Src/dsp_task.c **** 
+ 1140              		.loc 1 62 1 view .LVU347
+ 1141 0010 08BD     		pop	{r3, pc}
+ 1142              	.L82:
+ 1143 0012 00BF     		.align	2
+ 1144              	.L81:
+ 1145 0014 00000000 		.word	active_half
+ 1146 0018 00000000 		.word	dsp_task_id
+ 1147              		.cfi_endproc
+ 1148              	.LFE140:
+ 1150              		.section	.text.StartDSPTask,"ax",%progbits
+ 1151              		.align	1
+ 1152              		.global	StartDSPTask
+ 1153              		.syntax unified
+ 1154              		.thumb
+ 1155              		.thumb_func
+ 1157              	StartDSPTask:
+ 1158              	.LVL109:
+ 1159              	.LFB146:
+ 219:Core/Src/dsp_task.c **** 
+ 220:Core/Src/dsp_task.c **** /* DSP task: highest priority.
+ 221:Core/Src/dsp_task.c ****    Receives audio from PCM1808 ADC (I2S RX) and sends processed audio
+ 222:Core/Src/dsp_task.c ****    to PCM5102A DAC (I2S TX) using full-duplex I2S3.
+ 223:Core/Src/dsp_task.c **** 
+ 224:Core/Src/dsp_task.c ****    Ping-pong: DMA (circular) continuously streams into rx_dma_buf and out
+ 225:Core/Src/dsp_task.c ****    of tx_dma_buf.  HalfCplt signals that the first HALF_BUF_LEN words are
+ 226:Core/Src/dsp_task.c ****    ready; TxRxCplt signals that the second half is ready.  The task wakes,
+ 227:Core/Src/dsp_task.c ****    copies the fresh RX half into the corresponding TX half, applies effects,
+ 228:Core/Src/dsp_task.c ****    and goes back to sleep — all before DMA wraps around to that half again. */
+ 229:Core/Src/dsp_task.c **** void StartDSPTask(void const *argument)
+ 230:Core/Src/dsp_task.c **** {
+ 1160              		.loc 1 230 1 is_stmt 1 view -0
+ 1161              		.cfi_startproc
+ 1162              		@ args = 0, pretend = 0, frame = 40
+ 1163              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1164              		.loc 1 230 1 is_stmt 0 view .LVU349
+ 1165 0000 70B5     		push	{r4, r5, r6, lr}
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 29
+
+
+ 1166              		.cfi_def_cfa_offset 16
+ 1167              		.cfi_offset 4, -16
+ 1168              		.cfi_offset 5, -12
+ 1169              		.cfi_offset 6, -8
+ 1170              		.cfi_offset 14, -4
+ 1171 0002 8AB0     		sub	sp, sp, #40
+ 1172              		.cfi_def_cfa_offset 56
+ 231:Core/Src/dsp_task.c ****     AudioEffectParams_t params;
+ 1173              		.loc 1 231 5 is_stmt 1 view .LVU350
+ 232:Core/Src/dsp_task.c **** 
+ 233:Core/Src/dsp_task.c ****     dsp_task_id = osThreadGetId();
+ 1174              		.loc 1 233 5 view .LVU351
+ 1175              		.loc 1 233 19 is_stmt 0 view .LVU352
+ 1176 0004 FFF7FEFF 		bl	osThreadGetId
+ 1177              	.LVL110:
+ 1178              		.loc 1 233 17 discriminator 1 view .LVU353
+ 1179 0008 2C4B     		ldr	r3, .L93
+ 1180 000a 1860     		str	r0, [r3]
+ 234:Core/Src/dsp_task.c **** 
+ 235:Core/Src/dsp_task.c ****     memset(tx_dma_buf, 0, sizeof(tx_dma_buf));
+ 1181              		.loc 1 235 5 is_stmt 1 view .LVU354
+ 1182 000c 2C4C     		ldr	r4, .L93+4
+ 1183 000e 4FF48072 		mov	r2, #256
+ 1184 0012 0021     		movs	r1, #0
+ 1185 0014 2046     		mov	r0, r4
+ 1186 0016 FFF7FEFF 		bl	memset
+ 1187              	.LVL111:
+ 236:Core/Src/dsp_task.c **** 
+ 237:Core/Src/dsp_task.c ****     /* HAL doubles Size internally for 24-bit format (TxXferSize = Size << 1).
+ 238:Core/Src/dsp_task.c ****        Buffer holds HALF_BUF_LEN uint16_t per half = HALF_BUF_LEN/2 32-bit words per half.
+ 239:Core/Src/dsp_task.c ****        Full double-buffer = HALF_BUF_LEN/2 * 2 halves = HALF_BUF_LEN/2 WORD transfers pre-doubling.
+ 240:Core/Src/dsp_task.c ****        After HAL doubles: HALF_BUF_LEN WORD transfers = 256 bytes = exact buffer size. */
+ 241:Core/Src/dsp_task.c ****     HAL_I2SEx_TransmitReceive_DMA(&hi2s3, tx_dma_buf, rx_dma_buf,
+ 1188              		.loc 1 241 5 view .LVU355
+ 1189 001a 2023     		movs	r3, #32
+ 1190 001c 294A     		ldr	r2, .L93+8
+ 1191 001e 2146     		mov	r1, r4
+ 1192 0020 2948     		ldr	r0, .L93+12
+ 1193 0022 FFF7FEFF 		bl	HAL_I2SEx_TransmitReceive_DMA
+ 1194              	.LVL112:
+ 1195 0026 08E0     		b	.L87
+ 1196              	.LVL113:
+ 1197              	.L84:
+ 1198              	.LBB17:
+ 242:Core/Src/dsp_task.c ****                                   HALF_BUF_LEN / 2);
+ 243:Core/Src/dsp_task.c **** 
+ 244:Core/Src/dsp_task.c ****     for (;;) {
+ 245:Core/Src/dsp_task.c ****         osSignalWait(SIG_DMA_RDY, osWaitForever);
+ 246:Core/Src/dsp_task.c **** 
+ 247:Core/Src/dsp_task.c ****         /* Snapshot which half the ISR marked ready, then derive pointers */
+ 248:Core/Src/dsp_task.c ****         uint8_t   half    = active_half;
+ 249:Core/Src/dsp_task.c ****         uint16_t *rx_half = &rx_dma_buf[half * HALF_BUF_LEN];
+ 250:Core/Src/dsp_task.c ****         uint16_t *tx_half = &tx_dma_buf[half * HALF_BUF_LEN];
+ 251:Core/Src/dsp_task.c **** 
+ 252:Core/Src/dsp_task.c ****         /* Copy fresh ADC samples into the output half, then process in-place */
+ 253:Core/Src/dsp_task.c ****         memcpy(tx_half, rx_half, HALF_BUF_LEN * sizeof(uint16_t));
+ 254:Core/Src/dsp_task.c **** 
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 30
+
+
+ 255:Core/Src/dsp_task.c ****         osMutexWait(g_params_mutex, osWaitForever);
+ 256:Core/Src/dsp_task.c ****         params = g_audio_params;
+ 257:Core/Src/dsp_task.c ****         osMutexRelease(g_params_mutex);
+ 258:Core/Src/dsp_task.c **** 
+ 259:Core/Src/dsp_task.c ****         if (params.effects_mask & EFFECT_VOLUME)
+ 260:Core/Src/dsp_task.c ****             apply_volume(tx_half, params.volume);
+ 261:Core/Src/dsp_task.c **** 
+ 262:Core/Src/dsp_task.c ****         if (params.effects_mask & EFFECT_LPF)
+ 1199              		.loc 1 262 9 view .LVU356
+ 1200              		.loc 1 262 12 is_stmt 0 view .LVU357
+ 1201 0028 14F0020F 		tst	r4, #2
+ 1202 002c 34D1     		bne	.L90
+ 1203              	.L85:
+ 263:Core/Src/dsp_task.c ****             apply_lpf(tx_half, params.lpf_alpha);
+ 264:Core/Src/dsp_task.c **** 
+ 265:Core/Src/dsp_task.c ****         if (params.effects_mask & EFFECT_CHORUS)
+ 1204              		.loc 1 265 9 is_stmt 1 view .LVU358
+ 1205              		.loc 1 265 12 is_stmt 0 view .LVU359
+ 1206 002e 14F0040F 		tst	r4, #4
+ 1207 0032 37D1     		bne	.L91
+ 1208              	.L86:
+ 266:Core/Src/dsp_task.c ****             apply_chorus(tx_half, params.chorus_rate);
+ 267:Core/Src/dsp_task.c **** 
+ 268:Core/Src/dsp_task.c ****         if (params.effects_mask & EFFECT_PITCH)
+ 1209              		.loc 1 268 9 is_stmt 1 view .LVU360
+ 1210              		.loc 1 268 12 is_stmt 0 view .LVU361
+ 1211 0034 14F0080F 		tst	r4, #8
+ 1212 0038 3AD1     		bne	.L92
+ 1213              	.LVL114:
+ 1214              	.L87:
+ 1215              		.loc 1 268 12 view .LVU362
+ 1216              	.LBE17:
+ 244:Core/Src/dsp_task.c ****         osSignalWait(SIG_DMA_RDY, osWaitForever);
+ 1217              		.loc 1 244 5 is_stmt 1 view .LVU363
+ 1218              	.LBB18:
+ 245:Core/Src/dsp_task.c **** 
+ 1219              		.loc 1 245 9 view .LVU364
+ 1220 003a 4FF0FF32 		mov	r2, #-1
+ 1221 003e 0121     		movs	r1, #1
+ 1222 0040 6846     		mov	r0, sp
+ 1223 0042 FFF7FEFF 		bl	osSignalWait
+ 1224              	.LVL115:
+ 248:Core/Src/dsp_task.c ****         uint16_t *rx_half = &rx_dma_buf[half * HALF_BUF_LEN];
+ 1225              		.loc 1 248 9 view .LVU365
+ 248:Core/Src/dsp_task.c ****         uint16_t *rx_half = &rx_dma_buf[half * HALF_BUF_LEN];
+ 1226              		.loc 1 248 19 is_stmt 0 view .LVU366
+ 1227 0046 214B     		ldr	r3, .L93+16
+ 1228 0048 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1229              	.LVL116:
+ 249:Core/Src/dsp_task.c ****         uint16_t *tx_half = &tx_dma_buf[half * HALF_BUF_LEN];
+ 1230              		.loc 1 249 9 is_stmt 1 view .LVU367
+ 250:Core/Src/dsp_task.c **** 
+ 1231              		.loc 1 250 9 view .LVU368
+ 250:Core/Src/dsp_task.c **** 
+ 1232              		.loc 1 250 19 is_stmt 0 view .LVU369
+ 1233 004a 1D4D     		ldr	r5, .L93+4
+ 1234 004c 05EBC315 		add	r5, r5, r3, lsl #7
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 31
+
+
+ 1235              	.LVL117:
+ 253:Core/Src/dsp_task.c **** 
+ 1236              		.loc 1 253 9 is_stmt 1 view .LVU370
+ 1237 0050 8022     		movs	r2, #128
+ 1238 0052 1C49     		ldr	r1, .L93+8
+ 1239 0054 01EBC311 		add	r1, r1, r3, lsl #7
+ 1240              	.LVL118:
+ 253:Core/Src/dsp_task.c **** 
+ 1241              		.loc 1 253 9 is_stmt 0 view .LVU371
+ 1242 0058 2846     		mov	r0, r5
+ 1243 005a FFF7FEFF 		bl	memcpy
+ 1244              	.LVL119:
+ 255:Core/Src/dsp_task.c ****         params = g_audio_params;
+ 1245              		.loc 1 255 9 is_stmt 1 view .LVU372
+ 1246 005e 1C4E     		ldr	r6, .L93+20
+ 1247 0060 4FF0FF31 		mov	r1, #-1
+ 1248 0064 3068     		ldr	r0, [r6]
+ 1249 0066 FFF7FEFF 		bl	osMutexWait
+ 1250              	.LVL120:
+ 256:Core/Src/dsp_task.c ****         osMutexRelease(g_params_mutex);
+ 1251              		.loc 1 256 9 view .LVU373
+ 256:Core/Src/dsp_task.c ****         osMutexRelease(g_params_mutex);
+ 1252              		.loc 1 256 16 is_stmt 0 view .LVU374
+ 1253 006a 0DF1140C 		add	ip, sp, #20
+ 1254 006e 194C     		ldr	r4, .L93+24
+ 1255 0070 0FCC     		ldmia	r4!, {r0, r1, r2, r3}
+ 1256 0072 ACE80F00 		stmia	ip!, {r0, r1, r2, r3}
+ 1257 0076 2368     		ldr	r3, [r4]
+ 1258 0078 CCF80030 		str	r3, [ip]
+ 257:Core/Src/dsp_task.c **** 
+ 1259              		.loc 1 257 9 is_stmt 1 view .LVU375
+ 1260 007c 3068     		ldr	r0, [r6]
+ 1261 007e FFF7FEFF 		bl	osMutexRelease
+ 1262              	.LVL121:
+ 259:Core/Src/dsp_task.c ****             apply_volume(tx_half, params.volume);
+ 1263              		.loc 1 259 9 view .LVU376
+ 259:Core/Src/dsp_task.c ****             apply_volume(tx_half, params.volume);
+ 1264              		.loc 1 259 19 is_stmt 0 view .LVU377
+ 1265 0082 9DF82440 		ldrb	r4, [sp, #36]	@ zero_extendqisi2
+ 259:Core/Src/dsp_task.c ****             apply_volume(tx_half, params.volume);
+ 1266              		.loc 1 259 12 view .LVU378
+ 1267 0086 14F0010F 		tst	r4, #1
+ 1268 008a CDD0     		beq	.L84
+ 260:Core/Src/dsp_task.c **** 
+ 1269              		.loc 1 260 13 is_stmt 1 view .LVU379
+ 1270 008c 9DED050A 		vldr.32	s0, [sp, #20]
+ 1271 0090 2846     		mov	r0, r5
+ 1272 0092 FFF7FEFF 		bl	apply_volume
+ 1273              	.LVL122:
+ 1274 0096 C7E7     		b	.L84
+ 1275              	.L90:
+ 263:Core/Src/dsp_task.c **** 
+ 1276              		.loc 1 263 13 view .LVU380
+ 1277 0098 9DED060A 		vldr.32	s0, [sp, #24]
+ 1278 009c 2846     		mov	r0, r5
+ 1279 009e FFF7FEFF 		bl	apply_lpf
+ 1280              	.LVL123:
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 32
+
+
+ 1281 00a2 C4E7     		b	.L85
+ 1282              	.L91:
+ 266:Core/Src/dsp_task.c **** 
+ 1283              		.loc 1 266 13 view .LVU381
+ 1284 00a4 9DED070A 		vldr.32	s0, [sp, #28]
+ 1285 00a8 2846     		mov	r0, r5
+ 1286 00aa FFF7FEFF 		bl	apply_chorus
+ 1287              	.LVL124:
+ 1288 00ae C1E7     		b	.L86
+ 1289              	.L92:
+ 269:Core/Src/dsp_task.c ****             apply_pitch_shift(tx_half, params.pitch_semitones);
+ 1290              		.loc 1 269 13 view .LVU382
+ 1291 00b0 9DED080A 		vldr.32	s0, [sp, #32]
+ 1292 00b4 2846     		mov	r0, r5
+ 1293 00b6 FFF7FEFF 		bl	apply_pitch_shift
+ 1294              	.LVL125:
+ 1295 00ba BEE7     		b	.L87
+ 1296              	.L94:
+ 1297              		.align	2
+ 1298              	.L93:
+ 1299 00bc 00000000 		.word	dsp_task_id
+ 1300 00c0 00000000 		.word	tx_dma_buf
+ 1301 00c4 00000000 		.word	rx_dma_buf
+ 1302 00c8 00000000 		.word	hi2s3
+ 1303 00cc 00000000 		.word	active_half
+ 1304 00d0 00000000 		.word	g_params_mutex
+ 1305 00d4 00000000 		.word	g_audio_params
+ 1306              	.LBE18:
+ 1307              		.cfi_endproc
+ 1308              	.LFE146:
+ 1310              		.section	.bss.dsp_task_id,"aw",%nobits
+ 1311              		.align	2
+ 1314              	dsp_task_id:
+ 1315 0000 00000000 		.space	4
+ 1316              		.section	.bss.active_half,"aw",%nobits
+ 1319              	active_half:
+ 1320 0000 00       		.space	1
+ 1321              		.section	.bss.lpf_R,"aw",%nobits
+ 1322              		.align	2
+ 1325              	lpf_R:
+ 1326 0000 00000000 		.space	4
+ 1327              		.section	.bss.lpf_L,"aw",%nobits
+ 1328              		.align	2
+ 1331              	lpf_L:
+ 1332 0000 00000000 		.space	4
+ 1333              		.section	.bss.pitch_xfade,"aw",%nobits
+ 1334              		.align	2
+ 1337              	pitch_xfade:
+ 1338 0000 00000000 		.space	4
+ 1339              		.section	.bss.pitch_rd2,"aw",%nobits
+ 1340              		.align	2
+ 1343              	pitch_rd2:
+ 1344 0000 00000000 		.space	4
+ 1345              		.section	.data.pitch_rd1,"aw"
+ 1346              		.align	2
+ 1349              	pitch_rd1:
+ 1350 0000 00004045 		.word	1161822208
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 33
+
+
+ 1351              		.section	.bss.pitch_wr,"aw",%nobits
+ 1352              		.align	2
+ 1355              	pitch_wr:
+ 1356 0000 00000000 		.space	4
+ 1357              		.section	.bss.pitch_buf_R,"aw",%nobits
+ 1358              		.align	2
+ 1361              	pitch_buf_R:
+ 1362 0000 00000000 		.space	8192
+ 1362      00000000 
+ 1362      00000000 
+ 1362      00000000 
+ 1362      00000000 
+ 1363              		.section	.bss.pitch_buf_L,"aw",%nobits
+ 1364              		.align	2
+ 1367              	pitch_buf_L:
+ 1368 0000 00000000 		.space	8192
+ 1368      00000000 
+ 1368      00000000 
+ 1368      00000000 
+ 1368      00000000 
+ 1369              		.section	.bss.chorus_lfo,"aw",%nobits
+ 1370              		.align	2
+ 1373              	chorus_lfo:
+ 1374 0000 00000000 		.space	4
+ 1375              		.section	.bss.chorus_wr,"aw",%nobits
+ 1376              		.align	2
+ 1379              	chorus_wr:
+ 1380 0000 00000000 		.space	4
+ 1381              		.section	.bss.chorus_buf_R,"aw",%nobits
+ 1382              		.align	2
+ 1385              	chorus_buf_R:
+ 1386 0000 00000000 		.space	4096
+ 1386      00000000 
+ 1386      00000000 
+ 1386      00000000 
+ 1386      00000000 
+ 1387              		.section	.bss.chorus_buf_L,"aw",%nobits
+ 1388              		.align	2
+ 1391              	chorus_buf_L:
+ 1392 0000 00000000 		.space	4096
+ 1392      00000000 
+ 1392      00000000 
+ 1392      00000000 
+ 1392      00000000 
+ 1393              		.section	.bss.tx_dma_buf,"aw",%nobits
+ 1394              		.align	2
+ 1397              	tx_dma_buf:
+ 1398 0000 00000000 		.space	256
+ 1398      00000000 
+ 1398      00000000 
+ 1398      00000000 
+ 1398      00000000 
+ 1399              		.section	.bss.rx_dma_buf,"aw",%nobits
+ 1400              		.align	2
+ 1403              	rx_dma_buf:
+ 1404 0000 00000000 		.space	256
+ 1404      00000000 
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 34
+
+
+ 1404      00000000 
+ 1404      00000000 
+ 1404      00000000 
+ 1405              		.global	g_params_mutex
+ 1406              		.section	.bss.g_params_mutex,"aw",%nobits
+ 1407              		.align	2
+ 1410              	g_params_mutex:
+ 1411 0000 00000000 		.space	4
+ 1412              		.global	g_audio_params
+ 1413              		.section	.data.g_audio_params,"aw"
+ 1414              		.align	2
+ 1417              	g_audio_params:
+ 1418 0000 CDCC4C3F 		.word	1061997773
+ 1419 0004 0000803F 		.word	1065353216
+ 1420 0008 0000003F 		.word	1056964608
+ 1421 000c 0000E040 		.word	1088421888
+ 1422 0010 01       		.byte	1
+ 1423 0011 000000   		.space	3
+ 1424              		.text
+ 1425              	.Letext0:
+ 1426              		.file 2 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
+ 1427              		.file 3 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
+ 1428              		.file 4 "Middlewares/Third_Party/FreeRTOS/Source/include/task.h"
+ 1429              		.file 5 "Middlewares/Third_Party/FreeRTOS/Source/include/queue.h"
+ 1430              		.file 6 "Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h"
+ 1431              		.file 7 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h"
+ 1432              		.file 8 "Core/Inc/dsp_task.h"
+ 1433              		.file 9 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
+ 1434              		.file 10 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 1435              		.file 11 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
+ 1436              		.file 12 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2s.h"
+ 1437              		.file 13 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-t
+ 1438              		.file 14 "C:/Users/leejo/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-t
+ 1439              		.file 15 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2s_ex.h"
+ 1440              		.file 16 "<built-in>"
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 35
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 dsp_task.c
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:21     .text.apply_volume:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:26     .text.apply_volume:00000000 apply_volume
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:84     .text.apply_lpf:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:89     .text.apply_lpf:00000000 apply_lpf
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:191    .text.apply_lpf:00000084 $d
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:697    .bss.lpf_L:00000000 lpf_L
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:691    .bss.lpf_R:00000000 lpf_R
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:197    .text.apply_delay:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:202    .text.apply_delay:00000000 apply_delay
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:438    .text.apply_delay:00000150 $d
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:703    .bss.delay_wr:00000000 delay_wr
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:709    .bss.delay_line_R:00000000 delay_line_R
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:715    .bss.delay_line_L:00000000 delay_line_L
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:449    .text.HAL_I2SEx_TxRxHalfCpltCallback:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:455    .text.HAL_I2SEx_TxRxHalfCpltCallback:00000000 HAL_I2SEx_TxRxHalfCpltCallback
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:485    .text.HAL_I2SEx_TxRxHalfCpltCallback:00000014 $d
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:685    .bss.active_half:00000000 active_half
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:680    .bss.dsp_task_id:00000000 dsp_task_id
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:491    .text.HAL_I2SEx_TxRxCpltCallback:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:497    .text.HAL_I2SEx_TxRxCpltCallback:00000000 HAL_I2SEx_TxRxCpltCallback
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:526    .text.HAL_I2SEx_TxRxCpltCallback:00000014 $d
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:532    .text.StartDSPTask:00000000 $t
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:538    .text.StartDSPTask:00000000 StartDSPTask
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:665    .text.StartDSPTask:000000a4 $d
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:721    .bss.tx_dma_buf:00000000 tx_dma_buf
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:727    .bss.rx_dma_buf:00000000 rx_dma_buf
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:734    .bss.g_params_mutex:00000000 g_params_mutex
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:741    .data.g_audio_params:00000000 g_audio_params
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:677    .bss.dsp_task_id:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:686    .bss.active_half:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:688    .bss.lpf_R:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:694    .bss.lpf_L:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:700    .bss.delay_wr:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:706    .bss.delay_line_R:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:712    .bss.delay_line_L:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:718    .bss.tx_dma_buf:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:724    .bss.rx_dma_buf:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:731    .bss.g_params_mutex:00000000 $d
-C:\Users\leejo\AppData\Local\Temp\ccowyPF5.s:738    .data.g_audio_params:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:21     .text.apply_volume:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:26     .text.apply_volume:00000000 apply_volume
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:84     .text.apply_lpf:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:89     .text.apply_lpf:00000000 apply_lpf
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:191    .text.apply_lpf:00000084 $d
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1331   .bss.lpf_L:00000000 lpf_L
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1325   .bss.lpf_R:00000000 lpf_R
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:197    .text.pitch_read:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:202    .text.pitch_read:00000000 pitch_read
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:260    .text.apply_chorus:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:265    .text.apply_chorus:00000000 apply_chorus
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:583    .text.apply_chorus:000001c8 $d
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1379   .bss.chorus_wr:00000000 chorus_wr
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1391   .bss.chorus_buf_L:00000000 chorus_buf_L
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1385   .bss.chorus_buf_R:00000000 chorus_buf_R
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1373   .bss.chorus_lfo:00000000 chorus_lfo
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:598    .text.apply_pitch_shift:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:603    .text.apply_pitch_shift:00000000 apply_pitch_shift
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1051   .text.apply_pitch_shift:00000298 $d
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1349   .data.pitch_rd1:00000000 pitch_rd1
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1343   .bss.pitch_rd2:00000000 pitch_rd2
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1337   .bss.pitch_xfade:00000000 pitch_xfade
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1355   .bss.pitch_wr:00000000 pitch_wr
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1367   .bss.pitch_buf_L:00000000 pitch_buf_L
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1361   .bss.pitch_buf_R:00000000 pitch_buf_R
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1068   .text.HAL_I2SEx_TxRxHalfCpltCallback:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1074   .text.HAL_I2SEx_TxRxHalfCpltCallback:00000000 HAL_I2SEx_TxRxHalfCpltCallback
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1104   .text.HAL_I2SEx_TxRxHalfCpltCallback:00000014 $d
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1319   .bss.active_half:00000000 active_half
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1314   .bss.dsp_task_id:00000000 dsp_task_id
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1110   .text.HAL_I2SEx_TxRxCpltCallback:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1116   .text.HAL_I2SEx_TxRxCpltCallback:00000000 HAL_I2SEx_TxRxCpltCallback
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1145   .text.HAL_I2SEx_TxRxCpltCallback:00000014 $d
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1151   .text.StartDSPTask:00000000 $t
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1157   .text.StartDSPTask:00000000 StartDSPTask
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1299   .text.StartDSPTask:000000bc $d
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1397   .bss.tx_dma_buf:00000000 tx_dma_buf
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1403   .bss.rx_dma_buf:00000000 rx_dma_buf
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1410   .bss.g_params_mutex:00000000 g_params_mutex
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1417   .data.g_audio_params:00000000 g_audio_params
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1311   .bss.dsp_task_id:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1320   .bss.active_half:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1322   .bss.lpf_R:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1328   .bss.lpf_L:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1334   .bss.pitch_xfade:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1340   .bss.pitch_rd2:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1346   .data.pitch_rd1:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1352   .bss.pitch_wr:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1358   .bss.pitch_buf_R:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1364   .bss.pitch_buf_L:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1370   .bss.chorus_lfo:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1376   .bss.chorus_wr:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1382   .bss.chorus_buf_R:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1388   .bss.chorus_buf_L:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1394   .bss.tx_dma_buf:00000000 $d
+ARM GAS  C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s 			page 36
+
+
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1400   .bss.rx_dma_buf:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1407   .bss.g_params_mutex:00000000 $d
+C:\Users\leejo\AppData\Local\Temp\ccjAx7Qf.s:1414   .data.g_audio_params:00000000 $d
 
 UNDEFINED SYMBOLS
+sinf
+powf
 osSignalSet
 osThreadGetId
 memset

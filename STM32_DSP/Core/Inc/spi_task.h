@@ -4,7 +4,7 @@
 #include "cmsis_os.h"
 
 /* Two-byte packet received from the Raspberry Pi SPI master.
-   Byte 0: gesture code (1 = volume, 2 = delay, 3 = LPF, 0/other = clear effects)
+   Byte 0: gesture code (1=volume, 2=chorus, 3=LPF, 4=pitch, 0/other=clear)
    Byte 1: intensity (0-255 mapped to the parameter range) */
 #define SPI_PKT_SIZE  2
 
