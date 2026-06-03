@@ -1,21 +1,3 @@
-"""
-evaluate_gesture_colab.py
-=========================
-Evaluates BOTH hand gesture models against your CSV dataset:
-
-  Model A (detect_up_test.py)    — rule-based, handles 3 classes (0/1/2)
-  Model B (hand_command_demo.py) — handles all 5 classes (0-4)
-
-Supports both CSV formats (auto-detected):
-  - Original keypoint.csv           : 42 features (x,y x 21), integer label 0-4, no header
-  - HaGRID hand_landmarks_data.csv  : 63 features (x,y,z x 21), string label, with header
-    -> Class 5 (stop/palm) and all non-number gestures are excluded automatically
-
-Steps (Colab):
-  1. Upload this file + your CSV using the folder icon on the left
-  2. Set CSV_PATH below
-  3. Run: exec(open("evaluate_gesture_colab.py").read())
-"""
 
 import numpy as np
 import pandas as pd
@@ -25,16 +7,8 @@ from sklearn.metrics import (
 )
 import matplotlib.pyplot as plt
 
-# ============================================================
-# SET YOUR CSV PATH HERE
-# ============================================================
-CSV_PATH = "hand_landmarks_data.csv"   # or "keypoint.csv"
-# ============================================================
 
-
-# ---------------------------------------------------------------------------
-# HaGRID label mapping (class 5 excluded — stop/palm not needed)
-# ---------------------------------------------------------------------------
+CSV_PATH = "hand_landmarks_data.csv" 
 
 HAGRID_MAP = {
     "one":    1,
@@ -52,11 +26,6 @@ HAGRID_RELEVANT = set(HAGRID_MAP.keys())
 def map_hagrid_label(label):
     return HAGRID_MAP.get(str(label).strip().lower(), None)  # None = exclude
 
-
-# ---------------------------------------------------------------------------
-# Format detection
-# ---------------------------------------------------------------------------
-
 def detect_format(csv_path):
     with open(csv_path) as f:
         first_line = f.readline()
@@ -65,11 +34,6 @@ def detect_format(csv_path):
         return "hagrid", pd.read_csv(csv_path)
     else:
         return "original", pd.read_csv(csv_path, header=None)
-
-
-# ---------------------------------------------------------------------------
-# Landmark wrapper — mimics MediaPipe landmark object
-# ---------------------------------------------------------------------------
 
 class LM:
     def __init__(self, x, y):
@@ -95,11 +59,6 @@ class LandmarkRow:
     def __getitem__(self, idx):
         return self._lms[idx]
 
-
-# ---------------------------------------------------------------------------
-# MODEL A — detect_up_test.py (3-class: 0/1/2)
-# ---------------------------------------------------------------------------
-
 def model_a(lm_row):
     def y(i): return lm_row.landmark[i].y
     if y(16) < y(14) or y(20) < y(18):
@@ -109,11 +68,6 @@ def model_a(lm_row):
     if y(8) < y(6) and y(12) < y(10):
         return 2
     return 0
-
-
-# ---------------------------------------------------------------------------
-# MODEL B — hand_command_demo.py (5-class: 0-4)
-# ---------------------------------------------------------------------------
 
 def is_extended(lm_row, tip_id):
     return lm_row.landmark[tip_id].y < lm_row.landmark[tip_id - 2].y
@@ -129,11 +83,6 @@ def model_b(lm_row):
     if index:                               return 1
     return 0
 
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
 def section(title):
     print("\n" + "=" * 64)
     print(f"  {title}")
@@ -147,11 +96,6 @@ def print_metrics(y_true, y_pred, labels, names):
     f = f1_score       (y_true, y_pred, average="macro", labels=labels, zero_division=0)
     print(f"Macro averages:  Precision={p:.4f}  Recall={r:.4f}  F1={f:.4f}")
     return p, r, f
-
-
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
 
 print(f"\n{'='*64}")
 print("  Hand Gesture CV Model Evaluation — Model A vs Model B")
