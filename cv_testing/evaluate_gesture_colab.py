@@ -8,7 +8,7 @@ from sklearn.metrics import (
 import matplotlib.pyplot as plt
 
 
-CSV_PATH = "hand_landmarks_data.csv" 
+CSV_PATH = "https://raw.githubusercontent.com/sokaryy/hand-gesture-classification-hagrid/main/data/hand_landmarks_data.csv"
 
 HAGRID_MAP = {
     "one":    1,
@@ -27,13 +27,19 @@ def map_hagrid_label(label):
     return HAGRID_MAP.get(str(label).strip().lower(), None)  # None = exclude
 
 def detect_format(csv_path):
-    with open(csv_path) as f:
-        first_line = f.readline()
-    has_header = not first_line.split(",")[0].strip().lstrip("-").replace(".", "").isdigit()
-    if has_header:
-        return "hagrid", pd.read_csv(csv_path)
+    if csv_path.startswith("http"):
+        first_line = pd.read_csv(csv_path, nrows=1).columns[0]
+        has_header = not str(first_line).lstrip("-").replace(".", "").isdigit()
+        df = pd.read_csv(csv_path)
+        return ("hagrid" if has_header else "original"), df
     else:
-        return "original", pd.read_csv(csv_path, header=None)
+        with open(csv_path) as f:
+            first_line = f.readline()
+        has_header = not first_line.split(",")[0].strip().lstrip("-").replace(".", "").isdigit()
+        if has_header:
+            return "hagrid", pd.read_csv(csv_path)
+        else:
+            return "original", pd.read_csv(csv_path, header=None)
 
 class LM:
     def __init__(self, x, y):
