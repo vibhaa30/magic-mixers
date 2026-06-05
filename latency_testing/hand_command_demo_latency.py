@@ -1,12 +1,3 @@
-"""
-Hand-tracking controller.
-
-Left hand  -> selects a feature (0-4) based on how many fingers are extended.
-Right hand -> controls amplitude via the thumb/index pinch angle.
-
-Both values are sent over SPI as a pair of bytes: [feature, amplitude].
-"""
-
 import math
 import time
 from collections import deque
@@ -16,10 +7,6 @@ import mediapipe as mp
 import spidev
 from picamera2 import Picamera2
 from latency_measure import LatencyProfiler
-
-# ---------------------------------------------------------------------------
-# Constants
-# ---------------------------------------------------------------------------
 
 # MediaPipe landmark indices for fingertips
 THUMB_TIP  = 4
@@ -46,11 +33,6 @@ SPI_DEVICE = 0
 SPI_SPEED  = 1_000_000
 SPI_MODE   = 0b00
 
-
-# ---------------------------------------------------------------------------
-# Setup
-# ---------------------------------------------------------------------------
-
 mp_hands = mp.solutions.hands
 mp_draw  = mp.solutions.drawing_utils
 hands    = mp_hands.Hands(max_num_hands=2, min_detection_confidence=0.7)
@@ -68,17 +50,7 @@ spi.open(SPI_BUS, SPI_DEVICE)
 spi.mode = SPI_MODE
 spi.max_speed_hz = SPI_SPEED
 
-# ---------------------------------------------------------------------------
-# Latency profiler
-# Set gpio_echo_pin to a BCM pin number if you have an echo wire from STM32.
-# Leave as None to measure software-side latency only (frame + SPI transfer).
-# ---------------------------------------------------------------------------
 profiler = LatencyProfiler(spi, gpio_echo_pin=None)
-
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
 
 def is_finger_extended(landmarks, tip_id):
     """True if a non-thumb finger is extended (tip above the PIP joint in image space)."""
@@ -123,10 +95,6 @@ def left_hand_feature(landmarks):
 
 
 def right_hand_amplitude(landmarks):
-    """
-    Quantize the angle between thumb tip and index tip (relative to the thumb base)
-    into 0..NUM_REGIONS-1.
-    """
     index_tip  = landmarks.landmark[INDEX_TIP]
     thumb_tip  = landmarks.landmark[THUMB_TIP]
     thumb_base = landmarks.landmark[1]
@@ -155,11 +123,6 @@ def right_hand_amplitude(landmarks):
 
 def spi_send(feature, intensity):
     spi.xfer([int(feature), int(intensity)])
-
-
-# ---------------------------------------------------------------------------
-# Main loop
-# ---------------------------------------------------------------------------
 
 amplitude_buffer = deque(maxlen=SMOOTHING_WINDOW)
 current_feature  = 0
@@ -193,13 +156,11 @@ try:
                     amplitude_buffer.append(right_hand_amplitude(hand_lms))
                     right_detected  = True
 
-        # ---- Only update when a hand is actually visible ----------------
         if not amplitude_buffer:
             smoothed_amplitude = 0
         else:
             smoothed_amplitude = round(sum(amplitude_buffer) / len(amplitude_buffer))
 
-        # ---- Gate SPI on actual change + dead-zone ----------------------
         feature_changed   = left_detected  and (current_feature != prev_feature)
         amplitude_changed = right_detected and (abs(smoothed_amplitude - prev_amplitude) > AMPLITUDE_DEAD_ZONE)
 
@@ -212,11 +173,7 @@ try:
             # Rolling report every 100 SPI sends
             if profiler.send_count % 100 == 0:
                 profiler.report(f"Rolling report @ send #{profiler.send_count}")
-
-        # =================================================================
-        # HUD RENDERING
-        # =================================================================
-        
+                
         disp_frame = frame.copy()
         h, w = disp_frame.shape[:2]
 
