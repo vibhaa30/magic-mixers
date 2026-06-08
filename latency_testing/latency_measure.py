@@ -93,11 +93,11 @@ class LatencyProfiler:
         print(f"{'='*60}")
 
         sections = [
-            ("Frame latency  (capture → MP result)", self.frame_times),
+            ("Frame latency  (capture to MP result)", self.frame_times),
             ("SPI transfer   (xfer() duration)",      self.spi_times),
         ]
         if self.echo_times:
-            sections.append(("GPIO round-trip (send → STM32 echo)", self.echo_times))
+            sections.append(("GPIO round-trip (send to STM32 echo)", self.echo_times))
 
         for title, data in sections:
             s = self._stats(data)
