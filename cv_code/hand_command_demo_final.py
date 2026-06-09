@@ -27,7 +27,7 @@ RING_TIP   = 16
 PINKY_TIP  = 20
 
 # Amplitude tuning
-ANGLE_MAX        = 45      # max thumb/index opening angle in degrees (empirical)
+ANGLE_MAX        = 60      # max thumb/index opening angle in degrees (empirical)
 NUM_REGIONS      = 256     # quantization levels for amplitude
 SMOOTHING_WINDOW = 10      # larger = smoother but more lag
 
